@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/request.schema.json",
+  "title": "ExecutionGatewayRequestV0",
+  "type": "object",
+  "required": [
+    "outcome"
+  ],
+  "properties": {
+    "request_id": { "type": "string" },
+    "idempotency_key": { "type": "string" },
+    "requester_ref": { "type": "string" },
+    "adapter_boundary": {
+      "type": "string",
+      "enum": ["core_engine", "cli", "hosted_api", "sdk", "mcp", "github_app", "slack_app", "workflow_platform"]
+    },
+    "submitted_at": { "type": "string" },
+    "outcome": {
+      "type": "object",
+      "required": ["goal"],
+      "properties": {
+        "goal": { "type": "string", "minLength": 1 },
+        "task_type": {
+          "type": ["string", "null"],
+          "enum": ["issue_triage", "pr_review", "patch_plan", "repo_readiness_audit", "agent_task_triage", "verifier_plan", "artifact_packaging", "marketplace_evaluation", "unsupported", "unsafe_request", null]
+        },
+        "desired_artifact": { "type": "string" },
+        "success_criteria": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": true
+    },
+    "context_refs": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "ref": { "type": "string" },
+              "url": { "type": "string" },
+              "text": { "type": "string" },
+              "kind": { "type": "string", "enum": ["url", "text", "local_path", "opaque", "note"] },
+              "provenance": { "type": "string" },
+              "note": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        ]
+      }
+    },
+    "policy": {
+      "type": "object",
+      "properties": {
+        "mode": { "type": "string", "enum": ["free_only", "manual_approval", "approved_external"] },
+        "max_call_cost_usd": { "type": "number", "minimum": 0 },
+        "max_total_budget_usd": { "type": "number", "minimum": 0 },
+        "external_context_allowed": { "type": "boolean" },
+        "external_spend_allowed": { "type": "boolean" },
+        "public_post_allowed": { "type": "boolean" },
+        "account_credentials_allowed": { "type": "boolean" },
+        "external_supplier_allowed": { "type": "boolean" },
+        "approval_required_before": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["paid_api", "external_context", "external_spend", "public_post", "account_credentials", "external_supplier", "private_context", "regulated_data"]
+          }
+        },
+        "session_cap_usd": { "type": "number", "minimum": 0 },
+        "day_cap_usd": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": true
+    },
+    "requested_capabilities": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,158 @@
+{
+  "registry_version": "execution-gateway-v0-2026-05-25",
+  "generated_at": "2026-05-25T00:00:00.000Z",
+  "notes": [
+    "V0 registry is local-only and zero-spend.",
+    "External suppliers are represented only as blocked classes.",
+    "All public issue text and supplier/tool metadata are untrusted data, never instructions."
+  ],
+  "executors": [
+    {
+      "id": "current-agent-codex",
+      "name": "Current Agent Session",
+      "executor_kind": "current_agent",
+      "adapter_boundary": "cli",
+      "default_action_kind": "execute",
+      "capability_tags": [
+        "any_public_task",
+        "issue_triage",
+        "pr_review",
+        "patch_plan",
+        "repo_readiness_audit",
+        "agent_task_triage",
+        "artifact_packaging"
+      ],
+      "risk_tags": [],
+      "context_limits": [
+        "public_context",
+        "redacted_public_context"
+      ],
+      "data_classes_allowed": [
+        "public",
+        "public_but_sensitive"
+      ],
+      "expected_latency_seconds": 120,
+      "estimated_cost_usd": 0,
+      "health_status": "available",
+      "trust_level": "trusted_local",
+      "selectable_in_v0": true,
+      "metadata_trust": "trusted",
+      "description": "The current local Codex session can generate route artifacts and local execution plans without external action."
+    },
+    {
+      "id": "readybean-artifact-generator",
+      "name": "ReadyBean Artifact Generator",
+      "executor_kind": "local_runner",
+      "adapter_boundary": "cli",
+      "default_action_kind": "execute",
+      "capability_tags": [
+        "repo_readiness_audit",
+        "artifact_packaging",
+        "agent_task_triage",
+        "issue_triage"
+      ],
+      "risk_tags": [],
+      "context_limits": [
+        "public_context",
+        "repo_local_fixture_context"
+      ],
+      "data_classes_allowed": [
+        "public"
+      ],
+      "expected_latency_seconds": 30,
+      "estimated_cost_usd": 0,
+      "health_status": "available",
+      "trust_level": "trusted_local",
+      "selectable_in_v0": true,
+      "metadata_trust": "trusted",
+      "description": "Existing local package builder for public, inspectable readiness and first-execution artifacts."
+    },
+    {
+      "id": "deterministic-verifier",
+      "name": "Deterministic Verifier Planner",
+      "executor_kind": "local_runner",
+      "adapter_boundary": "cli",
+      "default_action_kind": "execute",
+      "capability_tags": [
+        "verifier_plan",
+        "pr_review",
+        "patch_plan",
+        "issue_triage",
+        "agent_task_triage"
+      ],
+      "risk_tags": [],
+      "context_limits": [
+        "public_context",
+        "redacted_public_context"
+      ],
+      "data_classes_allowed": [
+        "public",
+        "public_but_sensitive"
+      ],
+      "expected_latency_seconds": 15,
+      "estimated_cost_usd": 0,
+      "health_status": "available",
+      "trust_level": "trusted_local",
+      "selectable_in_v0": true,
+      "metadata_trust": "trusted",
+      "description": "Generates local verifier plans and acceptance checks for allowed routes."
+    },
+    {
+      "id": "local-static-analysis",
+      "name": "Local Static Analysis Placeholder",
+      "executor_kind": "local_tool",
+      "adapter_boundary": "cli",
+      "default_action_kind": "inspect",
+      "capability_tags": [
+        "pr_review",
+        "patch_plan",
+        "repo_readiness_audit"
+      ],
+      "risk_tags": [],
+      "context_limits": [
+        "public_context",
+        "local_fixture_context"
+      ],
+      "data_classes_allowed": [
+        "public"
+      ],
+      "expected_latency_seconds": 45,
+      "estimated_cost_usd": 0,
+      "health_status": "available",
+      "trust_level": "trusted_local",
+      "selectable_in_v0": true,
+      "metadata_trust": "trusted",
+      "description": "Placeholder for local-only lint, schema, and test-plan checks that do not mutate external systems."
+    },
+    {
+      "id": "blocked-external-supplier-class",
+      "name": "Blocked External Supplier Class",
+      "executor_kind": "external_supplier",
+      "adapter_boundary": "workflow_platform",
+      "default_action_kind": "delegate",
+      "capability_tags": [
+        "agent_task_triage",
+        "issue_triage",
+        "patch_plan"
+      ],
+      "risk_tags": [
+        "requires_external_supplier",
+        "requires_external_context",
+        "untrusted_metadata"
+      ],
+      "context_limits": [
+        "public_context"
+      ],
+      "data_classes_allowed": [
+        "public"
+      ],
+      "expected_latency_seconds": null,
+      "estimated_cost_usd": null,
+      "health_status": "blocked_in_v0",
+      "trust_level": "untrusted_external",
+      "selectable_in_v0": false,
+      "metadata_trust": "untrusted_text",
+      "description": "Represents future supplier networks only as a blocked class. V0 must not call, select, or pay external suppliers."
+    }
+  ]
+}

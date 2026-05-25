@@ -1,0 +1,160 @@
+{
+  "generated_at": "2026-05-25T16:40:31.366Z",
+  "out_dir": ".",
+  "local_only": true,
+  "spend_usd": 0,
+  "external_writes": 0,
+  "external_executions": 0,
+  "files": [
+    {
+      "path": "scripts/execution-gateway-lib.mjs",
+      "exists": true,
+      "sha256": "b4f79865f097546fa92fb4ca9051de972f80e92f1d63208dab411e1c51af68e8"
+    },
+    {
+      "path": "scripts/execution-gateway.mjs",
+      "exists": true,
+      "sha256": "c14cdf112e1bed6183945115966f949c0b62ec51ef24e2295c66ab59746a3eb4"
+    },
+    {
+      "path": "scripts/execution-gateway-tools.mjs",
+      "exists": true,
+      "sha256": "b48b8957ec97c0e3cd3738cd548c9ef4e3d47c8bbf7ccd8761bf888e31b2682f"
+    },
+    {
+      "path": "scripts/execution-gateway-server.mjs",
+      "exists": true,
+      "sha256": "4a2b349505b1c4c531ee522627c4b983dcbf7a7c1e59ea9458f9e224a7baca2e"
+    },
+    {
+      "path": "scripts/work-network-lib.mjs",
+      "exists": true,
+      "sha256": "8943a2be434adc38a8c49dae3084d21bb7dc4fb4bd92ede43c294266ead91678"
+    },
+    {
+      "path": "render.yaml",
+      "exists": true,
+      "sha256": "34670bf63ad1705e9b0c8a2cd51141264f667ec4ef9b9de087cc56ad5a86160d"
+    },
+    {
+      "path": "schemas/execution-gateway/local-api.openapi.json",
+      "exists": true,
+      "sha256": "795815bfd022009c407c4a7ee089ad7bb5e7f26fe36f86b54e4954e8c67b2b93"
+    },
+    {
+      "path": "schemas/execution-gateway/request.schema.json",
+      "exists": true,
+      "sha256": "c840be8a370b7e11322a9f4575bdb030349a58852f18044e7e7efc5837219a38"
+    },
+    {
+      "path": "schemas/execution-gateway/response.schema.json",
+      "exists": true,
+      "sha256": "fd89a9854cd8b1f348c5b6143451c61bb3f48a2ca3d0c8497d060ad3bf456d27"
+    },
+    {
+      "path": "schemas/execution-gateway/outcome_record.schema.json",
+      "exists": true,
+      "sha256": "41db32053765475cdd7b29c5532ac130af7aa305d850050a5827922b3decefe4"
+    },
+    {
+      "path": "schemas/execution-gateway/executor_registry_entry.schema.json",
+      "exists": true,
+      "sha256": "63e5f644910d2ca36883f5d80e578124d31ce0d327fbf8130edc5e7ce62abedb"
+    },
+    {
+      "path": "data/execution-gateway/registry.json",
+      "exists": true,
+      "sha256": "0017111d5cf6242d14ad63b47c50e8140fd4e26cc5a3c3f569a9f2308014ced3"
+    },
+    {
+      "path": "fixtures/execution-gateway/sample-request.json",
+      "exists": true,
+      "sha256": "909873c87b0c99e70976b05333b67c536af4bc544a1f74cf5ae942198d3a7a2d"
+    },
+    {
+      "path": "fixtures/execution-gateway/adversarial-fixtures.json",
+      "exists": true,
+      "sha256": "74d54a9213e27773a3d6485ee3e3be680994d94a5baf5697269bf465aef1860c"
+    },
+    {
+      "path": "fixtures/execution-gateway/proof-tasks.json",
+      "exists": true,
+      "sha256": "7c8ef84e53525023b3bf249975bf583a21e3101035d37ba431fde2b8966b4eaf"
+    },
+    {
+      "path": "fixtures/execution-gateway/generated-proof-tasks.json",
+      "exists": true,
+      "sha256": "1a33252bfa7ea849e9aa3bb2d8c658e53afbc77b6fff6d5f4e275a87f4f1020f"
+    },
+    {
+      "path": "sdk/execution-gateway/js/index.mjs",
+      "exists": true,
+      "sha256": "40dcf93eb0f1da2f5b03e9e6fa3c676dbab91d3e290d7e664d88532770a94a47"
+    },
+    {
+      "path": "sdk/execution-gateway/js/README.md",
+      "exists": true,
+      "sha256": "cae92205d33b79930549cbd413d272176e34ffc28e4d9de075e3a27e5239ec47"
+    },
+    {
+      "path": "sdk/execution-gateway/python/bean_execution_gateway_client.py",
+      "exists": true,
+      "sha256": "971d523e8ee72354b3191030af917366719ff3f9064e4c152f971c29b1cb8357"
+    },
+    {
+      "path": "sdk/execution-gateway/python/README.md",
+      "exists": true,
+      "sha256": "cccc7b731661eedf42980524f0e10fe97f2fbd5edd734d4ee4de2d3440382256"
+    },
+    {
+      "path": "adapters/execution-gateway/mcp-adapter.stub.md",
+      "exists": true,
+      "sha256": "2eb7a3e04e86303d9b7a9f5bb6381926cd0b8e25bc6c5b70cd3454dc9bd0aa24"
+    },
+    {
+      "path": "adapters/execution-gateway/github-app-adapter.stub.md",
+      "exists": true,
+      "sha256": "aa789d5bb15fe6e5c68472ea0e3e2270dcdd7cd0e9decd4f9a4f66b1f2cd0f72"
+    },
+    {
+      "path": "adapters/execution-gateway/slack-app-adapter.stub.md",
+      "exists": true,
+      "sha256": "c040f77c023e1ebd6464e32b8b74504b02ccedcba54edf9d9e1354391e88ac6b"
+    },
+    {
+      "path": "adapters/execution-gateway/workflow-platform-adapter.stub.md",
+      "exists": true,
+      "sha256": "c0928f81f99e8e8da0523abdc415e1d71fa9fd01378e49d0a461427b97d97644"
+    },
+    {
+      "path": "assets/execution-gateway-demo/index.html",
+      "exists": true,
+      "sha256": "7b9c2fba49970d156b7b171decab4f62aab351e95188dbf2c67510ccdf5b58b6"
+    },
+    {
+      "path": "examples/execution-gateway/public-issue-request.json",
+      "exists": true,
+      "sha256": "6d8b06edbd314b50512a2437c8911686e16d494899d705da2aec34df9a2f22a2"
+    },
+    {
+      "path": "examples/execution-gateway/blocked-paid-public-write-request.json",
+      "exists": true,
+      "sha256": "b52660392979528c644d9dd8d49936239b71e09b2b14960a96ea0b301420aa74"
+    },
+    {
+      "path": "package.json",
+      "exists": true,
+      "sha256": "0b92a63b4e3301f7e6160fcee1e4c84433b065e63edc6967ed17e666708ede0c"
+    },
+    {
+      "path": ".gitignore",
+      "exists": true,
+      "sha256": "95b1e37cb3daf077f8d37a26273a6350dee7dcb7ab1a0655f9c189b1fbf24e10"
+    },
+    {
+      "path": "README.md",
+      "exists": true,
+      "sha256": "0922c4dca48abc38601e88c9a3a294981450297d47ced607153ec6656f3e580f"
+    }
+  ]
+}

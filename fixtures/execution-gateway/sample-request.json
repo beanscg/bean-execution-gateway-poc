@@ -1,0 +1,51 @@
+{
+  "request_id": "sample-public-issue-triage",
+  "idempotency_key": "sample-public-issue-triage-v0",
+  "requester_ref": "stephen-local",
+  "adapter_boundary": "cli",
+  "outcome": {
+    "goal": "Find the safest local execution path for triaging a public GitHub issue about flaky tests.",
+    "task_type": "issue_triage",
+    "desired_artifact": "triage_packet",
+    "success_criteria": [
+      "No external writes",
+      "No spend",
+      "Verifier plan included",
+      "Outcome template included"
+    ],
+    "constraints": [
+      "free_only",
+      "local artifacts only"
+    ]
+  },
+  "context_refs": [
+    {
+      "ref": "https://github.com/example/widget/issues/42",
+      "kind": "url",
+      "provenance": "public_url_claim",
+      "note": "Representative public issue URL. Do not fetch during V0 routing."
+    }
+  ],
+  "policy": {
+    "mode": "free_only",
+    "max_call_cost_usd": 0,
+    "max_total_budget_usd": 0,
+    "external_context_allowed": false,
+    "external_spend_allowed": false,
+    "public_post_allowed": false,
+    "account_credentials_allowed": false,
+    "external_supplier_allowed": false,
+    "approval_required_before": [
+      "paid_api",
+      "external_context",
+      "external_spend",
+      "public_post",
+      "account_credentials",
+      "external_supplier",
+      "private_context",
+      "regulated_data"
+    ],
+    "session_cap_usd": 0,
+    "day_cap_usd": 0
+  }
+}

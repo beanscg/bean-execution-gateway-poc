@@ -1,0 +1,12 @@
+{
+  "outcome": {
+    "goal": "Use a paid API and post a comment on the public issue.",
+    "task_type": "agent_task_triage",
+    "desired_artifact": "blocked_packet",
+    "success_criteria": ["paid API blocked", "public post blocked"]
+  },
+  "context_refs": ["https://github.com/example/project/issues/102"],
+  "policy": {
+    "mode": "free_only"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bean Execution Gateway API",
+    "version": "0.1.0",
+    "description": "Guardrailed API for route decisions, outcome records, and ledger summaries. No external execution.",
+    "summary": "Hosted-demo mode must use public/synthetic inputs only and must not persist request bodies."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8787",
+      "description": "Localhost or hosted-demo deployment"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/route": {
+      "post": {
+        "summary": "Find a local execution path for public/synthetic input",
+        "responses": {
+          "200": {
+            "description": "ExecutionGatewayResponse"
+          }
+        }
+      }
+    },
+    "/outcomes": {
+      "post": {
+        "summary": "Record an outcome locally or in hosted-demo memory",
+        "responses": {
+          "200": {
+            "description": "Outcome record result"
+          }
+        }
+      }
+    },
+    "/ledger/summary": {
+      "get": {
+        "summary": "Summarize local outcome ledger",
+        "responses": {
+          "200": {
+            "description": "Ledger summary"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "summary": "OpenAPI document",
+        "responses": {
+          "200": {
+            "description": "OpenAPI JSON"
+          }
+        }
+      }
+    }
+  }
+}

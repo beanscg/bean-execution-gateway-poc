@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: bean-execution-gateway-poc
+    runtime: node
+    plan: free
+    buildCommand: npm run gateway:verify
+    startCommand: npm run gateway:server:hosted-demo
+    envVars:
+      - key: BEAN_GATEWAY_HOSTED_DEMO
+        value: "1"
+      - key: NODE_ENV
+        value: production

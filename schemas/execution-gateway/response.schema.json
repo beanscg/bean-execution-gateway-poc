@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/response.schema.json",
+  "title": "ExecutionGatewayResponseV0",
+  "type": "object",
+  "required": [
+    "route_run_id",
+    "request_id",
+    "generated_at",
+    "adapter_boundary",
+    "active_adapter",
+    "task_type",
+    "decision",
+    "ranked_options",
+    "policy",
+    "cost",
+    "chargeable",
+    "would_require_paid_step",
+    "stop_conditions",
+    "sanitization_report",
+    "artifact_refs"
+  ],
+  "properties": {
+    "route_run_id": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "request_id": { "type": "string" },
+    "request_hash": { "type": "string" },
+    "idempotency_key": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "adapter_boundary": { "type": "string", "enum": ["core_engine"] },
+    "active_adapter": { "type": "string", "enum": ["cli"] },
+    "deferred_adapters": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["hosted_api", "sdk", "mcp", "github_app", "slack_app", "workflow_platform"] }
+    },
+    "task_type": { "type": "string" },
+    "decision": {
+      "type": "object",
+      "required": ["action_kind", "executor_kind", "policy_state", "policy_decision", "selected_executor_id", "recommendation", "permission_statement"],
+      "properties": {
+        "action_kind": { "type": "string", "enum": ["execute", "inspect", "delegate", "ask_user", "defer", "reject"] },
+        "executor_kind": { "type": "string", "enum": ["current_agent", "local_runner", "local_tool", "workflow", "external_supplier", "human"] },
+        "policy_state": { "type": "string", "enum": ["allowed", "approval_required", "blocked"] },
+        "policy_decision": { "type": "string", "enum": ["allow", "allow_with_redaction", "needs_approval", "deny"] },
+        "selected_executor_id": { "type": ["string", "null"] },
+        "recommendation": { "type": "string" },
+        "permission_statement": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "ranked_options": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["mode", "policy_state", "policy_decision", "reasons", "approval_required_before"],
+      "properties": {
+        "mode": { "type": "string" },
+        "policy_state": { "type": "string", "enum": ["allowed", "approval_required", "blocked"] },
+        "policy_decision": { "type": "string", "enum": ["allow", "allow_with_redaction", "needs_approval", "deny"] },
+        "reasons": { "type": "array", "items": { "type": "string" } },
+        "approval_required_before": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "cost": {
+      "type": "object",
+      "required": ["chargeable", "estimated_call_cost_usd", "estimated_total_cost_usd", "shadow_cost_estimate_usd", "would_require_paid_step"],
+      "properties": {
+        "chargeable": { "type": "boolean", "const": false },
+        "estimated_call_cost_usd": { "type": "number" },
+        "estimated_total_cost_usd": { "type": "number" },
+        "max_call_cost_usd": { "type": "number" },
+        "max_total_budget_usd": { "type": "number" },
+        "shadow_cost_estimate_usd": { "type": "number" },
+        "would_require_paid_step": { "type": "boolean" }
+      },
+      "additionalProperties": true
+    },
+    "chargeable": { "type": "boolean", "const": false },
+    "would_require_paid_step": { "type": "boolean" },
+    "stop_conditions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["requires_private_repo_access", "requires_paid_api", "requires_public_post", "requires_account_credentials", "requires_external_supplier", "requires_regulated_data", "unsafe_or_disallowed"]
+      }
+    },
+    "sanitization_report": {
+      "type": "object",
+      "required": ["status", "data_class", "untrusted_context_count", "redactions_applied", "findings"],
+      "properties": {
+        "status": { "type": "string" },
+        "data_class": { "type": "string", "enum": ["public", "public_but_sensitive", "private", "secret", "regulated", "unknown"] },
+        "untrusted_context_count": { "type": "number" },
+        "redactions_applied": { "type": "number" },
+        "findings": { "type": "object" }
+      },
+      "additionalProperties": true
+    },
+    "artifact_refs": {
+      "type": "object",
+      "required": ["response_json", "context_packet_md", "verifier_md", "outcome_template_json"],
+      "properties": {
+        "response_json": { "type": "string" },
+        "context_packet_md": { "type": "string" },
+        "verifier_md": { "type": "string" },
+        "outcome_template_json": { "type": "string" }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

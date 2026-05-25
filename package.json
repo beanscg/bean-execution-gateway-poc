@@ -1,0 +1,14 @@
+{
+  "name": "bean-execution-gateway-poc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "npm run gateway:server:hosted-demo",
+    "gateway:server:hosted-demo": "BEAN_GATEWAY_HOSTED_DEMO=1 node scripts/execution-gateway-server.mjs --host 0.0.0.0 --port ${PORT:-8787}",
+    "gateway:verify": "node scripts/execution-gateway.mjs verify --out dist/execution-gateway/verification"
+  }
+}

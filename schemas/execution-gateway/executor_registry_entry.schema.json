@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/executor_registry_entry.schema.json",
+  "title": "ExecutorRegistryEntryV0",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "executor_kind",
+    "adapter_boundary",
+    "capability_tags",
+    "risk_tags",
+    "context_limits",
+    "data_classes_allowed",
+    "expected_latency_seconds",
+    "estimated_cost_usd",
+    "health_status",
+    "trust_level",
+    "selectable_in_v0",
+    "metadata_trust"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "executor_kind": { "type": "string", "enum": ["current_agent", "local_runner", "local_tool", "workflow", "external_supplier", "human"] },
+    "adapter_boundary": { "type": "string", "enum": ["core_engine", "cli", "hosted_api", "sdk", "mcp", "github_app", "slack_app", "workflow_platform"] },
+    "default_action_kind": { "type": "string", "enum": ["execute", "inspect", "delegate", "ask_user", "defer", "reject"] },
+    "capability_tags": { "type": "array", "items": { "type": "string" } },
+    "risk_tags": { "type": "array", "items": { "type": "string" } },
+    "context_limits": { "type": "array", "items": { "type": "string" } },
+    "data_classes_allowed": {
+      "type": "array",
+      "items": { "type": "string", "enum": ["public", "public_but_sensitive", "private", "secret", "regulated", "unknown"] }
+    },
+    "expected_latency_seconds": { "type": ["number", "null"] },
+    "estimated_cost_usd": { "type": ["number", "null"] },
+    "health_status": { "type": "string" },
+    "trust_level": { "type": "string" },
+    "selectable_in_v0": { "type": "boolean" },
+    "metadata_trust": { "type": "string", "enum": ["trusted", "untrusted_text"] },
+    "description": { "type": "string" }
+  },
+  "additionalProperties": true
+}

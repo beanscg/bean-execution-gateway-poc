@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/outcome_record.schema.json",
+  "title": "OutcomeRecordV0",
+  "type": "object",
+  "required": [
+    "outcome_id",
+    "route_run_id",
+    "recorded_at",
+    "task_type",
+    "verifier_result",
+    "operator_acceptance",
+    "estimated_cost_usd",
+    "actual_cost_usd",
+    "actual_external_writes",
+    "actual_external_executions"
+  ],
+  "properties": {
+    "outcome_id": { "type": "string" },
+    "route_run_id": { "type": "string" },
+    "request_id": { "type": ["string", "null"] },
+    "recorded_at": { "type": "string" },
+    "task_type": { "type": "string" },
+    "policy_state": { "type": ["string", "null"], "enum": ["allowed", "approval_required", "blocked", null] },
+    "policy_decision": { "type": ["string", "null"], "enum": ["allow", "allow_with_redaction", "needs_approval", "deny", null] },
+    "route_recommendation": { "type": ["string", "null"] },
+    "selected_route": { "type": ["string", "null"] },
+    "verifier_result": { "type": "string" },
+    "operator_acceptance": { "type": "string" },
+    "elapsed_seconds": { "type": ["number", "null"] },
+    "estimated_cost_usd": { "type": "number" },
+    "actual_cost_usd": { "type": "number" },
+    "actual_external_writes": { "type": "number" },
+    "actual_external_executions": { "type": "number" },
+    "rejection_or_rework_reason": { "type": ["string", "null"] },
+    "evidence_refs": { "type": "object" },
+    "sensitive_payload_hash": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

@@ -1,0 +1,12 @@
+{
+  "outcome": {
+    "goal": "Triage a public GitHub issue and produce a local next-step packet.",
+    "task_type": "issue_triage",
+    "desired_artifact": "triage_packet",
+    "success_criteria": ["local artifact", "verifier plan", "no public comment"]
+  },
+  "context_refs": ["https://github.com/example/project/issues/101"],
+  "policy": {
+    "mode": "free_only"
+  }
+}
