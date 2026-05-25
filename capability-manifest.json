@@ -12,11 +12,23 @@
     { "method": "GET", "path": "/v0/health", "purpose": "Health and safety-mode check" },
     { "method": "GET", "path": "/v0/ready", "purpose": "Readiness and production gate status" },
     { "method": "GET", "path": "/v0/metrics", "purpose": "Metadata-only runtime metrics" },
+    { "method": "GET", "path": "/v0/examples", "purpose": "Return proof examples and hero metric definitions" },
     { "method": "POST", "path": "/v0/route", "purpose": "Return route decision for a public or synthetic outcome request" },
+    { "method": "POST", "path": "/v0/feedback", "purpose": "Record metadata-only route usefulness feedback" },
     { "method": "POST", "path": "/v0/dispatch", "purpose": "Disabled dispatch endpoint that proves V0 never executes externally" },
     { "method": "POST", "path": "/v0/outcomes", "purpose": "Record outcome locally or in hosted-demo memory" },
     { "method": "GET", "path": "/v0/ledger/summary", "purpose": "Summarize outcome records" },
-    { "method": "GET", "path": "/v0/openapi.json", "purpose": "OpenAPI contract" }
+    { "method": "GET", "path": "/v0/openapi.json", "purpose": "OpenAPI contract" },
+    { "method": "GET", "path": "/v0/open-demand/examples", "purpose": "Return open-demand proof examples" },
+    { "method": "POST", "path": "/v0/open-demand/scan", "purpose": "Scan fixture or read-only public GitHub demand" },
+    { "method": "POST", "path": "/v0/open-demand/opportunities/{opportunity_id}/bundle", "purpose": "Build a local task packet" },
+    { "method": "POST", "path": "/v0/open-demand/tasks/{task_id}/run", "purpose": "Run static verifier and evidence packet loop" },
+    { "method": "POST", "path": "/v0/open-demand/feedback", "purpose": "Record metadata-only open-demand feedback" }
+  ],
+  "hero_metrics_v0": [
+    "executable_path_rate",
+    "time_to_ranked_paths_seconds",
+    "unsafe_actions_prevented"
   ],
   "guarantees_v0": {
     "spend_usd": 0,

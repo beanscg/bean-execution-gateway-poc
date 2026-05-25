@@ -1,0 +1,9 @@
+{
+  "target_type": "open_demand_opportunity",
+  "target_id": "fixture_oss_docs_test_01",
+  "helpful": true,
+  "route_useful": true,
+  "would_have_built_manually": false,
+  "saved_time_estimate_minutes": 12,
+  "reason_code": "routed_to_useful_path"
+}

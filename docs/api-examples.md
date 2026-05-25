@@ -32,6 +32,33 @@ Key fields:
 }
 ```
 
+## Proof Examples
+
+```bash
+curl -s https://bean-execution-gateway-poc.onrender.com/v0/examples
+```
+
+Expected shape:
+
+```json
+{
+  "api_version": "v0",
+  "examples": [
+    {
+      "id": "public_issue_to_packet",
+      "title": "Public issue to local packet"
+    }
+  ],
+  "hero_metric_definitions": [
+    {
+      "id": "executable_path_rate",
+      "label": "Executable path rate"
+    }
+  ],
+  "external_actions_allowed": false
+}
+```
+
 ## Allowed Route
 
 ```bash
@@ -98,6 +125,53 @@ Expected shape:
   "api_version": "v0",
   "ok": false,
   "error": "hosted_demo_rejects_private_work_or_secret_like_context"
+}
+```
+
+## Open-Demand Scan
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/open-demand/scan \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-scan-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "api_version": "v0",
+  "external_actions_performed": false,
+  "metrics": {
+    "opportunities_scanned": 6,
+    "selected_candidates": 4
+  },
+  "hero_metrics": {
+    "measurement_scope": "metadata_only_public_demo",
+    "executable_path_rate": 0.667,
+    "unsafe_actions_prevented": 18
+  }
+}
+```
+
+## Open-Demand Feedback
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/open-demand/feedback \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-feedback-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "api_version": "v0",
+  "accepted": true,
+  "free_text_stored": false,
+  "feedback": {
+    "reason_code": "routed_to_useful_path"
+  }
 }
 ```
 

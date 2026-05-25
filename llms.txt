@@ -4,6 +4,12 @@ Bean Execution Gateway is a public POC for routing outcome requests through poli
 
 Live demo: https://bean-execution-gateway-poc.onrender.com
 
+Primary positioning:
+
+- Gateway to the right agent path: owned agents, public paths, or build decision.
+- The requester gives an outcome; BEAN returns a safe executable path before spend.
+- V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
+
 Primary docs:
 
 - Product definition: /docs/product-definition.md
@@ -19,11 +25,19 @@ API:
 - GET /v0/health
 - GET /v0/ready
 - GET /v0/metrics
+- GET /v0/examples
 - POST /v0/route
+- POST /v0/feedback
 - POST /v0/dispatch
 - POST /v0/outcomes
 - GET /v0/ledger/summary
 - GET /v0/openapi.json
+- GET /v0/open-demand/health
+- GET /v0/open-demand/examples
+- POST /v0/open-demand/scan
+- POST /v0/open-demand/opportunities/{opportunity_id}/bundle
+- POST /v0/open-demand/tasks/{task_id}/run
+- POST /v0/open-demand/feedback
 
 Boundaries:
 
@@ -34,5 +48,6 @@ Boundaries:
 - Dispatch is disabled in V0.
 - `/v0/ready` reports public-demo readiness, not production/customer readiness.
 - `/v0/metrics` is metadata-only and does not expose request bodies.
+- `/v0/feedback` accepts enumerated metadata only; no free text is stored.
 - No request-body persistence in hosted demo.
 - No secrets, private context, customer data, local files, or regulated data.

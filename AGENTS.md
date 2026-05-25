@@ -14,6 +14,7 @@ This repository is a public-only POC package for Bean Execution Gateway.
 
 - Improve public docs, schemas, examples, static demo UI, local verification, and local route logic.
 - Add synthetic fixtures that prove blocked and allowed behavior.
+- Add metadata-only metrics or enumerated feedback. Do not store free text or request bodies.
 - Add SDK or adapter stubs only when they do not call external systems.
 - Run local verification and hosted smoke checks.
 - Improve readiness, metrics, rate limits, security headers, and docs while keeping dispatch disabled.

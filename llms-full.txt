@@ -6,19 +6,34 @@ Bean Execution Gateway is a route-decision layer for agents. It accepts an outco
 
 The POC demonstrates the control plane for source-agnostic agent execution. Demand may come from GitHub, chat, browser agents, workflow runners, app wrappers, or internal automation. Supply may eventually include owned agents, local runners, workflow tools, and external supplier networks. V0 does not call external suppliers.
 
+The clearest positioning is: gateway to the right agent path. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, or a build decision before anyone pays for compute.
+
 ## Current Capabilities
 
 - Public hosted demo.
 - `/v0/route` route decisions.
 - `/v0/ready` readiness and production gate status.
 - `/v0/metrics` metadata-only counters.
+- `/v0/examples` proof examples and hero metric definitions.
+- `/v0/feedback` metadata-only route usefulness feedback.
 - `/v0/dispatch` disabled dispatch proof endpoint.
 - `/v0/outcomes` memory-only hosted outcome records or local ledger writes.
 - `/v0/ledger/summary` outcome ledger summaries.
 - `/v0/openapi.json` OpenAPI contract.
+- `/v0/open-demand/scan` public-demand scan with negative controls.
+- `/v0/open-demand/opportunities/{opportunity_id}/bundle` local task packet generation.
+- `/v0/open-demand/tasks/{task_id}/run` static verifier and evidence packet generation.
 - CLI route, evaluate, verify, OpenAPI, registry lint, and hosted smoke commands.
 - JS SDK wrapper and Python local stub.
 - Executor registry with selectable local zero-cost executors and blocked external supplier class.
+
+## Hero Metrics
+
+- Executable path rate: share of scanned public signals that become safe local packet candidates.
+- Time to ranked paths: wall-clock scan time to ranked agent paths.
+- Unsafe actions prevented: count of spend, private-data, account, public-write, and external-submission gates stopped before execution.
+
+These are public-demo proof signals, not revenue, customer SLA, or production reliability claims.
 
 ## Safety Contract
 
@@ -28,6 +43,7 @@ The POC demonstrates the control plane for source-agnostic agent execution. Dema
 - Hosted demo emits security headers and rate-limit headers.
 - Dispatch is disabled in V0.
 - Metrics are metadata-only and do not expose request bodies.
+- Feedback is metadata-only and rejects free text fields.
 - Route decisions are not permission for external actions.
 - Hosted demo does not persist request bodies.
 

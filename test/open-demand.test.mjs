@@ -4,6 +4,7 @@ import test from 'node:test';
 
 import {
   DECISION_REJECT,
+  PROOF_EXAMPLES,
   createOpenDemandService,
   githubIssueToOpportunity,
   negativeControls,
@@ -84,6 +85,36 @@ test('bundle and verifier lifecycle stays local and gated', async () => {
   assert.equal(report.external_actions_performed, false);
   assert.equal(report.submission_state, 'not_submitted_human_approval_required');
   assert.ok(bundle.guardrails.includes('no_spend'));
+  assert.equal(bundle.local_proof_plan.scope, 'public_or_fixture_only');
+  assert.ok(bundle.local_proof_plan.stop_conditions.includes('spend_required'));
+  assert.ok(report.tests_or_checks.length > 0);
+});
+
+test('proof examples and feedback stay metadata-only', () => {
+  const service = createOpenDemandService({ fetchImpl: fakeFetch });
+  const examples = service.examples();
+
+  assert.ok(PROOF_EXAMPLES.length >= 5);
+  assert.equal(examples.external_actions_allowed, false);
+  assert.ok(examples.hero_metric_definitions.some((item) => item.id === 'executable_path_rate'));
+
+  const feedback = service.feedback({
+    target_type: 'open_demand_opportunity',
+    target_id: 'fixture_oss_docs_test_01',
+    helpful: true,
+    route_useful: true,
+    would_have_built_manually: false,
+    saved_time_estimate_minutes: 12,
+    reason_code: 'routed_to_useful_path',
+  });
+  assert.equal(feedback.accepted, true);
+  assert.equal(feedback.feedback.free_text_stored, false);
+  assert.equal(feedback.feedback_summary.helpful, 1);
+
+  assert.throws(
+    () => service.feedback({ target_type: 'route', target_id: 'x', comment: 'free text is not accepted' }),
+    /feedback_accepts_metadata_only/,
+  );
 });
 
 test('negative controls reject spend and private data', () => {
@@ -135,16 +166,45 @@ test('public server exposes open-demand lifecycle without auth or external write
     assert.equal(scan.statusCode, 200);
     assert.equal(scan.body.external_actions_performed, false);
     assert.equal(scan.body.metrics.guardrail_violations, 0);
+    assert.equal(scan.body.hero_metrics.measurement_scope, 'metadata_only_public_demo');
+    assert.ok(scan.body.hero_metrics.definitions.length >= 3);
 
     const opportunity = scan.body.opportunities.find((item) => item.decision !== DECISION_REJECT);
     const bundle = await requestJson(baseUrl, `/v0/open-demand/opportunities/${opportunity.id}/bundle`, { method: 'POST' });
     assert.equal(bundle.statusCode, 201);
     assert.equal(bundle.body.bundle.external_actions_allowed, false);
+    assert.equal(bundle.body.bundle.local_proof_plan.scope, 'public_or_fixture_only');
 
     const run = await requestJson(baseUrl, `/v0/open-demand/tasks/${bundle.body.bundle.task_id}/run`, { method: 'POST' });
     assert.equal(run.statusCode, 201);
     assert.equal(run.body.run.external_actions_performed, false);
     assert.equal(run.body.report.submission_state, 'not_submitted_human_approval_required');
+
+    const examples = await requestJson(baseUrl, '/v0/examples');
+    assert.equal(examples.statusCode, 200);
+    assert.ok(examples.body.examples.length >= 5);
+
+    const feedback = await requestJson(baseUrl, '/v0/open-demand/feedback', {
+      method: 'POST',
+      body: {
+        target_type: 'open_demand_opportunity',
+        target_id: opportunity.id,
+        helpful: true,
+        route_useful: true,
+        would_have_built_manually: false,
+        saved_time_estimate_minutes: 7,
+        reason_code: 'routed_to_useful_path',
+      },
+    });
+    assert.equal(feedback.statusCode, 201);
+    assert.equal(feedback.body.free_text_stored, false);
+
+    const metrics = await requestJson(baseUrl, '/v0/metrics');
+    assert.equal(metrics.statusCode, 200);
+    assert.equal(metrics.body.metrics.open_demand.scans, 1);
+    assert.equal(metrics.body.metrics.open_demand.bundles, 1);
+    assert.equal(metrics.body.metrics.open_demand.runs, 1);
+    assert.equal(metrics.body.metrics.open_demand.feedback, 1);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

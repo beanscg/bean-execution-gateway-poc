@@ -223,6 +223,53 @@
         }
       }
     },
+    "/v0/examples": {
+      "get": {
+        "operationId": "getGatewayExamplesV0",
+        "summary": "Get proof examples and hero metric definitions",
+        "description": "Returns public demo examples. Examples are safe public or synthetic requests only.",
+        "responses": {
+          "200": {
+            "description": "Proof examples and hero metric definitions"
+          }
+        }
+      }
+    },
+    "/v0/feedback": {
+      "post": {
+        "operationId": "postFeedbackV0",
+        "summary": "Record metadata-only route usefulness feedback",
+        "description": "Accepts enumerated feedback only. Free text, emails, private context, secrets, and request bodies are not stored.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayFeedbackV0"
+              },
+              "examples": {
+                "usefulPath": {
+                  "value": {
+                    "target_type": "open_demand_opportunity",
+                    "target_id": "fixture_oss_docs_test_01",
+                    "helpful": true,
+                    "route_useful": true,
+                    "would_have_built_manually": false,
+                    "saved_time_estimate_minutes": 12,
+                    "reason_code": "routed_to_useful_path"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback accepted"
+          }
+        }
+      }
+    },
     "/v0/open-demand/health": {
       "get": {
         "operationId": "getOpenDemandHealthV0",
@@ -231,6 +278,18 @@
         "responses": {
           "200": {
             "description": "Open-demand health"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/examples": {
+      "get": {
+        "operationId": "getGatewayExamplesV0",
+        "summary": "Get proof examples and hero metric definitions",
+        "description": "Returns public demo examples. Examples are safe public or synthetic requests only.",
+        "responses": {
+          "200": {
+            "description": "Proof examples and hero metric definitions"
           }
         }
       }
@@ -331,6 +390,41 @@
         "responses": {
           "200": {
             "description": "Evidence packet"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/feedback": {
+      "post": {
+        "operationId": "postFeedbackV0",
+        "summary": "Record metadata-only route usefulness feedback",
+        "description": "Accepts enumerated feedback only. Free text, emails, private context, secrets, and request bodies are not stored.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayFeedbackV0"
+              },
+              "examples": {
+                "usefulPath": {
+                  "value": {
+                    "target_type": "open_demand_opportunity",
+                    "target_id": "fixture_oss_docs_test_01",
+                    "helpful": true,
+                    "route_useful": true,
+                    "would_have_built_manually": false,
+                    "saved_time_estimate_minutes": 12,
+                    "reason_code": "routed_to_useful_path"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback accepted"
           }
         }
       }
@@ -529,6 +623,53 @@
         }
       }
     },
+    "/examples": {
+      "get": {
+        "operationId": "getGatewayExamplesV0",
+        "summary": "Get proof examples and hero metric definitions",
+        "description": "Returns public demo examples. Examples are safe public or synthetic requests only.",
+        "responses": {
+          "200": {
+            "description": "Proof examples and hero metric definitions"
+          }
+        }
+      }
+    },
+    "/feedback": {
+      "post": {
+        "operationId": "postFeedbackV0",
+        "summary": "Record metadata-only route usefulness feedback",
+        "description": "Accepts enumerated feedback only. Free text, emails, private context, secrets, and request bodies are not stored.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayFeedbackV0"
+              },
+              "examples": {
+                "usefulPath": {
+                  "value": {
+                    "target_type": "open_demand_opportunity",
+                    "target_id": "fixture_oss_docs_test_01",
+                    "helpful": true,
+                    "route_useful": true,
+                    "would_have_built_manually": false,
+                    "saved_time_estimate_minutes": 12,
+                    "reason_code": "routed_to_useful_path"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback accepted"
+          }
+        }
+      }
+    },
     "/open-demand/health": {
       "get": {
         "operationId": "getOpenDemandHealthV0",
@@ -537,6 +678,18 @@
         "responses": {
           "200": {
             "description": "Open-demand health"
+          }
+        }
+      }
+    },
+    "/open-demand/examples": {
+      "get": {
+        "operationId": "getGatewayExamplesV0",
+        "summary": "Get proof examples and hero metric definitions",
+        "description": "Returns public demo examples. Examples are safe public or synthetic requests only.",
+        "responses": {
+          "200": {
+            "description": "Proof examples and hero metric definitions"
           }
         }
       }
@@ -637,6 +790,41 @@
         "responses": {
           "200": {
             "description": "Evidence packet"
+          }
+        }
+      }
+    },
+    "/open-demand/feedback": {
+      "post": {
+        "operationId": "postFeedbackV0",
+        "summary": "Record metadata-only route usefulness feedback",
+        "description": "Accepts enumerated feedback only. Free text, emails, private context, secrets, and request bodies are not stored.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GatewayFeedbackV0"
+              },
+              "examples": {
+                "usefulPath": {
+                  "value": {
+                    "target_type": "open_demand_opportunity",
+                    "target_id": "fixture_oss_docs_test_01",
+                    "helpful": true,
+                    "route_useful": true,
+                    "would_have_built_manually": false,
+                    "saved_time_estimate_minutes": 12,
+                    "reason_code": "routed_to_useful_path"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Feedback accepted"
           }
         }
       }
@@ -811,6 +999,51 @@
           "payable_usd": {
             "type": "number",
             "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "GatewayFeedbackV0": {
+        "type": "object",
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "route",
+              "open_demand_scan",
+              "open_demand_opportunity",
+              "open_demand_task",
+              "open_demand_report",
+              "open_demand_route"
+            ]
+          },
+          "target_id": {
+            "type": "string"
+          },
+          "helpful": {
+            "type": "boolean"
+          },
+          "route_useful": {
+            "type": "boolean"
+          },
+          "would_have_built_manually": {
+            "type": "boolean"
+          },
+          "saved_time_estimate_minutes": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 240
+          },
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "routed_to_useful_path",
+              "blocked_correctly",
+              "bad_routing",
+              "unclear_value",
+              "missing_supplier",
+              "too_slow"
+            ]
           }
         },
         "additionalProperties": false

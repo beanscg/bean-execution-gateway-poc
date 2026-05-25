@@ -31,6 +31,114 @@ const BLOCKED_ACTIONS = [
   'private_data_export',
 ];
 
+const HERO_METRIC_DEFINITIONS = [
+  {
+    id: 'executable_path_rate',
+    label: 'Executable path rate',
+    unit: 'ratio',
+    summary: 'Share of scanned public signals that can become a safe local packet.',
+  },
+  {
+    id: 'time_to_ranked_paths_seconds',
+    label: 'Time to ranked paths',
+    unit: 'seconds',
+    summary: 'Wall-clock time to turn a broad demand scan into ranked agent paths.',
+  },
+  {
+    id: 'unsafe_actions_prevented',
+    label: 'Unsafe actions prevented',
+    unit: 'count',
+    summary: 'Spend, private-data, account, public-write, and external-submission gates stopped before execution.',
+  },
+];
+
+const PROOF_EXAMPLES = [
+  {
+    id: 'public_issue_to_packet',
+    title: 'Public issue to local packet',
+    lane: LANE_OSS_CODE,
+    outcome: 'Turn a public bug report into a maintainer-safe patch packet.',
+    why_it_matters: 'Agents usually receive an outcome, not a named supplier. The gateway finds a safe first path without posting or spending.',
+    expected_signal: 'ranked public issue, task bundle, verifier packet',
+    request: {
+      source_mode: 'fixture',
+      limit: 8,
+    },
+  },
+  {
+    id: 'build_vs_use_existing_agent',
+    title: 'Build vs use existing agent decision',
+    lane: 'agent_path_selection',
+    outcome: 'Decide whether to use an existing public agent pattern or build a new one.',
+    why_it_matters: 'The gateway can make buy/build routing explicit before the requester pays for compute.',
+    expected_signal: 'selected path, local proof plan, human gates',
+    request: {
+      outcome: {
+        goal: 'Find the best agent path for a public repo triage task.',
+        task_type: 'agent_task_triage',
+        desired_artifact: 'agent_path_packet',
+      },
+      context_refs: ['https://github.com/example/project/issues/101'],
+      policy: { mode: 'free_only' },
+    },
+  },
+  {
+    id: 'non_code_public_benchmark',
+    title: 'Non-code public benchmark',
+    lane: LANE_NON_CODE_OPEN_GIG,
+    outcome: 'Use a public benchmark as unpaid training demand.',
+    why_it_matters: 'The product should learn from open work even when there is no immediate payout.',
+    expected_signal: 'repeatable scoring loop without account creation',
+    request: {
+      source_mode: 'fixture',
+      limit: 4,
+    },
+  },
+  {
+    id: 'paid_public_write_block',
+    title: 'Paid public write block',
+    lane: 'safety_gate',
+    outcome: 'Block paid API usage and public posting until an operator approves it.',
+    why_it_matters: 'The requester should not absorb surprise compute, platform, or reputation risk.',
+    expected_signal: 'blocked route with explicit stop conditions',
+    request: {
+      outcome: {
+        goal: 'Use a paid API and post a comment on the public issue.',
+        task_type: 'agent_task_triage',
+        desired_artifact: 'blocked_packet',
+      },
+      context_refs: ['https://github.com/example/project/issues/102'],
+      policy: { mode: 'free_only' },
+    },
+  },
+  {
+    id: 'private_context_reject',
+    title: 'Private context rejection',
+    lane: 'safety_gate',
+    outcome: 'Reject private or secret-like input in the hosted public demo.',
+    why_it_matters: 'The public surface must prove it can say no before it earns trust.',
+    expected_signal: 'hosted-demo rejection, no request-body persistence',
+    request: {
+      outcome: {
+        goal: 'Review a private repo issue and create a patch plan.',
+        task_type: 'patch_plan',
+        desired_artifact: 'blocked_packet',
+      },
+      context_refs: ['private://github/example/internal-repo/issues/9'],
+      policy: { mode: 'free_only' },
+    },
+  },
+];
+
+const FEEDBACK_REASON_CODES = [
+  'routed_to_useful_path',
+  'blocked_correctly',
+  'bad_routing',
+  'unclear_value',
+  'missing_supplier',
+  'too_slow',
+];
+
 const FIXTURE_OPPORTUNITIES = [
   {
     id: 'fixture_oss_docs_test',
@@ -358,7 +466,45 @@ function average(values) {
   return Math.round((numbers.reduce((sum, value) => sum + value, 0) / Math.max(numbers.length, 1)) * 100) / 100;
 }
 
-function metrics(opportunities) {
+function roundRatio(value) {
+  return Math.round(value * 1000) / 1000;
+}
+
+function estimateUnsafeActionsPrevented(opportunities) {
+  return opportunities.reduce((total, item) => {
+    const hard = item.hard_blockers?.length || 0;
+    const human = item.human_blockers?.length || 0;
+    const requiredExternalGates = [
+      item.account_required,
+      item.identity_required,
+      item.external_submission_required,
+      item.public_post_required,
+      Number(item.spend_required_usd || 0) > 0,
+      item.private_data_required,
+    ].filter(Boolean).length;
+    return total + hard + human + requiredExternalGates;
+  }, 0);
+}
+
+function heroMetrics(opportunities, { scanDurationMs = 0, bundleCount = 0, reportCount = 0, feedbackRecords = [] } = {}) {
+  const selected = opportunities.filter((item) => item.decision !== DECISION_REJECT);
+  const selectedZeroSpend = selected.filter((item) => Number(item.spend_required_usd || 0) === 0 && !item.private_data_required);
+  return {
+    schema_version: 'bean.open_demand_hero_metrics.v1',
+    measurement_scope: 'metadata_only_public_demo',
+    executable_path_rate: roundRatio(selected.length / Math.max(opportunities.length, 1)),
+    zero_spend_candidate_count: selectedZeroSpend.length,
+    time_to_ranked_paths_seconds: Math.round((scanDurationMs / 1000) * 100) / 100,
+    unsafe_actions_prevented: estimateUnsafeActionsPrevented(opportunities),
+    ready_packet_count: bundleCount,
+    evidence_packet_count: reportCount,
+    useful_feedback_count: feedbackRecords.filter((item) => item.helpful === true).length,
+    definitions: HERO_METRIC_DEFINITIONS,
+    caveat: 'Prototype metrics are public-demo proof signals, not revenue, customer SLA, or production reliability claims.',
+  };
+}
+
+function metrics(opportunities, scanDurationMs = 0) {
   const selected = opportunities.filter((item) => item.decision !== DECISION_REJECT);
   const rejected = opportunities.filter((item) => item.decision === DECISION_REJECT);
   const selectedAverage = average(selected.map((item) => item.trainability_score));
@@ -372,13 +518,67 @@ function metrics(opportunities) {
     attempted_average_trainability: selectedAverage,
     rejected_average_trainability: rejectedAverage,
     scoring_signal_observed: Boolean(rejected.length) && selectedAverage > rejectedAverage,
+    scan_duration_ms: scanDurationMs,
+  };
+}
+
+function publicRepoCloneUrl(sourceUrl) {
+  const match = String(sourceUrl || '').match(/^https:\/\/github\.com\/([^/\s]+)\/([^/\s]+)(?:\/|$)/);
+  if (!match) return null;
+  return `https://github.com/${match[1]}/${match[2]}.git`;
+}
+
+function buildLocalProofPlan(bundle) {
+  const cloneUrl = publicRepoCloneUrl(bundle.source_url);
+  const isCode = bundle.lane === LANE_OSS_CODE;
+  const publicSource = cloneUrl || bundle.source_url || 'fixture-backed public source';
+  return {
+    schema_version: 'bean.local_proof_plan.v1',
+    scope: 'public_or_fixture_only',
+    goal: 'Prove whether the selected path can be executed locally before any external submission.',
+    source_to_read: publicSource,
+    phases: isCode
+      ? [
+          'Confirm issue and repository are public.',
+          'Clone or inspect the public repository in an isolated workspace.',
+          'Identify the smallest repro, docs, lint, or test command from public metadata.',
+          'Draft a patch or skip rationale locally.',
+          'Run the cheapest local verifier available.',
+          'Stop before branch push, public PR, issue comment, bounty claim, or paid compute.',
+        ]
+      : [
+          'Confirm the benchmark or task source is public.',
+          'Capture scoring criteria and allowed tooling.',
+          'Run a baseline local solution or feasibility check.',
+          'Record repeatability notes and failure modes.',
+          'Stop before account creation, platform submission, identity verification, or paid compute.',
+        ],
+    suggested_commands: isCode
+      ? [
+          cloneUrl ? `git clone ${cloneUrl}` : 'inspect public source URL manually',
+          'rg -n "test|pytest|vitest|npm test|make test|lint" .',
+          'run the smallest discovered local check',
+        ]
+      : [
+          'download or inspect only public fixture/benchmark inputs',
+          'run local scorer or create a scoring checklist',
+          'record baseline result and repeatability notes',
+        ],
+    stop_conditions: [
+      'spend_required',
+      'private_data_required',
+      'account_creation_required',
+      'public_post_required',
+      'external_submission_required',
+      'bounty_claim_required',
+    ],
   };
 }
 
 function buildTaskBundle(opportunity, rank = 0) {
   const taskId = `open-demand-task-${stableDigest(opportunity.id)}`;
   const isCode = opportunity.lane === LANE_OSS_CODE;
-  return {
+  const bundle = {
     schema_version: 'bean.open_demand_task_bundle.v1',
     task_id: taskId,
     rank,
@@ -414,6 +614,10 @@ function buildTaskBundle(opportunity, rank = 0) {
     human_blockers: opportunity.human_blockers || [],
     hard_blockers: opportunity.hard_blockers || [],
     external_actions_allowed: false,
+  };
+  return {
+    ...bundle,
+    local_proof_plan: buildLocalProofPlan(bundle),
   };
 }
 
@@ -480,6 +684,7 @@ function buildEvidencePacket(bundle, run) {
 }
 
 function publicScan(state) {
+  const feedbackRecords = state.feedback_records || [];
   return {
     schema_version: state.schema_version,
     created_at: state.created_at,
@@ -487,10 +692,21 @@ function publicScan(state) {
     guardrails: state.guardrails || GUARDRAILS,
     external_actions_performed: false,
     metrics: state.metrics || {},
+    hero_metrics: heroMetrics(state.opportunities || [], {
+      scanDurationMs: state.metrics?.scan_duration_ms || 0,
+      bundleCount: Object.keys(state.bundles || {}).length,
+      reportCount: Object.keys(state.reports || {}).length,
+      feedbackRecords,
+    }),
     opportunities: state.opportunities || [],
     bundles: Object.values(state.bundles || {}),
     runs: Object.values(state.runs || {}),
     reports: Object.values(state.reports || {}),
+    feedback: {
+      total: feedbackRecords.length,
+      helpful: feedbackRecords.filter((item) => item.helpful === true).length,
+      not_helpful: feedbackRecords.filter((item) => item.helpful === false).length,
+    },
   };
 }
 
@@ -502,26 +718,69 @@ function findByTaskIdSource(items, taskId) {
   return items.find((item) => `open-demand-task-${stableDigest(item.id)}` === taskId) || null;
 }
 
+function normalizeFeedback(input = {}) {
+  const allowedKeys = new Set([
+    'target_type',
+    'target_id',
+    'helpful',
+    'route_useful',
+    'would_have_built_manually',
+    'saved_time_estimate_minutes',
+    'reason_code',
+  ]);
+  const forbidden = Object.keys(input).filter((key) => !allowedKeys.has(key) || /comment|note|text|body|email|secret|token|password|private/i.test(key));
+  if (forbidden.length) {
+    throw new OpenDemandError(`feedback_accepts_metadata_only:${forbidden.join(',')}`, 400);
+  }
+  const targetType = String(input.target_type || 'open_demand_route');
+  if (!['route', 'open_demand_scan', 'open_demand_opportunity', 'open_demand_task', 'open_demand_report', 'open_demand_route'].includes(targetType)) {
+    throw new OpenDemandError('invalid_feedback_target_type', 400);
+  }
+  const reasonCode = String(input.reason_code || 'routed_to_useful_path');
+  if (!FEEDBACK_REASON_CODES.includes(reasonCode)) {
+    throw new OpenDemandError('invalid_feedback_reason_code', 400);
+  }
+  const savedMinutes = Math.max(0, Math.min(Number(input.saved_time_estimate_minutes || 0), 240));
+  return {
+    schema_version: 'bean.open_demand_feedback.v1',
+    feedback_id: `feedback-${stableDigest(JSON.stringify(input), 16)}`,
+    created_at: Math.floor(Date.now() / 1000),
+    target_type: targetType,
+    target_id: safeId(input.target_id || 'unknown', 120),
+    helpful: typeof input.helpful === 'boolean' ? input.helpful : null,
+    route_useful: typeof input.route_useful === 'boolean' ? input.route_useful : null,
+    would_have_built_manually: typeof input.would_have_built_manually === 'boolean' ? input.would_have_built_manually : null,
+    saved_time_estimate_minutes: savedMinutes,
+    reason_code: reasonCode,
+    stored_fields: [...allowedKeys].sort(),
+    free_text_stored: false,
+  };
+}
+
 function createOpenDemandService({ fetchImpl = fetch } = {}) {
   let state = null;
+  const feedbackRecords = [];
   async function scan({ source_mode: sourceMode = 'fixture', limit = 20, query = GITHUB_SEARCH_QUERY } = {}) {
+    const started = Date.now();
     const bounded = boundedLimit(limit);
     if (!['fixture', 'live-github', 'auto'].includes(sourceMode)) {
       throw new OpenDemandError('source_mode must be fixture, live-github, or auto');
     }
     const [opportunities, source] = await discoverOpportunities({ sourceMode, limit: bounded, query, fetchImpl });
     const ranked = rankOpportunities(opportunities);
+    const scanDurationMs = Date.now() - started;
     state = {
       schema_version: 'bean.open_demand_scan.v1',
       created_at: Math.floor(Date.now() / 1000),
       source,
       guardrails: GUARDRAILS,
       external_actions_performed: false,
-      metrics: metrics(ranked),
+      metrics: metrics(ranked, scanDurationMs),
       opportunities: ranked,
       bundles: {},
       runs: {},
       reports: {},
+      feedback_records: feedbackRecords,
     };
     return publicScan(state);
   }
@@ -565,6 +824,33 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
     return { report: found };
   }
 
+  function examples() {
+    return {
+      schema_version: 'bean.open_demand_examples.v1',
+      examples: PROOF_EXAMPLES,
+      hero_metric_definitions: HERO_METRIC_DEFINITIONS,
+      guardrails: GUARDRAILS,
+      external_actions_allowed: false,
+    };
+  }
+
+  function feedback(input) {
+    const record = normalizeFeedback(input);
+    feedbackRecords.push(record);
+    if (state) state.feedback_records = feedbackRecords;
+    return {
+      accepted: true,
+      feedback: record,
+      feedback_summary: {
+        total: feedbackRecords.length,
+        helpful: feedbackRecords.filter((item) => item.helpful === true).length,
+        not_helpful: feedbackRecords.filter((item) => item.helpful === false).length,
+      },
+      request_body_persistence: false,
+      free_text_stored: false,
+    };
+  }
+
   return {
     health() {
       return {
@@ -574,26 +860,33 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
         external_actions_allowed: false,
         latest_available: Boolean(state),
         persistence: 'memory_only',
+        hero_metric_definitions: HERO_METRIC_DEFINITIONS,
       };
     },
+    examples,
     latest,
     opportunities: latest,
     scan,
     bundle,
     run,
     report,
+    feedback,
   };
 }
 
 export {
   BLOCKED_ACTIONS,
   DECISION_REJECT,
+  FEEDBACK_REASON_CODES,
   GITHUB_SEARCH_QUERY,
   GUARDRAILS,
+  HERO_METRIC_DEFINITIONS,
   OpenDemandError,
+  PROOF_EXAMPLES,
   buildTaskBundle,
   createOpenDemandService,
   githubIssueToOpportunity,
+  heroMetrics,
   negativeControls,
   rankOpportunities,
   scoreOpportunity,

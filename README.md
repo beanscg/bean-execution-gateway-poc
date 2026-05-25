@@ -4,6 +4,14 @@ Bean Execution Gateway is a public POC for routing outcome requests through poli
 
 Live demo: https://bean-execution-gateway-poc.onrender.com
 
+Positioning: BEAN is not a live marketplace yet. It is a gateway that helps an agent decide whether to use an owned agent, use an available public path, or build a new agent before anyone pays for compute.
+
+Current proof metrics:
+
+- Executable path rate: share of scanned public signals that can become a safe local packet.
+- Time to ranked paths: wall-clock time from demand scan to ranked agent paths.
+- Unsafe actions prevented: spend, private-data, account, public-write, and external-submission gates stopped before execution.
+
 ## What It Does Now
 
 - Accepts public or synthetic outcome requests through `/v0/route`.
@@ -11,6 +19,8 @@ Live demo: https://bean-execution-gateway-poc.onrender.com
 - Returns a deterministic route decision with ranked local executors, stop conditions, cost fields, sanitizer findings, and verifier artifacts.
 - Records outcomes locally, or in memory only when running as the hosted public demo.
 - Scans fixture or read-only public GitHub demand through `/v0/open-demand/*`, ranks candidate tasks, builds local packets, and runs a static verifier.
+- Exposes proof examples through `/v0/examples`.
+- Accepts metadata-only route feedback through `/v0/feedback` and `/v0/open-demand/feedback`.
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
@@ -45,11 +55,15 @@ BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8791 npm run gateway:smoke:hosted
 curl -s http://127.0.0.1:8787/v0/health
 curl -s http://127.0.0.1:8787/v0/ready
 curl -s http://127.0.0.1:8787/v0/metrics
+curl -s http://127.0.0.1:8787/v0/examples
 curl -s http://127.0.0.1:8787/v0/openapi.json
 curl -s http://127.0.0.1:8787/v0/open-demand/health
 curl -s -X POST http://127.0.0.1:8787/v0/open-demand/scan \
   -H 'content-type: application/json' \
-  -d '{"source_mode":"fixture","limit":6}'
+  --data @examples/execution-gateway/open-demand-scan-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/open-demand/feedback \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-feedback-request.json
 curl -s -X POST http://127.0.0.1:8787/v0/route \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/public-issue-request.json
@@ -98,6 +112,7 @@ Hosted demo input scope:
 - [Safety and trust](docs/safety-and-trust.md)
 - [V1 readiness](docs/v1-readiness.md)
 - [Pre-discovery readiness](docs/pre-discovery-readiness.md)
+- [Public launch packet](docs/public-launch-packet.md)
 - [Live-traffic readiness](docs/live-traffic-readiness.md)
 - [Production cutover](docs/production-cutover.md)
 - [Abuse and rate-limit policy](docs/abuse-and-rate-limit-policy.md)

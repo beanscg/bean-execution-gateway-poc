@@ -188,6 +188,17 @@ function createMetrics() {
     },
     dispatch_attempts: 0,
     outcomes_recorded: 0,
+    feedback_recorded: 0,
+    open_demand: {
+      scans: 0,
+      bundles: 0,
+      runs: 0,
+      reports: 0,
+      examples: 0,
+      feedback: 0,
+      feedback_helpful: 0,
+      guardrail_violations: 0,
+    },
     body_too_large: 0,
     errors: 0,
   };
@@ -425,6 +436,12 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && (pathname === '/examples' || pathname === '/open-demand/examples')) {
+        metrics.open_demand.examples += 1;
+        reply(200, openDemand.examples());
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/open-demand/health') {
         reply(200, openDemand.health());
         return;
@@ -442,6 +459,7 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
 
       if (req.method === 'GET' && pathname.startsWith('/open-demand/tasks/') && pathname.endsWith('/report')) {
         const taskId = pathname.replace(/^\/open-demand\/tasks\//, '').replace(/\/report$/, '');
+        metrics.open_demand.reports += 1;
         reply(200, await openDemand.report(taskId));
         return;
       }
@@ -459,19 +477,45 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
           });
           return;
         }
-        reply(200, await openDemand.scan(body));
+        const payload = await openDemand.scan(body);
+        metrics.open_demand.scans += 1;
+        metrics.open_demand.guardrail_violations += Number(payload.metrics?.guardrail_violations || 0);
+        reply(200, payload);
         return;
       }
 
       if (req.method === 'POST' && pathname.startsWith('/open-demand/opportunities/') && pathname.endsWith('/bundle')) {
         const opportunityId = pathname.replace(/^\/open-demand\/opportunities\//, '').replace(/\/bundle$/, '');
+        metrics.open_demand.bundles += 1;
         reply(201, await openDemand.bundle(decodeURIComponent(opportunityId)));
         return;
       }
 
       if (req.method === 'POST' && pathname.startsWith('/open-demand/tasks/') && pathname.endsWith('/run')) {
         const taskId = pathname.replace(/^\/open-demand\/tasks\//, '').replace(/\/run$/, '');
+        metrics.open_demand.runs += 1;
         reply(201, await openDemand.run(decodeURIComponent(taskId)));
+        return;
+      }
+
+      if (req.method === 'POST' && (pathname === '/feedback' || pathname === '/open-demand/feedback')) {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, {
+            ok: false,
+            hosted_demo: true,
+            error: hostedRejectReason,
+            warning: HOSTED_DEMO_WARNING,
+          });
+          return;
+        }
+        const payload = openDemand.feedback(body);
+        metrics.feedback_recorded += 1;
+        metrics.open_demand.feedback += 1;
+        if (payload.feedback?.helpful === true) metrics.open_demand.feedback_helpful += 1;
+        reply(201, payload);
         return;
       }
 

@@ -81,6 +81,65 @@
       font-size: 14px;
       line-height: 1.4;
     }
+    .hero-overview {
+      margin-bottom: 16px;
+    }
+    .hero-overview h2 {
+      margin: 0 0 7px;
+      font-size: 24px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+    .hero-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .hero-metrics div {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 11px;
+      min-width: 0;
+      background: #fbfcfa;
+    }
+    .hero-metrics strong {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 7px;
+    }
+    .hero-metrics span {
+      display: block;
+      font-size: 19px;
+      font-weight: 850;
+      overflow-wrap: anywhere;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .flow div {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      background: #fff;
+      min-height: 44px;
+    }
+    .example-rail {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .example-rail button {
+      font-size: 13px;
+      background: #fbfcfa;
+    }
     .open-demand {
       margin-bottom: 16px;
     }
@@ -200,6 +259,19 @@
       flex-wrap: wrap;
       margin-top: 10px;
     }
+    .feedback-line {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .feedback-line button {
+      padding: 7px 9px;
+      font-size: 13px;
+    }
     .open-demand-report {
       margin-top: 10px;
       min-height: 120px;
@@ -310,12 +382,12 @@
     @media (max-width: 920px) {
       header { grid-template-columns: 1fr; align-items: start; }
       .grid, .open-demand-head, .open-demand-layout { grid-template-columns: 1fr; }
-      .status, .open-demand-metrics, .open-demand-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .status, .open-demand-metrics, .open-demand-detail-grid, .hero-metrics, .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .open-demand-controls { justify-content: stretch; }
       .open-demand-controls label { min-width: 100%; }
     }
     @media (max-width: 520px) {
-      .status, .open-demand-metrics, .open-demand-detail-grid { grid-template-columns: 1fr; }
+      .status, .open-demand-metrics, .open-demand-detail-grid, .hero-metrics, .flow { grid-template-columns: 1fr; }
       h1 { font-size: 24px; }
     }
   </style>
@@ -325,7 +397,7 @@
     <header>
       <div>
         <h1>Bean Execution Gateway</h1>
-        <p>Gateway route decisions for public or synthetic outcome requests.</p>
+        <p>Gateway to the right agent path: your agents, public agents, or the build decision.</p>
       </div>
       <div class="pill"><span id="healthDot" class="dot"></span><span id="healthText">checking API</span></div>
     </header>
@@ -333,6 +405,24 @@
     <div class="notice">
       Public demo boundary: zero spend, no external writes, no supplier execution, no request-body persistence. Do not paste private, work, company, customer, secret, credential, local-file, internal, or regulated data.
     </div>
+
+    <section class="hero-overview">
+      <h2>Turn an outcome into an executable path before anyone pays for compute.</h2>
+      <p>BEAN scans public demand, chooses the safest next path, packages the local proof step, and stops before spend, account mutation, public posting, or external supplier execution.</p>
+      <div class="hero-metrics" id="heroMetrics">
+        <div><strong>Executable path rate</strong><span>-</span></div>
+        <div><strong>Time to ranked paths</strong><span>-</span></div>
+        <div><strong>Unsafe actions prevented</strong><span>-</span></div>
+      </div>
+      <div class="flow">
+        <div>1. Outcome</div>
+        <div>2. Route</div>
+        <div>3. Discover</div>
+        <div>4. Packet</div>
+        <div>5. Verify</div>
+      </div>
+      <div class="example-rail" id="proofExamples"></div>
+    </section>
 
     <section class="open-demand">
       <div class="open-demand-head">
@@ -386,6 +476,11 @@
           <button class="tab" data-view="json">JSON</button>
         </div>
         <pre id="output">Route a public or synthetic request to see the API response.</pre>
+        <div class="feedback-line">
+          <span id="routeFeedbackStatus">Route feedback is metadata only.</span>
+          <button data-route-feedback="true">Useful route</button>
+          <button data-route-feedback="false">Not useful</button>
+        </div>
       </aside>
     </div>
   </main>
@@ -439,7 +534,11 @@
     const openDemandStatus = document.querySelector('#openDemandStatus');
     const openDemandOpportunities = document.querySelector('#openDemandOpportunities');
     const openDemandDetail = document.querySelector('#openDemandDetail');
+    const heroMetrics = document.querySelector('#heroMetrics');
+    const proofExamples = document.querySelector('#proofExamples');
+    const routeFeedbackStatus = document.querySelector('#routeFeedbackStatus');
     let openDemand = null;
+    let examples = [];
     let selectedOpportunityId = '';
     let lastPayload = null;
     let activeView = 'summary';
@@ -561,6 +660,22 @@
       return mode.replaceAll('_', ' ');
     }
 
+    function renderHeroMetrics(metrics = {}) {
+      const pathRate = metrics.executable_path_rate == null ? '-' : `${Math.round(metrics.executable_path_rate * 100)}%`;
+      const time = metrics.time_to_ranked_paths_seconds == null ? '-' : `${metrics.time_to_ranked_paths_seconds}s`;
+      heroMetrics.innerHTML = [
+        ['Executable path rate', pathRate],
+        ['Time to ranked paths', time],
+        ['Unsafe actions prevented', metrics.unsafe_actions_prevented ?? '-'],
+      ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
+    }
+
+    function renderExamples() {
+      proofExamples.innerHTML = examples.slice(0, 5).map((item) => `
+        <button data-example-id="${escapeHtml(item.id)}">${escapeHtml(item.title)}</button>
+      `).join('');
+    }
+
     function renderOpenDemand() {
       if (!openDemand) {
         openDemandMetrics.innerHTML = '';
@@ -569,13 +684,14 @@
         return;
       }
       const metrics = openDemand.metrics || {};
+      renderHeroMetrics(openDemand.hero_metrics || {});
       openDemandMetrics.innerHTML = [
         ['Source', sourceText(openDemand.source)],
         ['Scanned', metrics.opportunities_scanned ?? 0],
         ['Selected', metrics.selected_candidates ?? 0],
-        ['Top 10 precision', metrics.candidate_precision_top_10 ?? 0],
-        ['Guardrail hits', metrics.guardrail_violations ?? 0],
-      ].map(([label, value]) => `<div><strong>${label}</strong><span>${value}</span></div>`).join('');
+        ['Path precision', metrics.candidate_precision_top_10 ?? 0],
+        ['Risk stops', openDemand.hero_metrics?.unsafe_actions_prevented ?? 0],
+      ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
 
       const opportunities = openDemand.opportunities || [];
       const selected = openDemandOpportunity(selectedOpportunityId) || opportunities.find((item) => item.decision !== 'reject') || opportunities[0] || null;
@@ -609,8 +725,23 @@
           <button data-open-demand-action="run" data-task-id="${escapeHtml(bundle?.task_id || '')}" ${bundle ? '' : 'disabled'}>Run verifier</button>
           <button disabled>External submission gated</button>
         </div>
+        <div class="feedback-line">
+          <span>Was this path useful?</span>
+          <button data-open-demand-action="feedback" data-helpful="true" data-target-id="${escapeHtml(selected.id)}">Useful</button>
+          <button data-open-demand-action="feedback" data-helpful="false" data-target-id="${escapeHtml(selected.id)}">Not useful</button>
+        </div>
         ${bundle ? `<pre class="open-demand-report">${escapeHtml(JSON.stringify(report || bundle, null, 2))}</pre>` : ''}
       `;
+    }
+
+    async function loadExamples() {
+      try {
+        const payload = await (await fetch(`${apiRoot}/v0/examples`)).json();
+        examples = payload.examples || [];
+        renderExamples();
+      } catch (error) {
+        examples = [];
+      }
     }
 
     async function loadOpenDemandLatest() {
@@ -669,6 +800,20 @@
       renderOpenDemand();
     }
 
+    async function sendFeedback(payload, statusElement) {
+      try {
+        const response = await fetch(`${apiRoot}/v0/open-demand/feedback`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const body = await response.json();
+        statusElement.textContent = response.ok ? `Feedback saved (${body.feedback_summary?.total ?? 1} total).` : body.error || 'Feedback rejected.';
+      } catch (error) {
+        statusElement.textContent = error.message;
+      }
+    }
+
     document.querySelector('#safe').addEventListener('click', () => loadSample(safeSample));
     document.querySelector('#blocked').addEventListener('click', () => loadSample(blockedSample));
     document.querySelector('#privateReject').addEventListener('click', () => loadSample(privateRejectSample));
@@ -685,6 +830,46 @@
       if (!control) return;
       if (control.dataset.openDemandAction === 'bundle') await buildOpenDemandPacket(control.dataset.opportunityId);
       if (control.dataset.openDemandAction === 'run') await runOpenDemandVerifier(control.dataset.taskId);
+      if (control.dataset.openDemandAction === 'feedback') {
+        await sendFeedback({
+          target_type: 'open_demand_opportunity',
+          target_id: control.dataset.targetId,
+          helpful: control.dataset.helpful === 'true',
+          route_useful: control.dataset.helpful === 'true',
+          would_have_built_manually: false,
+          saved_time_estimate_minutes: control.dataset.helpful === 'true' ? 10 : 0,
+          reason_code: control.dataset.helpful === 'true' ? 'routed_to_useful_path' : 'bad_routing'
+        }, openDemandStatus);
+        await loadOpenDemandLatest();
+      }
+    });
+    proofExamples.addEventListener('click', async (event) => {
+      const button = event.target.closest('[data-example-id]');
+      if (!button) return;
+      const example = examples.find((item) => item.id === button.dataset.exampleId);
+      if (!example) return;
+      if (example.request?.outcome) {
+        loadSample(example.request);
+        await routeRequest();
+        return;
+      }
+      if (example.request?.source_mode) {
+        openDemandSource.value = example.request.source_mode;
+        await scanOpenDemand();
+      }
+    });
+    document.querySelectorAll('[data-route-feedback]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        await sendFeedback({
+          target_type: 'route',
+          target_id: lastPayload?.payload?.route_run_id || lastPayload?.payload?.http_request_id || 'route-demo',
+          helpful: button.dataset.routeFeedback === 'true',
+          route_useful: button.dataset.routeFeedback === 'true',
+          would_have_built_manually: false,
+          saved_time_estimate_minutes: button.dataset.routeFeedback === 'true' ? 8 : 0,
+          reason_code: button.dataset.routeFeedback === 'true' ? 'routed_to_useful_path' : 'bad_routing'
+        }, routeFeedbackStatus);
+      });
     });
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -696,6 +881,7 @@
 
     loadSample(safeSample);
     refreshHealth();
+    loadExamples();
     loadOpenDemandLatest();
   </script>
 </body>

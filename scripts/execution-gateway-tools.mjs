@@ -444,6 +444,14 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'Open-demand health' } },
     },
   };
+  const examplesPath = {
+    get: {
+      operationId: 'getGatewayExamplesV0',
+      summary: 'Get proof examples and hero metric definitions',
+      description: 'Returns public demo examples. Examples are safe public or synthetic requests only.',
+      responses: { 200: { description: 'Proof examples and hero metric definitions' } },
+    },
+  };
   const openDemandLatestPath = {
     get: {
       operationId: 'getOpenDemandLatestV0',
@@ -499,6 +507,35 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'Evidence packet' } },
     },
   };
+  const feedbackPath = {
+    post: {
+      operationId: 'postFeedbackV0',
+      summary: 'Record metadata-only route usefulness feedback',
+      description: 'Accepts enumerated feedback only. Free text, emails, private context, secrets, and request bodies are not stored.',
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/GatewayFeedbackV0' },
+            examples: {
+              usefulPath: {
+                value: {
+                  target_type: 'open_demand_opportunity',
+                  target_id: 'fixture_oss_docs_test_01',
+                  helpful: true,
+                  route_useful: true,
+                  would_have_built_manually: false,
+                  saved_time_estimate_minutes: 12,
+                  reason_code: 'routed_to_useful_path',
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: { 201: { description: 'Feedback accepted' } },
+    },
+  };
   return {
     openapi: '3.1.0',
     info: {
@@ -532,13 +569,17 @@ export function buildOpenApiSpec() {
       '/v0/outcomes': outcomePath,
       '/v0/ledger/summary': ledgerPath,
       '/v0/openapi.json': openApiPath,
+      '/v0/examples': examplesPath,
+      '/v0/feedback': feedbackPath,
       '/v0/open-demand/health': openDemandHealthPath,
+      '/v0/open-demand/examples': examplesPath,
       '/v0/open-demand/latest': openDemandLatestPath,
       '/v0/open-demand/opportunities': openDemandLatestPath,
       '/v0/open-demand/scan': openDemandScanPath,
       '/v0/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
       '/v0/open-demand/tasks/{task_id}/run': openDemandRunPath,
       '/v0/open-demand/tasks/{task_id}/report': openDemandReportPath,
+      '/v0/open-demand/feedback': feedbackPath,
       '/health': healthPath,
       '/ready': readyPath,
       '/metrics': metricsPath,
@@ -547,13 +588,17 @@ export function buildOpenApiSpec() {
       '/outcomes': outcomePath,
       '/ledger/summary': ledgerPath,
       '/openapi.json': openApiPath,
+      '/examples': examplesPath,
+      '/feedback': feedbackPath,
       '/open-demand/health': openDemandHealthPath,
+      '/open-demand/examples': examplesPath,
       '/open-demand/latest': openDemandLatestPath,
       '/open-demand/opportunities': openDemandLatestPath,
       '/open-demand/scan': openDemandScanPath,
       '/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
       '/open-demand/tasks/{task_id}/run': openDemandRunPath,
       '/open-demand/tasks/{task_id}/report': openDemandReportPath,
+      '/open-demand/feedback': feedbackPath,
     },
     components: {
       schemas: {
@@ -616,6 +661,25 @@ export function buildOpenApiSpec() {
             rejection_reasons: { type: 'array', items: { type: 'string' } },
             rework_requested: { type: 'array', items: { type: 'string' } },
             payable_usd: { type: 'number', minimum: 0 },
+          },
+          additionalProperties: false,
+        },
+        GatewayFeedbackV0: {
+          type: 'object',
+          properties: {
+            target_type: {
+              type: 'string',
+              enum: ['route', 'open_demand_scan', 'open_demand_opportunity', 'open_demand_task', 'open_demand_report', 'open_demand_route'],
+            },
+            target_id: { type: 'string' },
+            helpful: { type: 'boolean' },
+            route_useful: { type: 'boolean' },
+            would_have_built_manually: { type: 'boolean' },
+            saved_time_estimate_minutes: { type: 'number', minimum: 0, maximum: 240 },
+            reason_code: {
+              type: 'string',
+              enum: ['routed_to_useful_path', 'blocked_correctly', 'bad_routing', 'unclear_value', 'missing_supplier', 'too_slow'],
+            },
           },
           additionalProperties: false,
         },
@@ -699,6 +763,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'scripts/execution-gateway.mjs',
     'scripts/execution-gateway-tools.mjs',
     'scripts/execution-gateway-server.mjs',
+    'scripts/open-demand-lib.mjs',
     'scripts/work-network-lib.mjs',
     'render.yaml',
     'schemas/execution-gateway/local-api.openapi.json',
@@ -732,6 +797,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/safety-and-trust.md',
     'docs/v1-readiness.md',
     'docs/pre-discovery-readiness.md',
+    'docs/public-launch-packet.md',
     'docs/live-traffic-readiness.md',
     'docs/production-cutover.md',
     'docs/abuse-and-rate-limit-policy.md',
@@ -744,6 +810,10 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/public-issue-request.json',
     'examples/execution-gateway/blocked-paid-public-write-request.json',
     'examples/execution-gateway/private-input-rejected-request.json',
+    'examples/execution-gateway/open-demand-scan-request.json',
+    'examples/execution-gateway/open-demand-feedback-request.json',
+    'examples/execution-gateway/agent-path-build-vs-use-request.json',
+    'examples/execution-gateway/non-code-public-benchmark-request.json',
     'examples/execution-gateway/outcome-record.json',
     'examples/execution-gateway/route-allowed-response.example.json',
     'examples/execution-gateway/route-denied-response.example.json',

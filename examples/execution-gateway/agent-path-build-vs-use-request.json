@@ -1,0 +1,19 @@
+{
+  "outcome": {
+    "goal": "Find the best agent path for a public repo triage task.",
+    "task_type": "agent_task_triage",
+    "desired_artifact": "agent_path_packet",
+    "success_criteria": [
+      "owned agent option",
+      "public path option",
+      "build decision",
+      "zero spend"
+    ]
+  },
+  "context_refs": [
+    "https://github.com/example/project/issues/101"
+  ],
+  "policy": {
+    "mode": "free_only"
+  }
+}
