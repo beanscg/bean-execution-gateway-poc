@@ -18,12 +18,16 @@ For sensitive reports, do not use the public demo or public issue tracker until 
 
 - Hosted demo rejects private and secret-like input before route processing.
 - Hosted demo records outcomes in memory only.
+- Security headers are emitted on API and demo responses.
+- Public demo rate limiting is active.
+- `/v0/metrics` exposes metadata-only counters and does not expose request bodies.
+- `/v0/dispatch` is present only to return `dispatch_disabled_in_v0`.
 - No payment rails, supplier calls, account mutation, private repositories, or external execution exist in V0.
 - Route decisions are not permission to perform external actions.
 
 ## Known POC Limitations
 
 - No production auth or tenant isolation.
-- No production rate limiting or abuse queue.
+- No production tenant-scoped rate limiting or abuse queue.
 - No private vulnerability reporting channel yet.
 - No durable audit system beyond local verification artifacts.

@@ -1,0 +1,28 @@
+{
+  "api_version": "v0",
+  "public_demo": true,
+  "hosted_demo": true,
+  "http_request_id": "req_example",
+  "ok": true,
+  "metrics_scope": "metadata_only",
+  "request_body_logging": false,
+  "request_body_persistence": false,
+  "rate_limiter": {
+    "limit_per_minute": 60,
+    "active_buckets": 1
+  },
+  "metrics": {
+    "started_at": "2026-05-25T00:00:00.000Z",
+    "requests_total": 1,
+    "by_method_path": { "GET /v0/health": 1 },
+    "by_status": { "200": 1 },
+    "rate_limited": 0,
+    "hosted_rejections": 0,
+    "route_decisions": { "allowed": 0, "blocked": 0, "approval_required": 0, "unknown": 0 },
+    "dispatch_attempts": 0,
+    "outcomes_recorded": 0,
+    "body_too_large": 0,
+    "errors": 0,
+    "uptime_seconds": 1
+  }
+}

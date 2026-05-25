@@ -5,6 +5,10 @@
 - Public hosted demo runs on Render Free with no payment method required by the repo config.
 - Root demo page calls the real `/v0/route` API.
 - The hosted API rejects private, secret-like, internal, local-file, and credential-looking input before route processing.
+- The hosted API emits security headers and rate-limit headers.
+- `/v0/ready` reports public-demo readiness while keeping `production_ready: false`.
+- `/v0/metrics` exposes metadata-only counters without request bodies.
+- `/v0/dispatch` exists only to return `dispatch_disabled_in_v0`.
 - The route engine produces deterministic route IDs from request hash, idempotency key, and registry version.
 - The route engine blocks spend, paid APIs, public posting, account credentials, external supplier requests, private refs, regulated data, secret-like text, and unsafe work.
 - Allowed routes are limited to local, zero-cost executors.
@@ -20,6 +24,7 @@
 - No automatic public comments, pull requests, posts, messages, or account mutation.
 - No live marketplace liquidity or supplier bidding.
 - No durability guarantees for hosted-demo outcome records.
+- No customer/live-execution readiness despite public-demo readiness.
 
 ## Honest Demo Promise
 

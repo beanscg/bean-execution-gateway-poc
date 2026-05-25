@@ -10,3 +10,5 @@ services:
         value: "1"
       - key: NODE_ENV
         value: production
+      - key: BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE
+        value: "60"

@@ -10,6 +10,9 @@ The POC demonstrates the control plane for source-agnostic agent execution. Dema
 
 - Public hosted demo.
 - `/v0/route` route decisions.
+- `/v0/ready` readiness and production gate status.
+- `/v0/metrics` metadata-only counters.
+- `/v0/dispatch` disabled dispatch proof endpoint.
 - `/v0/outcomes` memory-only hosted outcome records or local ledger writes.
 - `/v0/ledger/summary` outcome ledger summaries.
 - `/v0/openapi.json` OpenAPI contract.
@@ -22,6 +25,9 @@ The POC demonstrates the control plane for source-agnostic agent execution. Dema
 - Missing policy defaults to approval required.
 - `free_only` blocks paid APIs, public writes, account credentials, external suppliers, private refs, regulated data, secret-like content, and unsafe work.
 - Hosted demo rejects private or secret-like input before routing.
+- Hosted demo emits security headers and rate-limit headers.
+- Dispatch is disabled in V0.
+- Metrics are metadata-only and do not expose request bodies.
 - Route decisions are not permission for external actions.
 - Hosted demo does not persist request bodies.
 
@@ -35,6 +41,7 @@ The POC demonstrates the control plane for source-agnostic agent execution. Dema
 - Monetization.
 - Public posting or account mutation.
 - External execution.
+Customer traffic is also not ready. `/v0/ready` reports `production_ready: false` until authenticated tenants, durable audit logs, payment/cost controls, supplier trust, and private-context handling exist.
 
 ## Best Next Work
 

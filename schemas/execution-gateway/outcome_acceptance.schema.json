@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/outcome_acceptance.schema.json",
+  "title": "OutcomeAcceptanceV0",
+  "description": "Future acceptance and dispute contract for outcome-based pricing.",
+  "type": "object",
+  "required": [
+    "outcome_id",
+    "acceptance_state",
+    "payable_usd"
+  ],
+  "properties": {
+    "outcome_id": { "type": "string" },
+    "route_run_id": { "type": ["string", "null"] },
+    "acceptance_state": {
+      "type": "string",
+      "enum": ["accepted", "rejected", "needs_rework", "disputed"]
+    },
+    "verifier_result": { "type": ["string", "null"] },
+    "rejection_reasons": { "type": "array", "items": { "type": "string" } },
+    "rework_requested": { "type": "array", "items": { "type": "string" } },
+    "payable_usd": { "type": "number", "minimum": 0 },
+    "acceptance_evidence_refs": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}

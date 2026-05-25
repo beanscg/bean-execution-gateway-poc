@@ -10,7 +10,7 @@
 
 - Version every endpoint under `/v1`.
 - Add authenticated tenants, API keys, scopes, rate limits, and idempotency guarantees.
-- Separate dry-run route decisions from executable dispatch.
+- Keep dry-run route decisions separate from executable dispatch. V0 exposes `/v0/dispatch` only as a disabled proof endpoint.
 - Add supplier bid schema with price, latency, compute location, model/tool claims, evidence, and acceptance terms.
 - Add outcome acceptance schema with dispute states and rework reasons.
 

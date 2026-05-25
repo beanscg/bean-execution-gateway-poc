@@ -8,6 +8,8 @@ The public hosted demo is for public or synthetic inputs only.
 - Does not persist route request bodies to disk.
 - Stores outcome records in process memory only.
 - Rejects private, work, company, customer, credential, local-file, internal, and regulated-data signals before route processing.
+- Exposes metadata-only metrics and does not expose request bodies through `/v0/metrics`.
+- Returns request IDs for tracing without storing raw submitted payloads.
 
 ## Local Use
 

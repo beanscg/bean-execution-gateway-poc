@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/supplier_bid.schema.json",
+  "title": "SupplierBidV0",
+  "description": "Future supply bid contract. External supplier selection is not enabled in V0.",
+  "type": "object",
+  "required": [
+    "supplier_id",
+    "price_usd",
+    "estimated_latency_seconds",
+    "compute_location",
+    "quality_evidence",
+    "acceptance_terms"
+  ],
+  "properties": {
+    "supplier_id": { "type": "string" },
+    "supplier_kind": { "type": "string", "enum": ["owned_agent", "local_runner", "workflow", "external_supplier"] },
+    "price_usd": { "type": "number", "minimum": 0 },
+    "estimated_latency_seconds": { "type": "integer", "minimum": 0 },
+    "compute_location": {
+      "type": "string",
+      "enum": ["requester_hosted", "supplier_hosted", "gateway_hosted", "unknown"]
+    },
+    "model_or_tool_claims": { "type": "array", "items": { "type": "string" } },
+    "quality_evidence": { "type": "array", "items": { "type": "string" } },
+    "data_boundary": {
+      "type": "string",
+      "enum": ["public_only", "tenant_private", "secret_required", "unknown"]
+    },
+    "acceptance_terms": {
+      "type": "object",
+      "properties": {
+        "charge_on": { "type": "string", "enum": ["route", "dispatch", "accepted_outcome", "milestone"] },
+        "rejected_work_policy": { "type": "string" },
+        "cancellation_policy": { "type": "string" },
+        "max_rework_rounds": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

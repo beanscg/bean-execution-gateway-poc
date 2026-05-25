@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import http from 'node:http';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -21,6 +22,28 @@ import {
 const API_VERSION = 'v0';
 const DEMO_ASSET_PATH = path.join(rootDir, 'assets', 'execution-gateway-demo', 'index.html');
 const HOSTED_DEMO_WARNING = 'Do not paste private, work, company, customer, secret, credential, local file, internal, or regulated context into the public demo.';
+const MAX_JSON_BODY_BYTES = 1_000_000;
+const HOSTED_DEMO_MAX_INPUT_CHARS = 64_000;
+const DEFAULT_RATE_LIMIT_PER_MINUTE = 60;
+
+const apiContentSecurityPolicy = [
+  "default-src 'none'",
+  "frame-ancestors 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+].join('; ');
+
+const demoContentSecurityPolicy = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "frame-ancestors 'none'",
+  "base-uri 'none'",
+  "form-action 'none'",
+  "object-src 'none'",
+].join('; ');
 
 function parseFlags(argv) {
   const flags = { _: [] };
@@ -64,6 +87,152 @@ function sendHtml(res, statusCode, html, extraHeaders = {}) {
 
 const hostedRejectPattern = /\b(?:work\s+data|company\s+data|customer\s+data|customer\s+file|private\s+repo|internal\s+repo|api[_-]?key|secret|password|token)\b|(?:private|internal|vpn|intranet|localhost|127\.0\.0\.1|0\.0\.0\.0|file):\/\/|\/Users\/|\/private\/|~\//i;
 
+function parsePositiveInteger(value, fallback) {
+  const parsed = Number(value);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function makeRequestId(req) {
+  const raw = Array.isArray(req.headers['x-request-id'])
+    ? req.headers['x-request-id'][0]
+    : req.headers['x-request-id'];
+  if (typeof raw === 'string' && /^[A-Za-z0-9._:-]{1,80}$/.test(raw)) {
+    return raw;
+  }
+  return crypto.randomUUID();
+}
+
+function securityHeaders({ requestId, contentSecurityPolicy = apiContentSecurityPolicy } = {}) {
+  return {
+    'strict-transport-security': 'max-age=31536000',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+    'x-xss-protection': '0',
+    'content-security-policy': contentSecurityPolicy,
+    'x-request-id': requestId,
+  };
+}
+
+function getClientKey(req) {
+  const forwardedFor = Array.isArray(req.headers['x-forwarded-for'])
+    ? req.headers['x-forwarded-for'][0]
+    : req.headers['x-forwarded-for'];
+  if (typeof forwardedFor === 'string' && forwardedFor.trim()) {
+    return forwardedFor.split(',')[0].trim();
+  }
+  return req.socket.remoteAddress || 'unknown';
+}
+
+function createRateLimiter({ limitPerMinute = DEFAULT_RATE_LIMIT_PER_MINUTE } = {}) {
+  const buckets = new Map();
+  const windowMs = 60_000;
+  return {
+    check(req, now = Date.now()) {
+      const key = getClientKey(req);
+      let bucket = buckets.get(key);
+      if (!bucket || bucket.resetAt <= now) {
+        bucket = { count: 0, resetAt: now + windowMs };
+        buckets.set(key, bucket);
+      }
+      bucket.count += 1;
+      const remaining = Math.max(0, limitPerMinute - bucket.count);
+      return {
+        allowed: bucket.count <= limitPerMinute,
+        limit: limitPerMinute,
+        remaining,
+        resetAt: bucket.resetAt,
+        retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
+      };
+    },
+    snapshot(now = Date.now()) {
+      let active_buckets = 0;
+      for (const [key, bucket] of buckets.entries()) {
+        if (bucket.resetAt <= now) {
+          buckets.delete(key);
+        } else {
+          active_buckets += 1;
+        }
+      }
+      return { limit_per_minute: limitPerMinute, active_buckets };
+    },
+  };
+}
+
+function rateLimitHeaders(rateLimit) {
+  return {
+    'x-ratelimit-limit': String(rateLimit.limit),
+    'x-ratelimit-remaining': String(rateLimit.remaining),
+    'x-ratelimit-reset': String(Math.ceil(rateLimit.resetAt / 1000)),
+  };
+}
+
+function createMetrics() {
+  return {
+    started_at: new Date().toISOString(),
+    requests_total: 0,
+    by_method_path: {},
+    by_status: {},
+    rate_limited: 0,
+    hosted_rejections: 0,
+    route_decisions: {
+      allowed: 0,
+      blocked: 0,
+      approval_required: 0,
+      unknown: 0,
+    },
+    dispatch_attempts: 0,
+    outcomes_recorded: 0,
+    body_too_large: 0,
+    errors: 0,
+  };
+}
+
+function incrementCounter(bucket, key) {
+  bucket[key] = (bucket[key] || 0) + 1;
+}
+
+function authConfig() {
+  const required = process.env.BEAN_GATEWAY_REQUIRE_API_KEY === '1';
+  const configured = Boolean(process.env.BEAN_GATEWAY_API_KEY);
+  return {
+    required,
+    configured,
+    production_ready: required && configured,
+    protected_paths: ['/v0/route', '/v0/outcomes', '/v0/dispatch', '/v0/ledger/summary', '/v0/metrics'],
+  };
+}
+
+function authorizeRequest(req, pathname) {
+  const config = authConfig();
+  const protectedPath = ['/route', '/outcomes', '/dispatch', '/ledger/summary', '/metrics'].includes(pathname);
+  if (!config.required || !protectedPath) return { ok: true, config };
+  if (!config.configured) {
+    return {
+      ok: false,
+      statusCode: 503,
+      error: 'api_key_auth_required_but_not_configured',
+      config,
+    };
+  }
+  const bearer = typeof req.headers.authorization === 'string' && req.headers.authorization.startsWith('Bearer ')
+    ? req.headers.authorization.slice('Bearer '.length)
+    : null;
+  const explicit = Array.isArray(req.headers['x-bean-api-key'])
+    ? req.headers['x-bean-api-key'][0]
+    : req.headers['x-bean-api-key'];
+  if (bearer === process.env.BEAN_GATEWAY_API_KEY || explicit === process.env.BEAN_GATEWAY_API_KEY) {
+    return { ok: true, config };
+  }
+  return {
+    ok: false,
+    statusCode: 401,
+    error: 'api_key_required',
+    config,
+  };
+}
+
 function scrubLocalPaths(value) {
   if (Array.isArray(value)) return value.map((item) => scrubLocalPaths(item));
   if (value && typeof value === 'object') {
@@ -78,7 +247,7 @@ function scrubLocalPaths(value) {
 
 function rejectHostedDemoInput(input) {
   const text = JSON.stringify(input || {});
-  if (text.length > 64_000) {
+  if (text.length > HOSTED_DEMO_MAX_INPUT_CHARS) {
     return 'hosted_demo_request_too_large';
   }
   if (hostedRejectPattern.test(text)) {
@@ -90,14 +259,23 @@ function rejectHostedDemoInput(input) {
 function readJsonBody(req) {
   return new Promise((resolve, reject) => {
     let body = '';
+    let bytes = 0;
+    let tooLarge = false;
     req.on('data', (chunk) => {
-      body += chunk;
-      if (body.length > 1_000_000) {
-        req.destroy();
-        reject(new Error('Request body too large'));
+      bytes += chunk.length;
+      if (bytes > MAX_JSON_BODY_BYTES) {
+        tooLarge = true;
+        return;
       }
+      body += chunk;
     });
     req.on('end', () => {
+      if (tooLarge) {
+        const error = new Error('Request body too large');
+        error.code = 'BODY_TOO_LARGE';
+        reject(error);
+        return;
+      }
       try {
         resolve(body.trim() ? JSON.parse(body) : {});
       } catch (error) {
@@ -110,21 +288,64 @@ function readJsonBody(req) {
 
 function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false }) {
   const memoryLedger = [];
+  const metrics = createMetrics();
+  const rateLimiter = createRateLimiter({
+    limitPerMinute: parsePositiveInteger(process.env.BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE, DEFAULT_RATE_LIMIT_PER_MINUTE),
+  });
   return http.createServer(async (req, res) => {
+    const requestId = makeRequestId(req);
     const url = new URL(req.url || '/', 'http://bean.local');
     const pathname = url.pathname === '/v0' ? '/' : url.pathname.replace(/^\/v0(?=\/)/, '');
+    const originalPathname = url.pathname;
+    metrics.requests_total += 1;
+    incrementCounter(metrics.by_method_path, `${req.method} ${originalPathname}`);
     const modeHeaders = hostedDemo
       ? { 'x-bean-hosted-demo': 'true', 'x-bean-local-only': 'false' }
       : { 'x-bean-hosted-demo': 'false', 'x-bean-local-only': 'true' };
+    const rateLimit = rateLimiter.check(req);
+    const baseApiHeaders = {
+      ...securityHeaders({ requestId }),
+      ...modeHeaders,
+      ...rateLimitHeaders(rateLimit),
+    };
+    const baseHtmlHeaders = {
+      ...securityHeaders({ requestId, contentSecurityPolicy: demoContentSecurityPolicy }),
+      ...modeHeaders,
+      ...rateLimitHeaders(rateLimit),
+    };
     const withMeta = (payload) => ({
       api_version: API_VERSION,
       public_demo: hostedDemo,
       hosted_demo: hostedDemo,
+      http_request_id: requestId,
       ...payload,
     });
-    const reply = (statusCode, payload) => sendJson(res, statusCode, withMeta(payload), modeHeaders);
+    const countStatus = (statusCode) => incrementCounter(metrics.by_status, String(statusCode));
+    const reply = (statusCode, payload, extraHeaders = {}) => {
+      countStatus(statusCode);
+      sendJson(res, statusCode, withMeta(payload), { ...baseApiHeaders, ...extraHeaders });
+    };
+    const replyRawJson = (statusCode, payload, extraHeaders = {}) => {
+      countStatus(statusCode);
+      sendJson(res, statusCode, payload, { ...baseApiHeaders, ...extraHeaders });
+    };
+    const replyHtml = (statusCode, html, extraHeaders = {}) => {
+      countStatus(statusCode);
+      sendHtml(res, statusCode, html, { ...baseHtmlHeaders, ...extraHeaders });
+    };
 
     try {
+      if (!rateLimit.allowed) {
+        metrics.rate_limited += 1;
+        reply(429, {
+          ok: false,
+          error: 'rate_limit_exceeded',
+          retry_after_seconds: rateLimit.retryAfterSeconds,
+          limit_per_minute: rateLimit.limit,
+        }, { 'retry-after': String(rateLimit.retryAfterSeconds) });
+        return;
+      }
+
       if (req.method === 'OPTIONS') {
         reply(403, {
           ok: false,
@@ -134,7 +355,7 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
       }
 
       if (req.method === 'GET' && (pathname === '/' || pathname === '/demo')) {
-        sendHtml(res, 200, fs.readFileSync(DEMO_ASSET_PATH, 'utf8'), modeHeaders);
+        replyHtml(200, fs.readFileSync(DEMO_ASSET_PATH, 'utf8'));
         return;
       }
 
@@ -147,6 +368,9 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
           spend_usd: 0,
           external_writes: 0,
           external_executions: 0,
+          rate_limit_per_minute: rateLimit.limit,
+          api_key_auth_required: authConfig().required,
+          security_headers: true,
           request_body_logging: false,
           request_body_persistence: false,
           disk_ledger_writes_default: !hostedDemo,
@@ -155,8 +379,69 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/ready') {
+        const auth = authConfig();
+        reply(200, {
+          ok: true,
+          production_ready: false,
+          production_ready_reason: 'V0 can accept public demo traffic only. Customer/live execution traffic requires the blocked gates below.',
+          gates: {
+            public_demo_boundary: { status: 'pass', hosted_demo: hostedDemo, input_scope: 'public_or_synthetic_only' },
+            security_headers: { status: 'pass', hsts_preload: false },
+            rate_limit: { status: 'pass', limit_per_minute: rateLimit.limit },
+            metadata_only_metrics: { status: 'pass', request_body_logging: false, request_body_persistence: false },
+            auth: {
+              status: auth.production_ready ? 'pass' : 'blocked_requires_api_key_secret_and_enable_flag',
+              require_flag: 'BEAN_GATEWAY_REQUIRE_API_KEY=1',
+              secret_env: 'BEAN_GATEWAY_API_KEY',
+            },
+            external_dispatch: { status: 'blocked_not_supported', endpoint: '/v0/dispatch' },
+            external_supplier_execution: { status: 'blocked_not_supported' },
+            payment_rails: { status: 'blocked_not_supported' },
+            private_context: { status: 'blocked_not_supported' },
+            durable_audit_log: { status: hostedDemo ? 'blocked_not_supported_in_public_demo' : 'partial_local_only' },
+            tenant_isolation: { status: 'blocked_not_supported' },
+            abuse_review_queue: { status: 'blocked_not_supported' },
+          },
+          required_before_customer_traffic: [
+            'enable authenticated tenants and scoped API keys',
+            'add durable audit logs with retention controls',
+            'add private-context vaulting and tenant isolation',
+            'add supplier identity, scoring, settlement, and dispute controls',
+            'add payment rails and cost accounting',
+            'add operational monitoring and abuse response',
+          ],
+        });
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/openapi.json') {
-        sendJson(res, 200, buildOpenApiSpec(), modeHeaders);
+        replyRawJson(200, buildOpenApiSpec());
+        return;
+      }
+
+      const authorization = authorizeRequest(req, pathname);
+      if (!authorization.ok) {
+        reply(authorization.statusCode, {
+          ok: false,
+          error: authorization.error,
+          api_key_auth_required: authorization.config.required,
+        });
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/metrics') {
+        reply(200, {
+          ok: true,
+          metrics_scope: 'metadata_only',
+          request_body_logging: false,
+          request_body_persistence: false,
+          rate_limiter: rateLimiter.snapshot(),
+          metrics: {
+            ...metrics,
+            uptime_seconds: Math.round((Date.now() - Date.parse(metrics.started_at)) / 1000),
+          },
+        });
         return;
       }
 
@@ -175,6 +460,7 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         };
         const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(input) : null;
         if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
           reply(400, {
             ok: false,
             hosted_demo: true,
@@ -188,6 +474,9 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
           outDir: hostedDemo ? undefined : input.out_dir ? path.resolve(input.out_dir) : path.join(routeOutDir, input.request_id || 'request'),
           persistArtifacts: !hostedDemo,
         });
+        const policyState = route.response?.decision?.policy_state || 'unknown';
+        if (metrics.route_decisions[policyState] == null) metrics.route_decisions.unknown += 1;
+        else metrics.route_decisions[policyState] += 1;
         reply(200, scrubLocalPaths({
           ...route.response,
           hosted_demo: hostedDemo,
@@ -198,11 +487,37 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'POST' && pathname === '/dispatch') {
+        metrics.dispatch_attempts += 1;
+        const input = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(input) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, {
+            ok: false,
+            hosted_demo: true,
+            error: hostedRejectReason,
+            warning: HOSTED_DEMO_WARNING,
+          });
+          return;
+        }
+        reply(403, {
+          ok: false,
+          error: 'dispatch_disabled_in_v0',
+          message: 'V0 returns route decisions only. It never executes suppliers, external tools, public writes, paid APIs, or customer traffic.',
+          spend_usd: 0,
+          external_writes: 0,
+          external_executions: 0,
+        });
+        return;
+      }
+
       if (req.method === 'POST' && pathname === '/outcomes') {
         const input = await readJsonBody(req);
         if (hostedDemo) {
           const record = buildOutcomeRecord(input);
           memoryLedger.push(record);
+          metrics.outcomes_recorded += 1;
           reply(200, {
             ledger_path: 'memory://hosted-demo/outcomes',
             record,
@@ -212,6 +527,7 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
           return;
         }
         const outcome = recordOutcome(input, { ledgerPath });
+        metrics.outcomes_recorded += 1;
         reply(200, outcome);
         return;
       }
@@ -221,6 +537,16 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         error: 'Not found',
       });
     } catch (error) {
+      metrics.errors += 1;
+      if (error.code === 'BODY_TOO_LARGE') {
+        metrics.body_too_large += 1;
+        reply(413, {
+          ok: false,
+          error: error.message,
+          max_body_bytes: MAX_JSON_BODY_BYTES,
+        });
+        return;
+      }
       reply(400, {
         ok: false,
         error: error.message,

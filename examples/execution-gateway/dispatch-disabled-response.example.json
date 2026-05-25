@@ -1,0 +1,12 @@
+{
+  "api_version": "v0",
+  "public_demo": true,
+  "hosted_demo": true,
+  "http_request_id": "req_example",
+  "ok": false,
+  "error": "dispatch_disabled_in_v0",
+  "message": "V0 returns route decisions only. It never executes suppliers, external tools, public writes, paid APIs, or customer traffic.",
+  "spend_usd": 0,
+  "external_writes": 0,
+  "external_executions": 0
+}

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://bean.local/schemas/execution-gateway/dispatch_request.schema.json",
+  "title": "ExecutionDispatchRequestV0",
+  "description": "Future executable dispatch contract. V0 accepts the shape only to return dispatch_disabled_in_v0.",
+  "type": "object",
+  "required": [
+    "route_run_id",
+    "request_id",
+    "desired_outcome",
+    "max_budget_usd"
+  ],
+  "properties": {
+    "route_run_id": { "type": "string" },
+    "request_id": { "type": "string" },
+    "desired_outcome": { "type": "object" },
+    "selected_executor_id": { "type": ["string", "null"] },
+    "max_budget_usd": { "type": "number", "const": 0 },
+    "external_writes_allowed": { "type": "boolean", "const": false },
+    "external_supplier_allowed": { "type": "boolean", "const": false },
+    "idempotency_key": { "type": ["string", "null"] }
+  },
+  "additionalProperties": true
+}

@@ -20,10 +20,13 @@ Primary risks:
 - All supplier classes are represented as blocked future supply, not callable supply.
 - Route output includes a permission statement that the recommendation is not permission for external action.
 - Hosted outcome records are memory-only.
+- Security headers and rate-limit headers are emitted by the public demo.
+- `/v0/metrics` exposes metadata-only counters without request bodies.
+- `/v0/dispatch` is disabled and returns `dispatch_disabled_in_v0`.
 
 ## Known Gaps
 
-- No production auth, tenant isolation, rate limiting, audit log, WAF, or abuse queue.
+- No production auth, tenant isolation, tenant-scoped rate limiting, audit log, WAF, or abuse queue.
 - No dedicated secret-scanning service on submitted request bodies beyond pattern rejection.
 - No private-context vault or data-class attestation.
 - No supplier identity, staking, quality score, dispute, or payment settlement.

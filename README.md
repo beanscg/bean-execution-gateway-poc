@@ -10,6 +10,8 @@ Live demo: https://bean-execution-gateway-poc.onrender.com
 - Classifies spend, private context, public writes, account credentials, external suppliers, secrets, regulated data, and unsafe work.
 - Returns a deterministic route decision with ranked local executors, stop conditions, cost fields, sanitizer findings, and verifier artifacts.
 - Records outcomes locally, or in memory only when running as the hosted public demo.
+- Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
+- Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
 
 ## What It Does Not Do Yet
@@ -40,8 +42,13 @@ BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8791 npm run gateway:smoke:hosted
 
 ```bash
 curl -s http://127.0.0.1:8787/v0/health
+curl -s http://127.0.0.1:8787/v0/ready
+curl -s http://127.0.0.1:8787/v0/metrics
 curl -s http://127.0.0.1:8787/v0/openapi.json
 curl -s -X POST http://127.0.0.1:8787/v0/route \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/public-issue-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/dispatch \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/public-issue-request.json
 ```
@@ -56,6 +63,8 @@ BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8787 npm run gateway:smoke:hosted
 ```
 
 The verification suite checks proof tasks, adversarial policy fixtures, schema self-tests, registry lint, zero spend, zero external writes, and zero external executions.
+
+The hosted smoke suite also checks security headers, rate-limit headers, `/v0/ready`, `/v0/metrics`, disabled dispatch, hosted private-input rejection, and memory-only hosted outcomes.
 
 ## Public Demo Boundary
 
@@ -72,6 +81,9 @@ Hosted demo input scope:
 - Public or synthetic requests only.
 - No private, work, company, customer, secret, credential, local-file, internal, or regulated data.
 - No request-body persistence and no request-body logging in the app code.
+- Runtime rate limiting is on by default.
+- Security headers are emitted on API and demo responses.
+- `/v0/ready` intentionally reports `production_ready: false`.
 
 ## Docs
 
@@ -81,3 +93,7 @@ Hosted demo input scope:
 - [Safety and trust](docs/safety-and-trust.md)
 - [V1 readiness](docs/v1-readiness.md)
 - [Pre-discovery readiness](docs/pre-discovery-readiness.md)
+- [Live-traffic readiness](docs/live-traffic-readiness.md)
+- [Production cutover](docs/production-cutover.md)
+- [Abuse and rate-limit policy](docs/abuse-and-rate-limit-policy.md)
+- [Public demo terms](TERMS.md)

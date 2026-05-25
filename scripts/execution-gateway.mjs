@@ -93,7 +93,11 @@ async function fetchJson(baseUrl, routePath, options = {}) {
   } catch (error) {
     payload = { parse_error: error.message, raw: text.slice(0, 200) };
   }
-  return { status: response.status, payload };
+  return {
+    status: response.status,
+    payload,
+    headers: Object.fromEntries(response.headers.entries()),
+  };
 }
 
 async function runHostedSmoke({ baseUrl }) {
@@ -135,9 +139,34 @@ async function runHostedSmoke({ baseUrl }) {
   const health = await fetchJson(baseUrl, '/v0/health');
   addCheck('health_ok', health.status === 200 && health.payload?.ok === true, health.payload);
   addCheck('hosted_demo_zero_spend', health.payload?.spend_usd === 0 && health.payload?.external_writes === 0 && health.payload?.external_executions === 0, health.payload);
+  addCheck('security_headers_present', [
+    'strict-transport-security',
+    'x-content-type-options',
+    'x-frame-options',
+    'referrer-policy',
+    'permissions-policy',
+    'content-security-policy',
+    'x-request-id',
+  ].every((header) => Boolean(health.headers?.[header])), health.headers);
+  addCheck('rate_limit_headers_present', [
+    'x-ratelimit-limit',
+    'x-ratelimit-remaining',
+    'x-ratelimit-reset',
+  ].every((header) => Boolean(health.headers?.[header])), health.headers);
+
+  const ready = await fetchJson(baseUrl, '/v0/ready');
+  addCheck('readiness_public_demo_not_customer_ready', ready.status === 200
+    && ready.payload?.ok === true
+    && ready.payload?.production_ready === false
+    && ready.payload?.gates?.rate_limit?.status === 'pass'
+    && ready.payload?.gates?.external_dispatch?.status === 'blocked_not_supported', ready.payload);
 
   const openapi = await fetchJson(baseUrl, '/v0/openapi.json');
-  addCheck('openapi_available', openapi.status === 200 && openapi.payload?.openapi === '3.1.0' && Boolean(openapi.payload?.paths?.['/v0/route']), { status: openapi.status });
+  addCheck('openapi_available', openapi.status === 200
+    && openapi.payload?.openapi === '3.1.0'
+    && Boolean(openapi.payload?.paths?.['/v0/route'])
+    && Boolean(openapi.payload?.paths?.['/v0/ready'])
+    && Boolean(openapi.payload?.paths?.['/v0/dispatch']), { status: openapi.status });
 
   const safe = await fetchJson(baseUrl, '/v0/route', {
     method: 'POST',
@@ -160,6 +189,15 @@ async function runHostedSmoke({ baseUrl }) {
   });
   addCheck('hosted_private_input_rejected_before_routing', privateReject.status === 400
     && privateReject.payload?.error === 'hosted_demo_rejects_private_work_or_secret_like_context', privateReject.payload);
+
+  const dispatch = await fetchJson(baseUrl, '/v0/dispatch', {
+    method: 'POST',
+    body: JSON.stringify(safeRequest),
+  });
+  addCheck('dispatch_disabled_in_v0', dispatch.status === 403
+    && dispatch.payload?.error === 'dispatch_disabled_in_v0'
+    && dispatch.payload?.spend_usd === 0
+    && dispatch.payload?.external_executions === 0, dispatch.payload);
 
   const outcome = await fetchJson(baseUrl, '/v0/outcomes', {
     method: 'POST',
@@ -184,6 +222,15 @@ async function runHostedSmoke({ baseUrl }) {
     && ledger.payload?.actual_cost_usd === 0
     && ledger.payload?.actual_external_writes === 0
     && ledger.payload?.actual_external_executions === 0, ledger.payload);
+
+  const metrics = await fetchJson(baseUrl, '/v0/metrics');
+  addCheck('metadata_only_metrics_available', metrics.status === 200
+    && metrics.payload?.metrics_scope === 'metadata_only'
+    && metrics.payload?.request_body_logging === false
+    && metrics.payload?.request_body_persistence === false
+    && Number.isInteger(metrics.payload?.metrics?.requests_total)
+    && metrics.payload?.metrics?.raw_request_body == null
+    && metrics.payload?.metrics?.last_request_body == null, metrics.payload);
 
   return {
     ok: checks.every((check) => check.passed),

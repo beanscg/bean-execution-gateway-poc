@@ -16,6 +16,7 @@ This repository is a public-only POC package for Bean Execution Gateway.
 - Add synthetic fixtures that prove blocked and allowed behavior.
 - Add SDK or adapter stubs only when they do not call external systems.
 - Run local verification and hosted smoke checks.
+- Improve readiness, metrics, rate limits, security headers, and docs while keeping dispatch disabled.
 
 ## Verification
 
@@ -35,3 +36,5 @@ BEAN_GATEWAY_BASE_URL=https://bean-execution-gateway-poc.onrender.com npm run ga
 ## Product Truth
 
 The POC is a gateway decision layer. It is not yet a production marketplace, payment system, supplier network, private-context processor, or external execution runner.
+
+`/v0/ready` is the source of truth for this boundary. It should keep reporting `production_ready: false` until authenticated tenants, durable audit logs, payment/cost controls, supplier trust, and private-context handling exist.

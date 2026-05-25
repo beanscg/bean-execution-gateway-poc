@@ -1,0 +1,23 @@
+{
+  "api_version": "v0",
+  "public_demo": true,
+  "hosted_demo": true,
+  "http_request_id": "req_example",
+  "ok": true,
+  "production_ready": false,
+  "production_ready_reason": "V0 can accept public demo traffic only. Customer/live execution traffic requires the blocked gates below.",
+  "gates": {
+    "public_demo_boundary": { "status": "pass", "hosted_demo": true, "input_scope": "public_or_synthetic_only" },
+    "security_headers": { "status": "pass", "hsts_preload": false },
+    "rate_limit": { "status": "pass", "limit_per_minute": 60 },
+    "metadata_only_metrics": { "status": "pass", "request_body_logging": false, "request_body_persistence": false },
+    "auth": { "status": "blocked_requires_api_key_secret_and_enable_flag" },
+    "external_dispatch": { "status": "blocked_not_supported", "endpoint": "/v0/dispatch" },
+    "external_supplier_execution": { "status": "blocked_not_supported" },
+    "payment_rails": { "status": "blocked_not_supported" },
+    "private_context": { "status": "blocked_not_supported" },
+    "durable_audit_log": { "status": "blocked_not_supported_in_public_demo" },
+    "tenant_isolation": { "status": "blocked_not_supported" },
+    "abuse_review_queue": { "status": "blocked_not_supported" }
+  }
+}

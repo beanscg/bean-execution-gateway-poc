@@ -370,11 +370,63 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'Ledger summary' } },
     },
   };
+  const dispatchPath = {
+    post: {
+      operationId: 'createExecutionDispatchV0',
+      summary: 'Prove external dispatch is disabled in V0',
+      description: 'Always returns 403 in V0. Dispatch, supplier calls, paid APIs, account mutation, and public writes are intentionally unavailable.',
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/ExecutionDispatchRequestV0' },
+          },
+        },
+      },
+      responses: {
+        403: {
+          description: 'Dispatch is disabled in V0',
+          content: {
+            'application/json': {
+              examples: {
+                disabled: {
+                  value: {
+                    api_version: 'v0',
+                    ok: false,
+                    error: 'dispatch_disabled_in_v0',
+                    spend_usd: 0,
+                    external_writes: 0,
+                    external_executions: 0,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
   const healthPath = {
     get: {
       operationId: 'getHealthV0',
       summary: 'Health and safety mode check',
       responses: { 200: { description: 'OK' } },
+    },
+  };
+  const readyPath = {
+    get: {
+      operationId: 'getReadinessV0',
+      summary: 'Readiness and production gate status',
+      description: 'Reports public-demo readiness separately from customer/live-execution readiness.',
+      responses: { 200: { description: 'Readiness status' } },
+    },
+  };
+  const metricsPath = {
+    get: {
+      operationId: 'getMetricsV0',
+      summary: 'Metadata-only runtime metrics',
+      description: 'Reports counters only. Does not expose request bodies.',
+      responses: { 200: { description: 'Metadata-only metrics' } },
     },
   };
   const openApiPath = {
@@ -403,15 +455,25 @@ export function buildOpenApiSpec() {
       external_executions: 0,
       hosted_demo_request_body_persistence: false,
       hosted_demo_input_scope: 'public_or_synthetic_only',
+      dispatch_enabled: false,
+      security_headers_enabled: true,
+      rate_limiting_enabled: true,
+      customer_traffic_ready: false,
     },
     paths: {
       '/v0/health': healthPath,
+      '/v0/ready': readyPath,
+      '/v0/metrics': metricsPath,
       '/v0/route': routePath,
+      '/v0/dispatch': dispatchPath,
       '/v0/outcomes': outcomePath,
       '/v0/ledger/summary': ledgerPath,
       '/v0/openapi.json': openApiPath,
       '/health': healthPath,
+      '/ready': readyPath,
+      '/metrics': metricsPath,
       '/route': routePath,
+      '/dispatch': dispatchPath,
       '/outcomes': outcomePath,
       '/ledger/summary': ledgerPath,
       '/openapi.json': openApiPath,
@@ -442,6 +504,43 @@ export function buildOpenApiSpec() {
             hosted_demo: { type: 'boolean' },
           },
           additionalProperties: true,
+        },
+        ExecutionDispatchRequestV0: {
+          type: 'object',
+          properties: {
+            route_run_id: { type: 'string' },
+            request_id: { type: 'string' },
+            desired_outcome: { type: 'object' },
+            max_budget_usd: { type: 'number', const: 0 },
+          },
+          additionalProperties: true,
+        },
+        SupplierBidV0: {
+          type: 'object',
+          required: ['supplier_id', 'price_usd', 'estimated_latency_seconds', 'compute_location', 'quality_evidence'],
+          properties: {
+            supplier_id: { type: 'string' },
+            price_usd: { type: 'number', minimum: 0 },
+            estimated_latency_seconds: { type: 'integer', minimum: 0 },
+            compute_location: { type: 'string', enum: ['requester_hosted', 'supplier_hosted', 'gateway_hosted', 'unknown'] },
+            model_or_tool_claims: { type: 'array', items: { type: 'string' } },
+            quality_evidence: { type: 'array', items: { type: 'string' } },
+            acceptance_terms: { type: 'object' },
+          },
+          additionalProperties: false,
+        },
+        OutcomeAcceptanceV0: {
+          type: 'object',
+          required: ['outcome_id', 'acceptance_state'],
+          properties: {
+            outcome_id: { type: 'string' },
+            acceptance_state: { type: 'string', enum: ['accepted', 'rejected', 'needs_rework', 'disputed'] },
+            verifier_result: { type: 'string' },
+            rejection_reasons: { type: 'array', items: { type: 'string' } },
+            rework_requested: { type: 'array', items: { type: 'string' } },
+            payable_usd: { type: 'number', minimum: 0 },
+          },
+          additionalProperties: false,
         },
       },
     },
@@ -530,6 +629,9 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'schemas/execution-gateway/response.schema.json',
     'schemas/execution-gateway/outcome_record.schema.json',
     'schemas/execution-gateway/executor_registry_entry.schema.json',
+    'schemas/execution-gateway/dispatch_request.schema.json',
+    'schemas/execution-gateway/supplier_bid.schema.json',
+    'schemas/execution-gateway/outcome_acceptance.schema.json',
     'data/execution-gateway/registry.json',
     'fixtures/execution-gateway/sample-request.json',
     'fixtures/execution-gateway/adversarial-fixtures.json',
@@ -543,6 +645,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'LICENSE',
     'PRIVACY.md',
     'SECURITY.md',
+    'TERMS.md',
     'capability-manifest.json',
     'llms.txt',
     'llms-full.txt',
@@ -552,6 +655,9 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/safety-and-trust.md',
     'docs/v1-readiness.md',
     'docs/pre-discovery-readiness.md',
+    'docs/live-traffic-readiness.md',
+    'docs/production-cutover.md',
+    'docs/abuse-and-rate-limit-policy.md',
     'docs/evidence.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
@@ -566,6 +672,9 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/route-denied-response.example.json',
     'examples/execution-gateway/hosted-private-rejection-response.example.json',
     'examples/execution-gateway/ledger-summary.example.json',
+    'examples/execution-gateway/dispatch-disabled-response.example.json',
+    'examples/execution-gateway/readiness-response.example.json',
+    'examples/execution-gateway/metrics-response.example.json',
   ];
   const manifestFiles = [];
   for (const relative of files) {
@@ -615,6 +724,8 @@ dist/
         value: "1"
       - key: NODE_ENV
         value: production
+      - key: BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE
+        value: "60"
 `);
 
   const readmePath = path.join(outDir, 'README.md');
@@ -645,6 +756,8 @@ Render POC constraints:
 - Do not add secrets or private environment variables.
 - Do not connect private repositories or work/org accounts.
 - Stop if the platform asks for a paid plan, payment method, private data, private repo access, or broader account permissions.
+- /v0/ready reports public-demo readiness only; production/customer traffic stays blocked.
+- /v0/dispatch is intentionally disabled in V0.
 `);
   manifestFiles.push(readmePath);
   return buildArtifactManifest({ outDir, files: manifestFiles, generatedAt, relativePaths: true });

@@ -10,7 +10,10 @@
   "blocked_input_scope": ["private", "secret", "regulated", "customer_data", "company_data", "local_file", "internal"],
   "endpoints": [
     { "method": "GET", "path": "/v0/health", "purpose": "Health and safety-mode check" },
+    { "method": "GET", "path": "/v0/ready", "purpose": "Readiness and production gate status" },
+    { "method": "GET", "path": "/v0/metrics", "purpose": "Metadata-only runtime metrics" },
     { "method": "POST", "path": "/v0/route", "purpose": "Return route decision for a public or synthetic outcome request" },
+    { "method": "POST", "path": "/v0/dispatch", "purpose": "Disabled dispatch endpoint that proves V0 never executes externally" },
     { "method": "POST", "path": "/v0/outcomes", "purpose": "Record outcome locally or in hosted-demo memory" },
     { "method": "GET", "path": "/v0/ledger/summary", "purpose": "Summarize outcome records" },
     { "method": "GET", "path": "/v0/openapi.json", "purpose": "OpenAPI contract" }
@@ -21,7 +24,11 @@
     "external_executions": 0,
     "hosted_demo_request_body_persistence": false,
     "hosted_demo_request_body_logging": false,
-    "external_supplier_execution": false
+    "external_supplier_execution": false,
+    "dispatch_enabled": false,
+    "security_headers_enabled": true,
+    "rate_limiting_enabled": true,
+    "customer_traffic_ready": false
   },
   "policy_blocks": [
     "requires_private_repo_access",
@@ -37,6 +44,7 @@
   "future_executor_classes_status": "represented_as_blocked_classes_in_v0",
   "verification_commands": [
     "npm run gateway:verify",
-    "npm run gateway:smoke:hosted"
+    "npm run gateway:smoke:hosted",
+    "BEAN_GATEWAY_BASE_URL=https://bean-execution-gateway-poc.onrender.com npm run gateway:smoke:hosted"
   ]
 }
