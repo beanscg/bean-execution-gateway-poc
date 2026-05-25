@@ -10,6 +10,7 @@ Live demo: https://bean-execution-gateway-poc.onrender.com
 - Classifies spend, private context, public writes, account credentials, external suppliers, secrets, regulated data, and unsafe work.
 - Returns a deterministic route decision with ranked local executors, stop conditions, cost fields, sanitizer findings, and verifier artifacts.
 - Records outcomes locally, or in memory only when running as the hosted public demo.
+- Scans fixture or read-only public GitHub demand through `/v0/open-demand/*`, ranks candidate tasks, builds local packets, and runs a static verifier.
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
@@ -45,6 +46,10 @@ curl -s http://127.0.0.1:8787/v0/health
 curl -s http://127.0.0.1:8787/v0/ready
 curl -s http://127.0.0.1:8787/v0/metrics
 curl -s http://127.0.0.1:8787/v0/openapi.json
+curl -s http://127.0.0.1:8787/v0/open-demand/health
+curl -s -X POST http://127.0.0.1:8787/v0/open-demand/scan \
+  -H 'content-type: application/json' \
+  -d '{"source_mode":"fixture","limit":6}'
 curl -s -X POST http://127.0.0.1:8787/v0/route \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/public-issue-request.json
@@ -62,7 +67,7 @@ npm run gateway:verify
 BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8787 npm run gateway:smoke:hosted
 ```
 
-The verification suite checks proof tasks, adversarial policy fixtures, schema self-tests, registry lint, zero spend, zero external writes, and zero external executions.
+The verification suite checks proof tasks, adversarial policy fixtures, schema self-tests, registry lint, open-demand guardrails, zero spend, zero external writes, and zero external executions.
 
 The hosted smoke suite also checks security headers, rate-limit headers, `/v0/ready`, `/v0/metrics`, disabled dispatch, hosted private-input rejection, and memory-only hosted outcomes.
 

@@ -436,6 +436,69 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'OpenAPI JSON' } },
     },
   };
+  const openDemandHealthPath = {
+    get: {
+      operationId: 'getOpenDemandHealthV0',
+      summary: 'Open-demand prototype health',
+      description: 'Reports the public open-demand guardrails. No external writes or spend.',
+      responses: { 200: { description: 'Open-demand health' } },
+    },
+  };
+  const openDemandLatestPath = {
+    get: {
+      operationId: 'getOpenDemandLatestV0',
+      summary: 'Latest open-demand scan',
+      description: 'Returns the latest in-memory open-demand scan, or fixture data if no scan has run.',
+      responses: { 200: { description: 'Latest open-demand scan' } },
+    },
+  };
+  const openDemandScanPath = {
+    post: {
+      operationId: 'postOpenDemandScanV0',
+      summary: 'Scan public demand',
+      description: 'Scans fixture data or read-only public GitHub issues and appends negative controls.',
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                source_mode: { type: 'string', enum: ['fixture', 'auto', 'live-github'] },
+                limit: { type: 'integer', minimum: 1, maximum: 50 },
+                query: { type: 'string' },
+              },
+              additionalProperties: false,
+            },
+          },
+        },
+      },
+      responses: { 200: { description: 'Ranked open-demand opportunities' } },
+    },
+  };
+  const openDemandBundlePath = {
+    post: {
+      operationId: 'postOpenDemandBundleV0',
+      summary: 'Build local task packet',
+      description: 'Builds an in-memory task packet. External submission remains disabled.',
+      responses: { 201: { description: 'Task bundle' } },
+    },
+  };
+  const openDemandRunPath = {
+    post: {
+      operationId: 'postOpenDemandRunV0',
+      summary: 'Run local verifier',
+      description: 'Runs the static prototype verifier and returns an evidence packet.',
+      responses: { 201: { description: 'Solver run and evidence packet' } },
+    },
+  };
+  const openDemandReportPath = {
+    get: {
+      operationId: 'getOpenDemandReportV0',
+      summary: 'Get evidence packet',
+      responses: { 200: { description: 'Evidence packet' } },
+    },
+  };
   return {
     openapi: '3.1.0',
     info: {
@@ -469,6 +532,13 @@ export function buildOpenApiSpec() {
       '/v0/outcomes': outcomePath,
       '/v0/ledger/summary': ledgerPath,
       '/v0/openapi.json': openApiPath,
+      '/v0/open-demand/health': openDemandHealthPath,
+      '/v0/open-demand/latest': openDemandLatestPath,
+      '/v0/open-demand/opportunities': openDemandLatestPath,
+      '/v0/open-demand/scan': openDemandScanPath,
+      '/v0/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
+      '/v0/open-demand/tasks/{task_id}/run': openDemandRunPath,
+      '/v0/open-demand/tasks/{task_id}/report': openDemandReportPath,
       '/health': healthPath,
       '/ready': readyPath,
       '/metrics': metricsPath,
@@ -477,6 +547,13 @@ export function buildOpenApiSpec() {
       '/outcomes': outcomePath,
       '/ledger/summary': ledgerPath,
       '/openapi.json': openApiPath,
+      '/open-demand/health': openDemandHealthPath,
+      '/open-demand/latest': openDemandLatestPath,
+      '/open-demand/opportunities': openDemandLatestPath,
+      '/open-demand/scan': openDemandScanPath,
+      '/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
+      '/open-demand/tasks/{task_id}/run': openDemandRunPath,
+      '/open-demand/tasks/{task_id}/report': openDemandReportPath,
     },
     components: {
       schemas: {

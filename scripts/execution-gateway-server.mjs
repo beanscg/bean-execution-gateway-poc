@@ -18,6 +18,10 @@ import {
   buildOpenApiSpec,
   summarizeLedgerFile,
 } from './execution-gateway-tools.mjs';
+import {
+  OpenDemandError,
+  createOpenDemandService,
+} from './open-demand-lib.mjs';
 
 const API_VERSION = 'v0';
 const DEMO_ASSET_PATH = path.join(rootDir, 'assets', 'execution-gateway-demo', 'index.html');
@@ -289,6 +293,7 @@ function readJsonBody(req) {
 function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false }) {
   const memoryLedger = [];
   const metrics = createMetrics();
+  const openDemand = createOpenDemandService();
   const rateLimiter = createRateLimiter({
     limitPerMinute: parsePositiveInteger(process.env.BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE, DEFAULT_RATE_LIMIT_PER_MINUTE),
   });
@@ -420,6 +425,56 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/open-demand/health') {
+        reply(200, openDemand.health());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/open-demand/latest') {
+        reply(200, await openDemand.latest());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/open-demand/opportunities') {
+        reply(200, await openDemand.opportunities());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname.startsWith('/open-demand/tasks/') && pathname.endsWith('/report')) {
+        const taskId = pathname.replace(/^\/open-demand\/tasks\//, '').replace(/\/report$/, '');
+        reply(200, await openDemand.report(taskId));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/open-demand/scan') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, {
+            ok: false,
+            hosted_demo: true,
+            error: hostedRejectReason,
+            warning: HOSTED_DEMO_WARNING,
+          });
+          return;
+        }
+        reply(200, await openDemand.scan(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname.startsWith('/open-demand/opportunities/') && pathname.endsWith('/bundle')) {
+        const opportunityId = pathname.replace(/^\/open-demand\/opportunities\//, '').replace(/\/bundle$/, '');
+        reply(201, await openDemand.bundle(decodeURIComponent(opportunityId)));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname.startsWith('/open-demand/tasks/') && pathname.endsWith('/run')) {
+        const taskId = pathname.replace(/^\/open-demand\/tasks\//, '').replace(/\/run$/, '');
+        reply(201, await openDemand.run(decodeURIComponent(taskId)));
+        return;
+      }
+
       const authorization = authorizeRequest(req, pathname);
       if (!authorization.ok) {
         reply(authorization.statusCode, {
@@ -538,6 +593,13 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
       });
     } catch (error) {
       metrics.errors += 1;
+      if (error instanceof OpenDemandError) {
+        reply(error.statusCode || 400, {
+          ok: false,
+          error: error.message,
+        });
+        return;
+      }
       if (error.code === 'BODY_TOO_LARGE') {
         metrics.body_too_large += 1;
         reply(413, {

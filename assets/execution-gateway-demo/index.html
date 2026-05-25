@@ -81,6 +81,129 @@
       font-size: 14px;
       line-height: 1.4;
     }
+    .open-demand {
+      margin-bottom: 16px;
+    }
+    .open-demand-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+    .open-demand-head h2 {
+      margin: 0 0 5px;
+      font-size: 22px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+    .open-demand-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: end;
+      justify-content: flex-end;
+    }
+    .open-demand-controls label {
+      margin: 0;
+      min-width: 180px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    input,
+    select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      padding: 9px 10px;
+      font: inherit;
+    }
+    .open-demand-metrics,
+    .open-demand-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .open-demand-metrics div,
+    .open-demand-detail-grid div {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      min-width: 0;
+    }
+    .open-demand-metrics strong,
+    .open-demand-detail-grid strong {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .open-demand-metrics span,
+    .open-demand-detail-grid span {
+      display: block;
+      font-size: 15px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+    .open-demand-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .opportunity-list {
+      display: grid;
+      gap: 6px;
+      max-height: 420px;
+      overflow: auto;
+    }
+    .opportunity-card {
+      width: 100%;
+      text-align: left;
+      display: grid;
+      gap: 5px;
+      min-height: 70px;
+      background: #fbfcfa;
+    }
+    .opportunity-card.selected {
+      border-color: var(--accent);
+      background: #eef7f3;
+    }
+    .opportunity-card strong,
+    .open-demand-detail h3 {
+      overflow-wrap: anywhere;
+    }
+    .opportunity-card small,
+    .open-demand-status,
+    .open-demand-detail p {
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .open-demand-detail {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fbfcfa;
+      padding: 12px;
+      min-height: 220px;
+    }
+    .open-demand-detail h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+    .open-demand-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .open-demand-report {
+      margin-top: 10px;
+      min-height: 120px;
+    }
     .grid {
       display: grid;
       grid-template-columns: minmax(320px, 0.84fr) minmax(420px, 1.16fr);
@@ -186,11 +309,13 @@
     .warnText { color: var(--warn); }
     @media (max-width: 920px) {
       header { grid-template-columns: 1fr; align-items: start; }
-      .grid { grid-template-columns: 1fr; }
-      .status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid, .open-demand-head, .open-demand-layout { grid-template-columns: 1fr; }
+      .status, .open-demand-metrics, .open-demand-detail-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .open-demand-controls { justify-content: stretch; }
+      .open-demand-controls label { min-width: 100%; }
     }
     @media (max-width: 520px) {
-      .status { grid-template-columns: 1fr; }
+      .status, .open-demand-metrics, .open-demand-detail-grid { grid-template-columns: 1fr; }
       h1 { font-size: 24px; }
     }
   </style>
@@ -208,6 +333,32 @@
     <div class="notice">
       Public demo boundary: zero spend, no external writes, no supplier execution, no request-body persistence. Do not paste private, work, company, customer, secret, credential, local-file, internal, or regulated data.
     </div>
+
+    <section class="open-demand">
+      <div class="open-demand-head">
+        <div>
+          <h2>Open Demand Prototype</h2>
+          <p>Scan public work signals, rank agent-solvable tasks, and build local evidence packets.</p>
+        </div>
+        <div class="open-demand-controls">
+          <label>
+            Source
+            <select id="openDemandSource">
+              <option value="fixture">Fixture</option>
+              <option value="auto">Live GitHub with fallback</option>
+              <option value="live-github">Live GitHub only</option>
+            </select>
+          </label>
+          <button class="primary" id="openDemandScan">Scan</button>
+        </div>
+      </div>
+      <div class="open-demand-metrics" id="openDemandMetrics"></div>
+      <div class="open-demand-status" id="openDemandStatus">Loading open demand prototype</div>
+      <div class="open-demand-layout">
+        <div class="opportunity-list" id="openDemandOpportunities"></div>
+        <div class="open-demand-detail" id="openDemandDetail"></div>
+      </div>
+    </section>
 
     <div class="grid">
       <section>
@@ -282,11 +433,28 @@
     const versionEl = document.querySelector('#version');
     const healthDot = document.querySelector('#healthDot');
     const healthText = document.querySelector('#healthText');
+    const openDemandSource = document.querySelector('#openDemandSource');
+    const openDemandScan = document.querySelector('#openDemandScan');
+    const openDemandMetrics = document.querySelector('#openDemandMetrics');
+    const openDemandStatus = document.querySelector('#openDemandStatus');
+    const openDemandOpportunities = document.querySelector('#openDemandOpportunities');
+    const openDemandDetail = document.querySelector('#openDemandDetail');
+    let openDemand = null;
+    let selectedOpportunityId = '';
     let lastPayload = null;
     let activeView = 'summary';
 
     function loadSample(sample) {
       requestEl.value = JSON.stringify(sample, null, 2);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
     }
 
     function setMetricClass(element, className) {
@@ -366,10 +534,158 @@
       }
     }
 
+    function openDemandOpportunity(id) {
+      return (openDemand?.opportunities || []).find((item) => item.id === id) || null;
+    }
+
+    function openDemandBundle(opportunityId) {
+      return (openDemand?.bundles || []).find((item) => item.opportunity_id === opportunityId) || null;
+    }
+
+    function openDemandReport(taskId) {
+      return (openDemand?.reports || []).find((item) => item.task_id === taskId) || null;
+    }
+
+    function decisionText(decision) {
+      if (decision === 'execute_local_training') return 'ready';
+      if (decision === 'draft_review_packet') return 'packet';
+      if (decision === 'inspect_more') return 'inspect';
+      if (decision === 'reject') return 'reject';
+      return decision || 'unknown';
+    }
+
+    function sourceText(source) {
+      const mode = source?.source_mode || 'unknown';
+      if (mode === 'live_github_with_negative_controls') return 'live GitHub';
+      if (mode === 'fixture_fallback') return 'fixture fallback';
+      return mode.replaceAll('_', ' ');
+    }
+
+    function renderOpenDemand() {
+      if (!openDemand) {
+        openDemandMetrics.innerHTML = '';
+        openDemandOpportunities.innerHTML = '';
+        openDemandDetail.textContent = 'No scan loaded yet.';
+        return;
+      }
+      const metrics = openDemand.metrics || {};
+      openDemandMetrics.innerHTML = [
+        ['Source', sourceText(openDemand.source)],
+        ['Scanned', metrics.opportunities_scanned ?? 0],
+        ['Selected', metrics.selected_candidates ?? 0],
+        ['Top 10 precision', metrics.candidate_precision_top_10 ?? 0],
+        ['Guardrail hits', metrics.guardrail_violations ?? 0],
+      ].map(([label, value]) => `<div><strong>${label}</strong><span>${value}</span></div>`).join('');
+
+      const opportunities = openDemand.opportunities || [];
+      const selected = openDemandOpportunity(selectedOpportunityId) || opportunities.find((item) => item.decision !== 'reject') || opportunities[0] || null;
+      selectedOpportunityId = selected?.id || '';
+      openDemandOpportunities.innerHTML = opportunities.slice(0, 12).map((item) => `
+        <button class="opportunity-card${item.id === selectedOpportunityId ? ' selected' : ''}" data-opportunity-id="${escapeHtml(item.id)}">
+          <strong>${escapeHtml(item.title)}</strong>
+          <small>${escapeHtml(item.repository || item.source_type || item.lane)}</small>
+          <small>${escapeHtml(decisionText(item.decision))} · train ${escapeHtml(item.trainability_score ?? 0)} · ready ${escapeHtml(item.execution_readiness_score ?? 0)}</small>
+        </button>
+      `).join('') || 'No opportunities found.';
+
+      if (!selected) {
+        openDemandDetail.textContent = 'Run a scan to load opportunities.';
+        return;
+      }
+      const bundle = openDemandBundle(selected.id);
+      const report = bundle ? openDemandReport(bundle.task_id) : null;
+      openDemandDetail.innerHTML = `
+        <h3>${escapeHtml(selected.title)}</h3>
+        <p>${escapeHtml(selected.body_excerpt || selected.title)}</p>
+        <div class="open-demand-detail-grid">
+          <div><strong>Lane</strong><span>${escapeHtml(selected.lane)}</span></div>
+          <div><strong>Decision</strong><span>${escapeHtml(decisionText(selected.decision))}</span></div>
+          <div><strong>Human gates</strong><span>${escapeHtml((selected.human_blockers || []).join(', ') || 'none')}</span></div>
+          <div><strong>Hard blockers</strong><span>${escapeHtml((selected.hard_blockers || []).join(', ') || 'none')}</span></div>
+          <div><strong>Cash</strong><span>$${escapeHtml(selected.cash_potential_usd_min ?? 0)}-$${escapeHtml(selected.cash_potential_usd_max ?? 0)}</span></div>
+        </div>
+        <div class="open-demand-actions">
+          <button data-open-demand-action="bundle" data-opportunity-id="${escapeHtml(selected.id)}">Build packet</button>
+          <button data-open-demand-action="run" data-task-id="${escapeHtml(bundle?.task_id || '')}" ${bundle ? '' : 'disabled'}>Run verifier</button>
+          <button disabled>External submission gated</button>
+        </div>
+        ${bundle ? `<pre class="open-demand-report">${escapeHtml(JSON.stringify(report || bundle, null, 2))}</pre>` : ''}
+      `;
+    }
+
+    async function loadOpenDemandLatest() {
+      try {
+        const response = await fetch(`${apiRoot}/v0/open-demand/latest`);
+        openDemand = await response.json();
+        openDemandStatus.textContent = 'Prototype loaded. No external actions have been performed.';
+      } catch (error) {
+        openDemandStatus.textContent = error.message;
+      }
+      renderOpenDemand();
+    }
+
+    async function scanOpenDemand() {
+      openDemandScan.disabled = true;
+      openDemandStatus.textContent = 'Scanning open demand...';
+      try {
+        const response = await fetch(`${apiRoot}/v0/open-demand/scan`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ source_mode: openDemandSource.value, limit: 12 })
+        });
+        openDemand = await response.json();
+        selectedOpportunityId = '';
+        openDemandStatus.textContent = response.ok ? 'Scan complete. Results are local evidence only.' : openDemand.error || 'Scan failed.';
+      } catch (error) {
+        openDemandStatus.textContent = error.message;
+      } finally {
+        openDemandScan.disabled = false;
+        renderOpenDemand();
+      }
+    }
+
+    async function buildOpenDemandPacket(opportunityId) {
+      const response = await fetch(`${apiRoot}/v0/open-demand/opportunities/${encodeURIComponent(opportunityId)}/bundle`, { method: 'POST' });
+      const payload = await response.json();
+      if (!response.ok) {
+        openDemandStatus.textContent = payload.error || 'Packet failed.';
+        return;
+      }
+      openDemand = await (await fetch(`${apiRoot}/v0/open-demand/latest`)).json();
+      selectedOpportunityId = opportunityId;
+      openDemandStatus.textContent = 'Task packet ready. External submission remains gated.';
+      renderOpenDemand();
+    }
+
+    async function runOpenDemandVerifier(taskId) {
+      const response = await fetch(`${apiRoot}/v0/open-demand/tasks/${encodeURIComponent(taskId)}/run`, { method: 'POST' });
+      const payload = await response.json();
+      if (!response.ok) {
+        openDemandStatus.textContent = payload.error || 'Verifier failed.';
+        return;
+      }
+      openDemand = await (await fetch(`${apiRoot}/v0/open-demand/latest`)).json();
+      openDemandStatus.textContent = 'Verifier complete. Evidence packet is ready for review.';
+      renderOpenDemand();
+    }
+
     document.querySelector('#safe').addEventListener('click', () => loadSample(safeSample));
     document.querySelector('#blocked').addEventListener('click', () => loadSample(blockedSample));
     document.querySelector('#privateReject').addEventListener('click', () => loadSample(privateRejectSample));
     routeButton.addEventListener('click', routeRequest);
+    openDemandScan.addEventListener('click', scanOpenDemand);
+    openDemandOpportunities.addEventListener('click', (event) => {
+      const card = event.target.closest('[data-opportunity-id]');
+      if (!card) return;
+      selectedOpportunityId = card.dataset.opportunityId;
+      renderOpenDemand();
+    });
+    openDemandDetail.addEventListener('click', async (event) => {
+      const control = event.target.closest('[data-open-demand-action]');
+      if (!control) return;
+      if (control.dataset.openDemandAction === 'bundle') await buildOpenDemandPacket(control.dataset.opportunityId);
+      if (control.dataset.openDemandAction === 'run') await runOpenDemandVerifier(control.dataset.taskId);
+    });
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.addEventListener('click', () => {
         activeView = tab.dataset.view;
@@ -380,6 +696,7 @@
 
     loadSample(safeSample);
     refreshHealth();
+    loadOpenDemandLatest();
   </script>
 </body>
 </html>

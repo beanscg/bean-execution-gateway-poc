@@ -223,6 +223,118 @@
         }
       }
     },
+    "/v0/open-demand/health": {
+      "get": {
+        "operationId": "getOpenDemandHealthV0",
+        "summary": "Open-demand prototype health",
+        "description": "Reports the public open-demand guardrails. No external writes or spend.",
+        "responses": {
+          "200": {
+            "description": "Open-demand health"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/latest": {
+      "get": {
+        "operationId": "getOpenDemandLatestV0",
+        "summary": "Latest open-demand scan",
+        "description": "Returns the latest in-memory open-demand scan, or fixture data if no scan has run.",
+        "responses": {
+          "200": {
+            "description": "Latest open-demand scan"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/opportunities": {
+      "get": {
+        "operationId": "getOpenDemandLatestV0",
+        "summary": "Latest open-demand scan",
+        "description": "Returns the latest in-memory open-demand scan, or fixture data if no scan has run.",
+        "responses": {
+          "200": {
+            "description": "Latest open-demand scan"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/scan": {
+      "post": {
+        "operationId": "postOpenDemandScanV0",
+        "summary": "Scan public demand",
+        "description": "Scans fixture data or read-only public GitHub issues and appends negative controls.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source_mode": {
+                    "type": "string",
+                    "enum": [
+                      "fixture",
+                      "auto",
+                      "live-github"
+                    ]
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ranked open-demand opportunities"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/opportunities/{opportunity_id}/bundle": {
+      "post": {
+        "operationId": "postOpenDemandBundleV0",
+        "summary": "Build local task packet",
+        "description": "Builds an in-memory task packet. External submission remains disabled.",
+        "responses": {
+          "201": {
+            "description": "Task bundle"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/tasks/{task_id}/run": {
+      "post": {
+        "operationId": "postOpenDemandRunV0",
+        "summary": "Run local verifier",
+        "description": "Runs the static prototype verifier and returns an evidence packet.",
+        "responses": {
+          "201": {
+            "description": "Solver run and evidence packet"
+          }
+        }
+      }
+    },
+    "/v0/open-demand/tasks/{task_id}/report": {
+      "get": {
+        "operationId": "getOpenDemandReportV0",
+        "summary": "Get evidence packet",
+        "responses": {
+          "200": {
+            "description": "Evidence packet"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "operationId": "getHealthV0",
@@ -413,6 +525,118 @@
         "responses": {
           "200": {
             "description": "OpenAPI JSON"
+          }
+        }
+      }
+    },
+    "/open-demand/health": {
+      "get": {
+        "operationId": "getOpenDemandHealthV0",
+        "summary": "Open-demand prototype health",
+        "description": "Reports the public open-demand guardrails. No external writes or spend.",
+        "responses": {
+          "200": {
+            "description": "Open-demand health"
+          }
+        }
+      }
+    },
+    "/open-demand/latest": {
+      "get": {
+        "operationId": "getOpenDemandLatestV0",
+        "summary": "Latest open-demand scan",
+        "description": "Returns the latest in-memory open-demand scan, or fixture data if no scan has run.",
+        "responses": {
+          "200": {
+            "description": "Latest open-demand scan"
+          }
+        }
+      }
+    },
+    "/open-demand/opportunities": {
+      "get": {
+        "operationId": "getOpenDemandLatestV0",
+        "summary": "Latest open-demand scan",
+        "description": "Returns the latest in-memory open-demand scan, or fixture data if no scan has run.",
+        "responses": {
+          "200": {
+            "description": "Latest open-demand scan"
+          }
+        }
+      }
+    },
+    "/open-demand/scan": {
+      "post": {
+        "operationId": "postOpenDemandScanV0",
+        "summary": "Scan public demand",
+        "description": "Scans fixture data or read-only public GitHub issues and appends negative controls.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "source_mode": {
+                    "type": "string",
+                    "enum": [
+                      "fixture",
+                      "auto",
+                      "live-github"
+                    ]
+                  },
+                  "limit": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 50
+                  },
+                  "query": {
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ranked open-demand opportunities"
+          }
+        }
+      }
+    },
+    "/open-demand/opportunities/{opportunity_id}/bundle": {
+      "post": {
+        "operationId": "postOpenDemandBundleV0",
+        "summary": "Build local task packet",
+        "description": "Builds an in-memory task packet. External submission remains disabled.",
+        "responses": {
+          "201": {
+            "description": "Task bundle"
+          }
+        }
+      }
+    },
+    "/open-demand/tasks/{task_id}/run": {
+      "post": {
+        "operationId": "postOpenDemandRunV0",
+        "summary": "Run local verifier",
+        "description": "Runs the static prototype verifier and returns an evidence packet.",
+        "responses": {
+          "201": {
+            "description": "Solver run and evidence packet"
+          }
+        }
+      }
+    },
+    "/open-demand/tasks/{task_id}/report": {
+      "get": {
+        "operationId": "getOpenDemandReportV0",
+        "summary": "Get evidence packet",
+        "responses": {
+          "200": {
+            "description": "Evidence packet"
           }
         }
       }
