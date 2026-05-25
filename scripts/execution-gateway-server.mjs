@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import http from 'node:http';
+import fs from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -16,6 +17,10 @@ import {
   buildOpenApiSpec,
   summarizeLedgerFile,
 } from './execution-gateway-tools.mjs';
+
+const API_VERSION = 'v0';
+const DEMO_ASSET_PATH = path.join(rootDir, 'assets', 'execution-gateway-demo', 'index.html');
+const HOSTED_DEMO_WARNING = 'Do not paste private, work, company, customer, secret, credential, local file, internal, or regulated context into the public demo.';
 
 function parseFlags(argv) {
   const flags = { _: [] };
@@ -45,6 +50,16 @@ function sendJson(res, statusCode, payload, extraHeaders = {}) {
     ...extraHeaders,
   });
   res.end(`${JSON.stringify(payload, null, 2)}\n`);
+}
+
+function sendHtml(res, statusCode, html, extraHeaders = {}) {
+  res.writeHead(statusCode, {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'no-store',
+    'x-bean-api-surface': 'execution-gateway',
+    ...extraHeaders,
+  });
+  res.end(html);
 }
 
 const hostedRejectPattern = /\b(?:work\s+data|company\s+data|customer\s+data|customer\s+file|private\s+repo|internal\s+repo|api[_-]?key|secret|password|token)\b|(?:private|internal|vpn|intranet|localhost|127\.0\.0\.1|0\.0\.0\.0|file):\/\/|\/Users\/|\/private\/|~\//i;
@@ -96,10 +111,18 @@ function readJsonBody(req) {
 function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false }) {
   const memoryLedger = [];
   return http.createServer(async (req, res) => {
+    const url = new URL(req.url || '/', 'http://bean.local');
+    const pathname = url.pathname === '/v0' ? '/' : url.pathname.replace(/^\/v0(?=\/)/, '');
     const modeHeaders = hostedDemo
       ? { 'x-bean-hosted-demo': 'true', 'x-bean-local-only': 'false' }
       : { 'x-bean-hosted-demo': 'false', 'x-bean-local-only': 'true' };
-    const reply = (statusCode, payload) => sendJson(res, statusCode, payload, modeHeaders);
+    const withMeta = (payload) => ({
+      api_version: API_VERSION,
+      public_demo: hostedDemo,
+      hosted_demo: hostedDemo,
+      ...payload,
+    });
+    const reply = (statusCode, payload) => sendJson(res, statusCode, withMeta(payload), modeHeaders);
 
     try {
       if (req.method === 'OPTIONS') {
@@ -110,7 +133,12 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
-      if (req.method === 'GET' && req.url === '/health') {
+      if (req.method === 'GET' && (pathname === '/' || pathname === '/demo')) {
+        sendHtml(res, 200, fs.readFileSync(DEMO_ASSET_PATH, 'utf8'), modeHeaders);
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/health') {
         reply(200, {
           ok: true,
           local_only: !hostedDemo,
@@ -122,31 +150,36 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
           request_body_logging: false,
           request_body_persistence: false,
           disk_ledger_writes_default: !hostedDemo,
+          warning: hostedDemo ? HOSTED_DEMO_WARNING : 'Local API only. Do not expose private data unless you own the environment.',
         });
         return;
       }
 
-      if (req.method === 'GET' && req.url === '/openapi.json') {
-        reply(200, buildOpenApiSpec());
+      if (req.method === 'GET' && pathname === '/openapi.json') {
+        sendJson(res, 200, buildOpenApiSpec(), modeHeaders);
         return;
       }
 
-      if (req.method === 'GET' && req.url === '/ledger/summary') {
+      if (req.method === 'GET' && pathname === '/ledger/summary') {
         reply(200, hostedDemo
           ? { ledger_path: 'memory://hosted-demo/outcomes', ...summarizeOutcomeLedger(memoryLedger), hosted_demo: true }
           : summarizeLedgerFile(ledgerPath));
         return;
       }
 
-      if (req.method === 'POST' && req.url === '/route') {
-        const input = await readJsonBody(req);
+      if (req.method === 'POST' && pathname === '/route') {
+        const body = await readJsonBody(req);
+        const input = {
+          ...body,
+          adapter_boundary: hostedDemo ? 'hosted_api' : body.adapter_boundary,
+        };
         const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(input) : null;
         if (hostedRejectReason) {
           reply(400, {
             ok: false,
             hosted_demo: true,
             error: hostedRejectReason,
-            warning: 'Do not paste private, work, company, customer, secret, credential, local file, or internal context into the public demo.',
+            warning: HOSTED_DEMO_WARNING,
           });
           return;
         }
@@ -165,7 +198,7 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
-      if (req.method === 'POST' && req.url === '/outcomes') {
+      if (req.method === 'POST' && pathname === '/outcomes') {
         const input = await readJsonBody(req);
         if (hostedDemo) {
           const record = buildOutcomeRecord(input);

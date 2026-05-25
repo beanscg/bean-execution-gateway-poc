@@ -484,7 +484,7 @@ function chooseDecision(request, policyResult, rankedOptions) {
       policy_decision: 'deny',
       selected_executor_id: null,
       recommendation: 'Do not execute. The request crosses the V0 safety or zero-spend boundary.',
-      permission_statement: 'Recommendation is not permission. This route is blocked until Stephen explicitly approves a narrower, safe packet.',
+      permission_statement: 'Recommendation is not permission. This route is blocked until the operator explicitly approves a narrower, safe packet.',
     };
   }
   if (policyResult.policy_state === 'approval_required') {
@@ -494,7 +494,7 @@ function chooseDecision(request, policyResult, rankedOptions) {
       policy_state: 'approval_required',
       policy_decision: 'needs_approval',
       selected_executor_id: null,
-      recommendation: 'Ask Stephen for explicit approval or a free-only policy before any execution.',
+      recommendation: 'Ask the operator for explicit approval or a free-only policy before any execution.',
       permission_statement: 'Recommendation is not permission. Missing or non-free-only policy cannot execute in V0.',
     };
   }
@@ -506,7 +506,7 @@ function chooseDecision(request, policyResult, rankedOptions) {
       policy_state: 'approval_required',
       policy_decision: 'needs_approval',
       selected_executor_id: null,
-      recommendation: 'No local zero-cost executor can satisfy this request. Ask Stephen before proceeding.',
+      recommendation: 'No local zero-cost executor can satisfy this request. Ask the operator before proceeding.',
       permission_statement: 'Recommendation is not permission. No selectable local route exists.',
     };
   }
@@ -956,7 +956,7 @@ ${repeatCases || '- None'}
 
 ## Decision
 
-V0 is allowed to continue only as a local, free, CLI-backed gateway. Hosted adapters, public release, external suppliers, account mutation, payment rails, and private-context handling remain blocked until Stephen explicitly approves a separate packet.
+V0 is allowed to continue only as a local, free, CLI-backed gateway. Hosted adapters, public release, external suppliers, account mutation, payment rails, and private-context handling remain blocked until the operator explicitly approves a separate packet.
 `;
 }
 

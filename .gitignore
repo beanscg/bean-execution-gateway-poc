@@ -2,5 +2,14 @@ node_modules/
 dist/
 .env
 .env.*
+.env.local
+.env.production
 *.log
+*.key
+*.pem
+*.p12
+*.pfx
+aws/credentials
+id_rsa
+id_ed25519
 .DS_Store

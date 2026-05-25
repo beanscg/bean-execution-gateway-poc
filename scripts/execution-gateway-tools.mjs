@@ -284,6 +284,106 @@ export function runSchemaSelfTest({ samplePath, adversarialPath, proofPath, regi
 }
 
 export function buildOpenApiSpec() {
+  const routePath = {
+    post: {
+      operationId: 'createExecutionRouteV0',
+      summary: 'Find a policy-gated execution path for public or synthetic input',
+      description: 'Returns a route decision only. It does not execute external actions, spend money, call suppliers, or persist request bodies in hosted-demo mode.',
+      requestBody: {
+        required: true,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/ExecutionGatewayRequestV0' },
+            examples: {
+              allowed: {
+                summary: 'Public issue triage',
+                value: {
+                  outcome: {
+                    goal: 'Triage a public GitHub issue and produce a local next-step packet.',
+                    task_type: 'issue_triage',
+                    desired_artifact: 'triage_packet',
+                    success_criteria: ['local artifact', 'verifier plan', 'no public comment'],
+                  },
+                  context_refs: ['https://github.com/example/project/issues/101'],
+                  policy: { mode: 'free_only' },
+                },
+              },
+              blocked: {
+                summary: 'Paid public write is blocked',
+                value: {
+                  outcome: {
+                    goal: 'Use a paid API and post a comment on the public issue.',
+                    task_type: 'agent_task_triage',
+                    desired_artifact: 'blocked_packet',
+                  },
+                  context_refs: ['https://github.com/example/project/issues/102'],
+                  policy: { mode: 'free_only' },
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: {
+        200: {
+          description: 'ExecutionGatewayResponseV0 route decision',
+          content: {
+            'application/json': {
+              schema: { $ref: '#/components/schemas/ExecutionGatewayResponseV0' },
+            },
+          },
+        },
+        400: {
+          description: 'Invalid JSON or hosted-demo private/secret input rejection',
+          content: {
+            'application/json': {
+              examples: {
+                hostedReject: {
+                  value: {
+                    api_version: 'v0',
+                    ok: false,
+                    hosted_demo: true,
+                    error: 'hosted_demo_rejects_private_work_or_secret_like_context',
+                    warning: 'Do not paste private, work, company, customer, secret, credential, local file, internal, or regulated context into the public demo.',
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };
+  const outcomePath = {
+    post: {
+      operationId: 'recordExecutionOutcomeV0',
+      summary: 'Record an outcome locally or in hosted-demo memory',
+      description: 'Hosted-demo mode records outcomes only in process memory and does not write to disk.',
+      responses: { 200: { description: 'Outcome record result' } },
+    },
+  };
+  const ledgerPath = {
+    get: {
+      operationId: 'getLedgerSummaryV0',
+      summary: 'Summarize the outcome ledger',
+      description: 'Hosted-demo mode reports the in-memory demo ledger only.',
+      responses: { 200: { description: 'Ledger summary' } },
+    },
+  };
+  const healthPath = {
+    get: {
+      operationId: 'getHealthV0',
+      summary: 'Health and safety mode check',
+      responses: { 200: { description: 'OK' } },
+    },
+  };
+  const openApiPath = {
+    get: {
+      operationId: 'getOpenApiV0',
+      summary: 'OpenAPI document',
+      responses: { 200: { description: 'OpenAPI JSON' } },
+    },
+  };
   return {
     openapi: '3.1.0',
     info: {
@@ -292,36 +392,56 @@ export function buildOpenApiSpec() {
       description: 'Guardrailed API for route decisions, outcome records, and ledger summaries. No external execution.',
       summary: 'Hosted-demo mode must use public/synthetic inputs only and must not persist request bodies.',
     },
-    servers: [{ url: 'http://127.0.0.1:8787', description: 'Localhost or hosted-demo deployment' }],
+    servers: [
+      { url: 'http://127.0.0.1:8787', description: 'Localhost deployment' },
+      { url: 'https://bean-execution-gateway-poc.onrender.com', description: 'Public hosted demo on Render Free' },
+    ],
+    'x-bean-constraints': {
+      api_version: 'v0',
+      spend_usd: 0,
+      external_writes: 0,
+      external_executions: 0,
+      hosted_demo_request_body_persistence: false,
+      hosted_demo_input_scope: 'public_or_synthetic_only',
+    },
     paths: {
-      '/health': {
-        get: {
-          summary: 'Health check',
-          responses: { 200: { description: 'OK' } },
+      '/v0/health': healthPath,
+      '/v0/route': routePath,
+      '/v0/outcomes': outcomePath,
+      '/v0/ledger/summary': ledgerPath,
+      '/v0/openapi.json': openApiPath,
+      '/health': healthPath,
+      '/route': routePath,
+      '/outcomes': outcomePath,
+      '/ledger/summary': ledgerPath,
+      '/openapi.json': openApiPath,
+    },
+    components: {
+      schemas: {
+        ExecutionGatewayRequestV0: {
+          type: 'object',
+          required: ['outcome'],
+          properties: {
+            outcome: { type: 'object', required: ['goal'] },
+            context_refs: { type: 'array' },
+            policy: { type: 'object' },
+          },
+          additionalProperties: true,
         },
-      },
-      '/route': {
-        post: {
-          summary: 'Find a local execution path for public/synthetic input',
-          responses: { 200: { description: 'ExecutionGatewayResponse' } },
-        },
-      },
-      '/outcomes': {
-        post: {
-          summary: 'Record an outcome locally or in hosted-demo memory',
-          responses: { 200: { description: 'Outcome record result' } },
-        },
-      },
-      '/ledger/summary': {
-        get: {
-          summary: 'Summarize local outcome ledger',
-          responses: { 200: { description: 'Ledger summary' } },
-        },
-      },
-      '/openapi.json': {
-        get: {
-          summary: 'OpenAPI document',
-          responses: { 200: { description: 'OpenAPI JSON' } },
+        ExecutionGatewayResponseV0: {
+          type: 'object',
+          required: ['route_run_id', 'request_id', 'decision', 'cost', 'stop_conditions', 'sanitization_report'],
+          properties: {
+            api_version: { type: 'string', const: 'v0' },
+            route_run_id: { type: 'string' },
+            request_id: { type: 'string' },
+            decision: { type: 'object' },
+            cost: { type: 'object' },
+            stop_conditions: { type: 'array', items: { type: 'string' } },
+            sanitization_report: { type: 'object' },
+            hosted_demo: { type: 'boolean' },
+          },
+          additionalProperties: true,
         },
       },
     },
@@ -419,6 +539,20 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'sdk/execution-gateway/js/README.md',
     'sdk/execution-gateway/python/bean_execution_gateway_client.py',
     'sdk/execution-gateway/python/README.md',
+    'AGENTS.md',
+    'LICENSE',
+    'PRIVACY.md',
+    'SECURITY.md',
+    'capability-manifest.json',
+    'llms.txt',
+    'llms-full.txt',
+    'docs/product-definition.md',
+    'docs/poc-truth.md',
+    'docs/api-examples.md',
+    'docs/safety-and-trust.md',
+    'docs/v1-readiness.md',
+    'docs/pre-discovery-readiness.md',
+    'docs/evidence.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
     'adapters/execution-gateway/slack-app-adapter.stub.md',
@@ -426,6 +560,12 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'assets/execution-gateway-demo/index.html',
     'examples/execution-gateway/public-issue-request.json',
     'examples/execution-gateway/blocked-paid-public-write-request.json',
+    'examples/execution-gateway/private-input-rejected-request.json',
+    'examples/execution-gateway/outcome-record.json',
+    'examples/execution-gateway/route-allowed-response.example.json',
+    'examples/execution-gateway/route-denied-response.example.json',
+    'examples/execution-gateway/hosted-private-rejection-response.example.json',
+    'examples/execution-gateway/ledger-summary.example.json',
   ];
   const manifestFiles = [];
   for (const relative of files) {
@@ -444,7 +584,9 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     engines: { node: '>=20' },
     scripts: {
       start: 'npm run gateway:server:hosted-demo',
+      'gateway:demo': 'npm run gateway:server:hosted-demo',
       'gateway:server:hosted-demo': 'BEAN_GATEWAY_HOSTED_DEMO=1 node scripts/execution-gateway-server.mjs --host 0.0.0.0 --port ${PORT:-8787}',
+      'gateway:smoke:hosted': 'node scripts/execution-gateway.mjs hosted-smoke --base-url ${BEAN_GATEWAY_BASE_URL:-http://127.0.0.1:8787}',
       'gateway:verify': 'node scripts/execution-gateway.mjs verify --out dist/execution-gateway/verification',
     },
   }, null, 2)}\n`);
@@ -476,17 +618,24 @@ dist/
 `);
 
   const readmePath = path.join(outDir, 'README.md');
-  fs.writeFileSync(readmePath, `# Bean Execution Gateway POC Package
+  fs.writeFileSync(readmePath, `# Bean Execution Gateway
 
 Generated: ${generatedAt}
 
-This package is the public-only hosted-demo source for the Bean Execution Gateway POC. It includes no deployment credentials, payment rails, external supplier integrations, private-context handling, personal ledgers, or private workspace files.
+Bean Execution Gateway is a public POC for routing outcome requests through policy, cost, safety, and verifier gates before an agent chooses an execution path.
 
 Run locally:
 
 \`\`\`bash
 npm run gateway:verify
-npm run gateway:server:hosted-demo
+npm run gateway:demo
+\`\`\`
+
+If 8787 is already in use:
+
+\`\`\`bash
+PORT=8791 npm run gateway:demo
+BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8791 npm run gateway:smoke:hosted
 \`\`\`
 
 Render POC constraints:

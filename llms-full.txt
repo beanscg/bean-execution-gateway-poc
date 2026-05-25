@@ -1,0 +1,41 @@
+# Bean Execution Gateway Full Agent Context
+
+## Summary
+
+Bean Execution Gateway is a route-decision layer for agents. It accepts an outcome request, evaluates policy and data boundaries, ranks eligible local executors, and returns a decision with cost, stop conditions, sanitizer findings, and verifier requirements.
+
+The POC demonstrates the control plane for source-agnostic agent execution. Demand may come from GitHub, chat, browser agents, workflow runners, app wrappers, or internal automation. Supply may eventually include owned agents, local runners, workflow tools, and external supplier networks. V0 does not call external suppliers.
+
+## Current Capabilities
+
+- Public hosted demo.
+- `/v0/route` route decisions.
+- `/v0/outcomes` memory-only hosted outcome records or local ledger writes.
+- `/v0/ledger/summary` outcome ledger summaries.
+- `/v0/openapi.json` OpenAPI contract.
+- CLI route, evaluate, verify, OpenAPI, registry lint, and hosted smoke commands.
+- JS SDK wrapper and Python local stub.
+- Executor registry with selectable local zero-cost executors and blocked external supplier class.
+
+## Safety Contract
+
+- Missing policy defaults to approval required.
+- `free_only` blocks paid APIs, public writes, account credentials, external suppliers, private refs, regulated data, secret-like content, and unsafe work.
+- Hosted demo rejects private or secret-like input before routing.
+- Route decisions are not permission for external actions.
+- Hosted demo does not persist request bodies.
+
+## Not Implemented
+
+- Production auth.
+- Multi-tenant isolation.
+- Private context processing.
+- Supplier bidding.
+- Payment settlement.
+- Monetization.
+- Public posting or account mutation.
+- External execution.
+
+## Best Next Work
+
+Before discovery polish, keep improving proof quality, API clarity, and product truth. For discovery polish, optimize README, screenshots, repo metadata, demo examples, issue templates, and developer/agent search phrasing without overclaiming a live marketplace.

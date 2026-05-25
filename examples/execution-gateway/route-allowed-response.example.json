@@ -1,0 +1,35 @@
+{
+  "api_version": "v0",
+  "route_run_id": "rr_example_allowed",
+  "request_id": "example-public-issue",
+  "hosted_demo": true,
+  "task_type": "issue_triage",
+  "decision": {
+    "action_kind": "inspect",
+    "executor_kind": "local_runner",
+    "policy_state": "allowed",
+    "policy_decision": "allow",
+    "selected_executor_id": "deterministic-verifier",
+    "recommendation": "Use Deterministic Verifier Planner to produce triage_packet, then verify with the generated verifier plan.",
+    "permission_statement": "Recommendation is not permission for external actions. V0 allows only local, zero-cost artifact generation and inspection."
+  },
+  "chargeable": false,
+  "cost": {
+    "estimated_call_cost_usd": 0,
+    "estimated_total_cost_usd": 0,
+    "would_require_paid_step": false
+  },
+  "stop_conditions": [],
+  "sanitization_report": {
+    "status": "clean",
+    "data_class": "public",
+    "untrusted_context_count": 1,
+    "redactions_applied": 0,
+    "findings": {}
+  },
+  "persistence": {
+    "artifacts_persisted": false,
+    "request_body_persisted": false,
+    "ledger_write_default": false
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "Bean Execution Gateway",
+  "slug": "bean-execution-gateway",
+  "version": "0.1.0",
+  "api_version": "v0",
+  "description": "Public POC gateway that routes outcome requests through policy, cost, context-risk, supplier, and verifier gates before agent execution.",
+  "homepage": "https://bean-execution-gateway-poc.onrender.com",
+  "repository": "https://github.com/beanscg/bean-execution-gateway-poc",
+  "input_scope": ["public", "synthetic"],
+  "blocked_input_scope": ["private", "secret", "regulated", "customer_data", "company_data", "local_file", "internal"],
+  "endpoints": [
+    { "method": "GET", "path": "/v0/health", "purpose": "Health and safety-mode check" },
+    { "method": "POST", "path": "/v0/route", "purpose": "Return route decision for a public or synthetic outcome request" },
+    { "method": "POST", "path": "/v0/outcomes", "purpose": "Record outcome locally or in hosted-demo memory" },
+    { "method": "GET", "path": "/v0/ledger/summary", "purpose": "Summarize outcome records" },
+    { "method": "GET", "path": "/v0/openapi.json", "purpose": "OpenAPI contract" }
+  ],
+  "guarantees_v0": {
+    "spend_usd": 0,
+    "external_writes": 0,
+    "external_executions": 0,
+    "hosted_demo_request_body_persistence": false,
+    "hosted_demo_request_body_logging": false,
+    "external_supplier_execution": false
+  },
+  "policy_blocks": [
+    "requires_private_repo_access",
+    "requires_paid_api",
+    "requires_public_post",
+    "requires_account_credentials",
+    "requires_external_supplier",
+    "requires_regulated_data",
+    "unsafe_or_disallowed"
+  ],
+  "current_executor_classes": ["current_agent", "local_runner", "local_tool"],
+  "future_executor_classes": ["workflow", "external_supplier"],
+  "future_executor_classes_status": "represented_as_blocked_classes_in_v0",
+  "verification_commands": [
+    "npm run gateway:verify",
+    "npm run gateway:smoke:hosted"
+  ]
+}

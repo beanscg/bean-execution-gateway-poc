@@ -1,6 +1,6 @@
 # Deferred Slack Adapter Stub
 
-Status: deferred. Do not create or configure a Slack app without Stephen approval.
+Status: deferred. Do not create or configure a Slack app without operator approval.
 
 Allowed future role:
 

@@ -1,0 +1,19 @@
+{
+  "route_run_id": "rr_demo_public_route",
+  "request_id": "demo-public-route",
+  "task_type": "issue_triage",
+  "policy_state": "allowed",
+  "policy_decision": "allow",
+  "route_recommendation": "Use deterministic verifier planner for a local artifact.",
+  "selected_route": "deterministic-verifier",
+  "verifier_result": "demo_passed",
+  "operator_acceptance": "accepted",
+  "elapsed_seconds": 1,
+  "estimated_cost_usd": 0,
+  "actual_cost_usd": 0,
+  "actual_external_writes": 0,
+  "actual_external_executions": 0,
+  "evidence_refs": {
+    "demo": "https://bean-execution-gateway-poc.onrender.com"
+  }
+}

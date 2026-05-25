@@ -7,15 +7,17 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f7f7f4;
+      --bg: #f6f7f4;
       --panel: #ffffff;
-      --text: #202421;
-      --muted: #616b63;
-      --line: #d9ddd7;
-      --accent: #1f7a5f;
-      --blocked: #a64030;
-      --warn: #9a6a00;
-      --ok: #1d6b50;
+      --text: #202420;
+      --muted: #5d675f;
+      --line: #d9ded7;
+      --accent: #176c57;
+      --accent-ink: #ffffff;
+      --bad: #9d3d30;
+      --warn: #8d650c;
+      --ok: #176c57;
+      --code: #fbfcfa;
     }
     * { box-sizing: border-box; }
     body {
@@ -25,22 +27,22 @@
       color: var(--text);
     }
     main {
-      max-width: 1180px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 28px 18px 40px;
+      padding: 24px 16px 36px;
     }
     header {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 18px;
       align-items: end;
       border-bottom: 1px solid var(--line);
-      padding-bottom: 18px;
-      margin-bottom: 18px;
+      padding-bottom: 16px;
+      margin-bottom: 16px;
     }
     h1 {
       font-size: 28px;
-      line-height: 1.1;
+      line-height: 1.12;
       margin: 0 0 8px;
       letter-spacing: 0;
     }
@@ -49,32 +51,63 @@
       color: var(--muted);
       line-height: 1.45;
     }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      padding: 8px 11px;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+    .dot.ok { background: var(--ok); }
+    .dot.bad { background: var(--bad); }
+    .notice {
+      border: 1px solid #e6d8ae;
+      background: #fff9e8;
+      color: #59440e;
+      border-radius: 8px;
+      padding: 11px 12px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
     .grid {
       display: grid;
-      grid-template-columns: minmax(320px, 0.85fr) minmax(360px, 1.15fr);
+      grid-template-columns: minmax(320px, 0.84fr) minmax(420px, 1.16fr);
       gap: 16px;
+      align-items: start;
     }
     section, aside {
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 16px;
+      padding: 15px;
     }
     label {
       display: block;
-      font-weight: 650;
+      font-weight: 750;
       margin-bottom: 8px;
     }
     textarea {
       width: 100%;
-      min-height: 440px;
+      min-height: 430px;
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 12px;
       font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       color: var(--text);
-      background: #fbfcfa;
+      background: var(--code);
     }
     .toolbar {
       display: flex;
@@ -88,17 +121,21 @@
       background: #fff;
       color: var(--text);
       padding: 9px 12px;
-      font-weight: 650;
+      font-weight: 750;
       cursor: pointer;
     }
     button.primary {
       border-color: var(--accent);
       background: var(--accent);
-      color: #fff;
+      color: var(--accent-ink);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
     .status {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-bottom: 12px;
     }
@@ -115,28 +152,46 @@
       margin-bottom: 8px;
     }
     .metric span {
-      font-size: 16px;
-      font-weight: 750;
+      font-size: 15px;
+      font-weight: 800;
       overflow-wrap: anywhere;
     }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+    .tab.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
     pre {
-      min-height: 360px;
+      min-height: 334px;
       margin: 0;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
       border: 1px solid var(--line);
       border-radius: 6px;
       padding: 12px;
-      background: #fbfcfa;
+      background: var(--code);
       font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     }
-    .ok { color: var(--ok); }
-    .blocked { color: var(--blocked); }
-    .warn { color: var(--warn); }
-    @media (max-width: 880px) {
-      header { display: block; }
+    .okText { color: var(--ok); }
+    .badText { color: var(--bad); }
+    .warnText { color: var(--warn); }
+    @media (max-width: 920px) {
+      header { grid-template-columns: 1fr; align-items: start; }
       .grid { grid-template-columns: 1fr; }
       .status { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 520px) {
+      .status { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
     }
   </style>
 </head>
@@ -145,38 +200,53 @@
     <header>
       <div>
         <h1>Bean Execution Gateway</h1>
-        <p>Local route preview for outcome, policy, stop conditions, verifier, and ledger shape.</p>
+        <p>Gateway route decisions for public or synthetic outcome requests.</p>
       </div>
-      <p>Static demo only. Do not paste private, work, company, customer, secret, credential, local-file, or regulated data.</p>
+      <div class="pill"><span id="healthDot" class="dot"></span><span id="healthText">checking API</span></div>
     </header>
+
+    <div class="notice">
+      Public demo boundary: zero spend, no external writes, no supplier execution, no request-body persistence. Do not paste private, work, company, customer, secret, credential, local-file, internal, or regulated data.
+    </div>
+
     <div class="grid">
       <section>
         <label for="request">Request JSON</label>
         <textarea id="request" spellcheck="false"></textarea>
         <div class="toolbar">
-          <button class="primary" id="preview">Preview route</button>
-          <button id="safe">Load safe sample</button>
-          <button id="blocked">Load blocked sample</button>
+          <button class="primary" id="route">Route</button>
+          <button id="safe">Safe sample</button>
+          <button id="blocked">Blocked sample</button>
+          <button id="privateReject">Private reject</button>
         </div>
       </section>
+
       <aside>
         <div class="status">
           <div class="metric"><strong>Policy</strong><span id="policy">-</span></div>
-          <div class="metric"><strong>Action</strong><span id="action">-</span></div>
+          <div class="metric"><strong>Executor</strong><span id="executor">-</span></div>
           <div class="metric"><strong>Cost</strong><span id="cost">0 USD</span></div>
           <div class="metric"><strong>Stops</strong><span id="stops">-</span></div>
+          <div class="metric"><strong>Persistence</strong><span id="persistence">-</span></div>
+          <div class="metric"><strong>Version</strong><span id="version">v0</span></div>
         </div>
-        <pre id="output">Paste or load a public/synthetic request, then preview the local route shape.</pre>
+        <div class="tabs">
+          <button class="tab active" data-view="summary">Summary</button>
+          <button class="tab" data-view="json">JSON</button>
+        </div>
+        <pre id="output">Route a public or synthetic request to see the API response.</pre>
       </aside>
     </div>
   </main>
+
   <script>
+    const apiRoot = window.location.protocol === 'file:' ? 'http://127.0.0.1:8787' : '';
     const safeSample = {
       outcome: {
-        goal: 'Triage a public GitHub issue and produce a local packet.',
+        goal: 'Triage a public GitHub issue and produce a local next-step packet.',
         task_type: 'issue_triage',
         desired_artifact: 'triage_packet',
-        success_criteria: ['local diagnosis', 'zero spend', 'verifier plan']
+        success_criteria: ['local artifact', 'verifier plan', 'no public comment']
       },
       context_refs: ['https://github.com/example/project/issues/101'],
       policy: { mode: 'free_only' }
@@ -185,64 +255,131 @@
       outcome: {
         goal: 'Use a paid API and post a comment on the public issue.',
         task_type: 'agent_task_triage',
-        desired_artifact: 'blocked_packet'
+        desired_artifact: 'blocked_packet',
+        success_criteria: ['paid API blocked', 'public post blocked']
       },
-      context_refs: ['private://github/example/internal/issues/9'],
+      context_refs: ['https://github.com/example/project/issues/102'],
       policy: { mode: 'free_only' }
     };
+    const privateRejectSample = {
+      outcome: {
+        goal: 'Review a private repo issue and create a patch plan.',
+        task_type: 'patch_plan',
+        desired_artifact: 'blocked_packet'
+      },
+      context_refs: ['private://github/example/internal-repo/issues/9'],
+      policy: { mode: 'free_only' }
+    };
+
     const requestEl = document.querySelector('#request');
     const outputEl = document.querySelector('#output');
+    const routeButton = document.querySelector('#route');
     const policyEl = document.querySelector('#policy');
-    const actionEl = document.querySelector('#action');
+    const executorEl = document.querySelector('#executor');
     const costEl = document.querySelector('#cost');
     const stopsEl = document.querySelector('#stops');
-    function classify(input) {
-      const text = JSON.stringify(input).toLowerCase();
-      const stops = [];
-      if (/private:\/\//.test(text) || /\/users\//.test(text)) stops.push('requires_private_repo_access');
-      if (/paid api|subscription|spend|costs?\s+\$/.test(text)) stops.push('requires_paid_api');
-      if (/post a comment|open a pull request|publish|outreach/.test(text)) stops.push('requires_public_post');
-      if (/login|oauth|kyc|account credentials/.test(text)) stops.push('requires_account_credentials');
-      if (/external supplier|marketplace agent|freelancer/.test(text)) stops.push('requires_external_supplier');
-      if (/phishing|malware|exploit a live target/.test(text)) stops.push('unsafe_or_disallowed');
-      const blocked = stops.length > 0;
-      return {
-        policy_state: blocked ? 'blocked' : 'allowed',
-        policy_decision: blocked ? 'deny' : 'allow',
-        action_kind: blocked ? 'reject' : 'inspect',
-        selected_executor_id: blocked ? null : 'deterministic-verifier',
-        chargeable: false,
-        estimated_total_cost_usd: 0,
-        stop_conditions: stops,
-        note: 'Browser preview only. Run the CLI for authoritative route artifacts.'
-      };
+    const persistenceEl = document.querySelector('#persistence');
+    const versionEl = document.querySelector('#version');
+    const healthDot = document.querySelector('#healthDot');
+    const healthText = document.querySelector('#healthText');
+    let lastPayload = null;
+    let activeView = 'summary';
+
+    function loadSample(sample) {
+      requestEl.value = JSON.stringify(sample, null, 2);
     }
-    function render(route) {
-      policyEl.textContent = `${route.policy_state} / ${route.policy_decision}`;
-      policyEl.className = route.policy_state === 'blocked' ? 'blocked' : 'ok';
-      actionEl.textContent = route.action_kind;
-      costEl.textContent = `${route.estimated_total_cost_usd} USD`;
-      stopsEl.textContent = route.stop_conditions.length ? route.stop_conditions.length : 'none';
-      stopsEl.className = route.stop_conditions.length ? 'blocked' : 'ok';
-      outputEl.textContent = JSON.stringify(route, null, 2);
+
+    function setMetricClass(element, className) {
+      element.className = className || '';
     }
-    document.querySelector('#safe').addEventListener('click', () => {
-      requestEl.value = JSON.stringify(safeSample, null, 2);
-      render(classify(safeSample));
-    });
-    document.querySelector('#blocked').addEventListener('click', () => {
-      requestEl.value = JSON.stringify(blockedSample, null, 2);
-      render(classify(blockedSample));
-    });
-    document.querySelector('#preview').addEventListener('click', () => {
-      try {
-        render(classify(JSON.parse(requestEl.value)));
-      } catch (error) {
-        outputEl.textContent = `Invalid JSON: ${error.message}`;
+
+    function summarize(payload, status) {
+      if (!payload) return `HTTP ${status}\nNo JSON payload returned.`;
+      if (payload.error) {
+        return [
+          `HTTP ${status}`,
+          `error: ${payload.error}`,
+          `warning: ${payload.warning || 'none'}`,
+          `api_version: ${payload.api_version || 'unknown'}`
+        ].join('\n');
       }
+      const decision = payload.decision || {};
+      const cost = payload.cost || {};
+      return [
+        `HTTP ${status}`,
+        `policy: ${decision.policy_state || '-'} / ${decision.policy_decision || '-'}`,
+        `action: ${decision.action_kind || '-'}`,
+        `executor: ${decision.selected_executor_id || 'none'}`,
+        `chargeable: ${payload.chargeable === true ? 'yes' : 'no'}`,
+        `estimated_total_cost_usd: ${cost.estimated_total_cost_usd ?? 0}`,
+        `stops: ${(payload.stop_conditions || []).join(', ') || 'none'}`,
+        `persistence: ${payload.persistence?.artifacts_persisted === false ? 'memory only' : 'local artifacts if not hosted'}`
+      ].join('\n');
+    }
+
+    function render(payload, status = 200) {
+      lastPayload = { payload, status };
+      const decision = payload?.decision || {};
+      const stops = payload?.stop_conditions || [];
+      const policyState = payload?.error ? 'rejected' : decision.policy_state || '-';
+      const decisionText = payload?.error ? payload.error : `${policyState} / ${decision.policy_decision || '-'}`;
+      policyEl.textContent = decisionText;
+      setMetricClass(policyEl, policyState === 'blocked' || payload?.error ? 'badText' : policyState === 'allowed' ? 'okText' : 'warnText');
+      executorEl.textContent = decision.selected_executor_id || 'none';
+      costEl.textContent = `${payload?.cost?.estimated_total_cost_usd ?? 0} USD`;
+      stopsEl.textContent = stops.length ? String(stops.length) : payload?.error ? 'reject' : 'none';
+      setMetricClass(stopsEl, stops.length || payload?.error ? 'badText' : 'okText');
+      persistenceEl.textContent = payload?.persistence?.artifacts_persisted === false || payload?.persisted_to_disk === false ? 'memory only' : 'no body log';
+      versionEl.textContent = payload?.api_version || 'v0';
+      outputEl.textContent = activeView === 'json' ? JSON.stringify(payload, null, 2) : summarize(payload, status);
+    }
+
+    async function routeRequest() {
+      routeButton.disabled = true;
+      outputEl.textContent = 'Routing...';
+      try {
+        const input = JSON.parse(requestEl.value);
+        const response = await fetch(`${apiRoot}/v0/route`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(input)
+        });
+        const payload = await response.json();
+        render(payload, response.status);
+      } catch (error) {
+        render({ api_version: 'v0', error: error.message }, 0);
+      } finally {
+        routeButton.disabled = false;
+      }
+    }
+
+    async function refreshHealth() {
+      try {
+        const response = await fetch(`${apiRoot}/v0/health`);
+        const payload = await response.json();
+        const ok = response.ok && payload.ok && payload.spend_usd === 0;
+        healthDot.className = ok ? 'dot ok' : 'dot bad';
+        healthText.textContent = ok ? 'api online, zero spend' : 'api unhealthy';
+      } catch (error) {
+        healthDot.className = 'dot bad';
+        healthText.textContent = 'api unavailable';
+      }
+    }
+
+    document.querySelector('#safe').addEventListener('click', () => loadSample(safeSample));
+    document.querySelector('#blocked').addEventListener('click', () => loadSample(blockedSample));
+    document.querySelector('#privateReject').addEventListener('click', () => loadSample(privateRejectSample));
+    routeButton.addEventListener('click', routeRequest);
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        activeView = tab.dataset.view;
+        document.querySelectorAll('.tab').forEach((item) => item.classList.toggle('active', item === tab));
+        if (lastPayload) render(lastPayload.payload, lastPayload.status);
+      });
     });
-    requestEl.value = JSON.stringify(safeSample, null, 2);
-    render(classify(safeSample));
+
+    loadSample(safeSample);
+    refreshHealth();
   </script>
 </body>
 </html>

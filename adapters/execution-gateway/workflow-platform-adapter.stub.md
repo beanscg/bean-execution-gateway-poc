@@ -1,6 +1,6 @@
 # Deferred Workflow Platform Adapter Stub
 
-Status: deferred. Do not connect Zapier, Make, n8n, GitHub Actions, CI, or hosted workflow systems without Stephen approval.
+Status: deferred. Do not connect Zapier, Make, n8n, GitHub Actions, CI, or hosted workflow systems without operator approval.
 
 Allowed future role:
 

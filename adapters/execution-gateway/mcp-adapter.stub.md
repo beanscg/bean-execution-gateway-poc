@@ -1,6 +1,6 @@
 # Deferred MCP Adapter Stub
 
-Status: deferred. Do not implement or expose without Stephen approval.
+Status: deferred. Do not implement or expose without operator approval.
 
 Shape:
 

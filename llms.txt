@@ -1,0 +1,32 @@
+# Bean Execution Gateway
+
+Bean Execution Gateway is a public POC for routing outcome requests through policy, cost, context-risk, supplier, and verifier gates before an agent chooses an execution path.
+
+Live demo: https://bean-execution-gateway-poc.onrender.com
+
+Primary docs:
+
+- Product definition: /docs/product-definition.md
+- POC truth pass: /docs/poc-truth.md
+- API examples: /docs/api-examples.md
+- Safety and trust: /docs/safety-and-trust.md
+- V1 readiness: /docs/v1-readiness.md
+- Capability manifest: /capability-manifest.json
+- Agent instructions: /AGENTS.md
+
+API:
+
+- GET /v0/health
+- POST /v0/route
+- POST /v0/outcomes
+- GET /v0/ledger/summary
+- GET /v0/openapi.json
+
+Boundaries:
+
+- Public or synthetic inputs only in hosted demo.
+- Zero spend.
+- No external writes.
+- No external supplier execution.
+- No request-body persistence in hosted demo.
+- No secrets, private context, customer data, local files, or regulated data.

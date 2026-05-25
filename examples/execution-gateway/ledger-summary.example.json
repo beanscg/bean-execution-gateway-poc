@@ -1,0 +1,21 @@
+{
+  "api_version": "v0",
+  "ledger_path": "memory://hosted-demo/outcomes",
+  "records": 1,
+  "by_task_type": {
+    "issue_triage": 1
+  },
+  "by_selected_route": {
+    "deterministic-verifier": 1
+  },
+  "by_verifier_result": {
+    "demo_passed": 1
+  },
+  "by_operator_acceptance": {
+    "accepted": 1
+  },
+  "actual_cost_usd": 0,
+  "actual_external_writes": 0,
+  "actual_external_executions": 0,
+  "hosted_demo": true
+}

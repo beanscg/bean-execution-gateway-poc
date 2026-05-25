@@ -1,0 +1,38 @@
+{
+  "api_version": "v0",
+  "route_run_id": "rr_example_denied",
+  "request_id": "example-paid-public-write",
+  "hosted_demo": true,
+  "task_type": "agent_task_triage",
+  "decision": {
+    "action_kind": "reject",
+    "executor_kind": "human",
+    "policy_state": "blocked",
+    "policy_decision": "deny",
+    "selected_executor_id": null,
+    "recommendation": "Do not execute. The request crosses the V0 safety or zero-spend boundary.",
+    "permission_statement": "Recommendation is not permission. This route is blocked until the operator explicitly approves a narrower, safe packet."
+  },
+  "chargeable": false,
+  "cost": {
+    "estimated_call_cost_usd": 0,
+    "estimated_total_cost_usd": 0,
+    "would_require_paid_step": true
+  },
+  "stop_conditions": [
+    "requires_paid_api",
+    "requires_public_post"
+  ],
+  "sanitization_report": {
+    "status": "clean",
+    "data_class": "public",
+    "untrusted_context_count": 1,
+    "redactions_applied": 0,
+    "findings": {}
+  },
+  "persistence": {
+    "artifacts_persisted": false,
+    "request_body_persisted": false,
+    "ledger_write_default": false
+  }
+}

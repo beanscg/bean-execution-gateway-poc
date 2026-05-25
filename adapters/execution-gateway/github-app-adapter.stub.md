@@ -1,6 +1,6 @@
 # Deferred GitHub App Adapter Stub
 
-Status: deferred. Do not install, publish, or request permissions without Stephen approval.
+Status: deferred. Do not install, publish, or request permissions without operator approval.
 
 Allowed future role:
 

@@ -21,6 +21,9 @@
     "artifact_refs"
   ],
   "properties": {
+    "api_version": { "type": "string", "const": "v0" },
+    "hosted_demo": { "type": "boolean" },
+    "public_demo": { "type": "boolean" },
     "route_run_id": { "type": "string" },
     "trace_id": { "type": "string" },
     "request_id": { "type": "string" },
@@ -107,6 +110,15 @@
         "context_packet_md": { "type": "string" },
         "verifier_md": { "type": "string" },
         "outcome_template_json": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "persistence": {
+      "type": "object",
+      "properties": {
+        "artifacts_persisted": { "type": "boolean" },
+        "request_body_persisted": { "type": "boolean", "const": false },
+        "ledger_write_default": { "type": "boolean" }
       },
       "additionalProperties": true
     }

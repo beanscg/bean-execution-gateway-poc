@@ -1,0 +1,13 @@
+{
+  "outcome": {
+    "goal": "Review a private repo issue and create a patch plan.",
+    "task_type": "patch_plan",
+    "desired_artifact": "blocked_packet"
+  },
+  "context_refs": [
+    "private://github/example/internal-repo/issues/9"
+  ],
+  "policy": {
+    "mode": "free_only"
+  }
+}

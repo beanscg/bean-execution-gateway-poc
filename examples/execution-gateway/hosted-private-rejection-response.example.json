@@ -1,0 +1,8 @@
+{
+  "api_version": "v0",
+  "ok": false,
+  "public_demo": true,
+  "hosted_demo": true,
+  "error": "hosted_demo_rejects_private_work_or_secret_like_context",
+  "warning": "Do not paste private, work, company, customer, secret, credential, local file, internal, or regulated context into the public demo."
+}

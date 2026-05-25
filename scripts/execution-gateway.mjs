@@ -44,6 +44,7 @@ function usage() {
   node scripts/execution-gateway.mjs registry-lint [--registry <json>]
   node scripts/execution-gateway.mjs openapi --out <json>
   node scripts/execution-gateway.mjs verify --out <dir> [--proof <json>] [--adversarial <json>] [--ledger <jsonl>]
+  node scripts/execution-gateway.mjs hosted-smoke [--base-url <url>]
   node scripts/execution-gateway.mjs build-package --out <dir>
   node scripts/execution-gateway.mjs progress --out <json>
 `;
@@ -75,6 +76,120 @@ function resolvePath(value, fallback) {
 
 function writeStdout(value) {
   process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+}
+
+async function fetchJson(baseUrl, routePath, options = {}) {
+  const response = await fetch(new URL(routePath, baseUrl), {
+    ...options,
+    headers: {
+      ...(options.body ? { 'content-type': 'application/json' } : {}),
+      ...(options.headers || {}),
+    },
+  });
+  const text = await response.text();
+  let payload = null;
+  try {
+    payload = text ? JSON.parse(text) : null;
+  } catch (error) {
+    payload = { parse_error: error.message, raw: text.slice(0, 200) };
+  }
+  return { status: response.status, payload };
+}
+
+async function runHostedSmoke({ baseUrl }) {
+  const safeRequest = {
+    request_id: 'smoke-safe-public-route',
+    outcome: {
+      goal: 'Triage a public GitHub issue and produce a local next-step packet.',
+      task_type: 'issue_triage',
+      desired_artifact: 'triage_packet',
+      success_criteria: ['local artifact', 'verifier plan', 'no public comment'],
+    },
+    context_refs: ['https://github.com/example/project/issues/101'],
+    policy: { mode: 'free_only' },
+  };
+  const blockedRequest = {
+    request_id: 'smoke-blocked-paid-public-write',
+    outcome: {
+      goal: 'Use a paid API and post a comment on the public issue.',
+      task_type: 'agent_task_triage',
+      desired_artifact: 'blocked_packet',
+    },
+    context_refs: ['https://github.com/example/project/issues/102'],
+    policy: { mode: 'free_only' },
+  };
+  const privateRejectRequest = {
+    request_id: 'smoke-hosted-private-reject',
+    outcome: {
+      goal: 'Review a private repo issue.',
+      task_type: 'issue_triage',
+      desired_artifact: 'blocked_packet',
+    },
+    context_refs: ['private://github/example/internal/issues/9'],
+    policy: { mode: 'free_only' },
+  };
+
+  const checks = [];
+  const addCheck = (name, passed, detail = null) => checks.push({ name, passed: Boolean(passed), detail });
+
+  const health = await fetchJson(baseUrl, '/v0/health');
+  addCheck('health_ok', health.status === 200 && health.payload?.ok === true, health.payload);
+  addCheck('hosted_demo_zero_spend', health.payload?.spend_usd === 0 && health.payload?.external_writes === 0 && health.payload?.external_executions === 0, health.payload);
+
+  const openapi = await fetchJson(baseUrl, '/v0/openapi.json');
+  addCheck('openapi_available', openapi.status === 200 && openapi.payload?.openapi === '3.1.0' && Boolean(openapi.payload?.paths?.['/v0/route']), { status: openapi.status });
+
+  const safe = await fetchJson(baseUrl, '/v0/route', {
+    method: 'POST',
+    body: JSON.stringify(safeRequest),
+  });
+  addCheck('safe_public_route_allowed', safe.status === 200 && safe.payload?.decision?.policy_state === 'allowed' && safe.payload?.cost?.estimated_total_cost_usd === 0, safe.payload?.decision);
+
+  const blocked = await fetchJson(baseUrl, '/v0/route', {
+    method: 'POST',
+    body: JSON.stringify(blockedRequest),
+  });
+  addCheck('paid_public_write_blocked', blocked.status === 200
+    && blocked.payload?.decision?.policy_state === 'blocked'
+    && blocked.payload?.stop_conditions?.includes('requires_paid_api')
+    && blocked.payload?.stop_conditions?.includes('requires_public_post'), blocked.payload?.stop_conditions);
+
+  const privateReject = await fetchJson(baseUrl, '/v0/route', {
+    method: 'POST',
+    body: JSON.stringify(privateRejectRequest),
+  });
+  addCheck('hosted_private_input_rejected_before_routing', privateReject.status === 400
+    && privateReject.payload?.error === 'hosted_demo_rejects_private_work_or_secret_like_context', privateReject.payload);
+
+  const outcome = await fetchJson(baseUrl, '/v0/outcomes', {
+    method: 'POST',
+    body: JSON.stringify({
+      route_run_id: safe.payload?.route_run_id || 'smoke-route-run',
+      request_id: safe.payload?.request_id || safeRequest.request_id,
+      task_type: 'issue_triage',
+      policy_state: 'allowed',
+      policy_decision: 'allow',
+      selected_route: safe.payload?.decision?.selected_executor_id || 'deterministic-verifier',
+      verifier_result: 'smoke_passed',
+      operator_acceptance: 'accepted',
+      actual_cost_usd: 0,
+      actual_external_writes: 0,
+      actual_external_executions: 0,
+    }),
+  });
+  addCheck('hosted_outcome_memory_only', outcome.status === 200 && outcome.payload?.persisted_to_disk === false && outcome.payload?.ledger_path === 'memory://hosted-demo/outcomes', outcome.payload);
+
+  const ledger = await fetchJson(baseUrl, '/v0/ledger/summary');
+  addCheck('ledger_summary_zero_actuals', ledger.status === 200
+    && ledger.payload?.actual_cost_usd === 0
+    && ledger.payload?.actual_external_writes === 0
+    && ledger.payload?.actual_external_executions === 0, ledger.payload);
+
+  return {
+    ok: checks.every((check) => check.passed),
+    base_url: baseUrl,
+    checks,
+  };
 }
 
 async function main(argv) {
@@ -209,6 +324,15 @@ async function main(argv) {
       ok: report.ok,
       report: path.join(outDir, 'verification-report.md'),
     });
+    if (!report.ok) process.exitCode = 1;
+    return;
+  }
+
+  if (command === 'hosted-smoke') {
+    const flags = parseFlags(rest);
+    const baseUrl = flags['base-url'] || process.env.BEAN_GATEWAY_BASE_URL || 'http://127.0.0.1:8787';
+    const report = await runHostedSmoke({ baseUrl });
+    writeStdout(report);
     if (!report.ok) process.exitCode = 1;
     return;
   }
