@@ -2,11 +2,13 @@
 
 ## Summary
 
-Bean Execution Gateway is a route-decision layer for agents. It accepts an outcome request, evaluates policy and data boundaries, ranks eligible local executors, and returns a decision with cost, stop conditions, sanitizer findings, and verifier requirements.
+Bean Execution Gateway is a route-decision layer for agents. It accepts an outcome request, evaluates policy and data boundaries, compares available execution paths, and returns a decision memo with cost, quality, speed, risk, blocked actions, proof requirements, and human approval gates.
 
 The POC demonstrates the control plane for source-agnostic agent execution. Demand may come from GitHub, chat, browser agents, workflow runners, app wrappers, or internal automation. Supply may eventually include owned agents, local runners, workflow tools, and external supplier networks. V0 does not call external suppliers.
 
-The clearest positioning is: gateway to the right execution path. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, a build decision, or a blocked path before anyone pays for compute.
+The clearest positioning is: route an outcome to the right agent path before compute runs. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, a build decision, or a blocked path before anyone pays for compute or dispatches a supplier.
+
+Search phrases: agent execution gateway, agent routing gateway, outcome to agent path, build vs use agent decision, source-agnostic agent marketplace control plane, public demand agent proof runner, metadata-only agent feedback, zero-spend agent execution guardrails.
 
 ## Current Capabilities
 
@@ -34,6 +36,7 @@ The clearest positioning is: gateway to the right execution path. A requester as
 - V2 product-delivery control plane for the 120-goal full-product checklist, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, operations, quality, commercial, and go-to-market packets.
 - Public beta readiness packet for trusted external review, including positioning, onboarding, feedback templates, support operations, learning metrics, and Stephen-only decision gates before invites or public posts.
 - First-user readiness packet for trusted beta review, including a guided public demo, decision memo output, evaluator quickstart, review guide, example results, and a 100-goal first-user readiness map.
+- Repo positioning optimized for beta/AEO review: README opens with live demo, OpenAPI, evaluator quickstart, beta boundary, agent/developer use cases, API surface, search context, and direct verification commands.
 
 ## Path Scores
 

@@ -1,8 +1,24 @@
 {
   "name": "bean-execution-gateway-poc",
   "version": "0.1.0",
+  "description": "Public beta POC for routing outcomes to owned agents, public paths, build decisions, or blocked execution before compute runs.",
   "private": true,
   "type": "module",
+  "homepage": "https://bean-execution-gateway-poc.onrender.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/beanscg/bean-execution-gateway-poc.git"
+  },
+  "keywords": [
+    "ai-agents",
+    "agent-routing",
+    "agent-marketplace",
+    "execution-gateway",
+    "build-vs-buy",
+    "agent-orchestration",
+    "openapi",
+    "public-beta"
+  ],
   "engines": {
     "node": ">=20"
   },

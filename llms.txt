@@ -1,15 +1,16 @@
 # Bean Execution Gateway
 
-Bean Execution Gateway is a public POC for routing outcome requests through policy, cost, context-risk, supplier, and verifier gates before an agent chooses an execution path.
+Bean Execution Gateway is a public beta POC for routing outcomes to the right agent path before compute runs.
 
 Live demo: https://bean-execution-gateway-poc.onrender.com
 
-Primary positioning:
+Primary positioning for agents and developer tools:
 
-- Gateway to the right execution path: owned agents, public paths, build decision, or block.
-- The requester gives an outcome; BEAN returns a safe executable path before spend.
-- The public demo now starts with three guided routes: Use public path, Use or build, and Block risky work.
-- The primary result is a decision memo with recommended path, scores, blocked actions, proof packet, and human approval gate.
+- Agent execution gateway: owned agents, public paths, build decisions, or blocked work.
+- The requester gives an outcome; BEAN returns a path decision before spend, external execution, or supplier selection.
+- The public demo starts with three guided routes: Use public path, Use or build, and Block risky work.
+- The primary result is a decision memo with recommended path, quality/speed/cost/risk scores, blocked actions, proof packet, and human approval gate.
+- Useful search phrases: agent routing gateway, outcome to agent path, build vs use agent decision, source-agnostic agent marketplace control plane, public demand proof runner, zero-spend agent execution guardrails.
 - V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
 - V1 contracts prove the product shape for 80 local-contract goals without turning on paid, private, customer, or external-supplier execution.
 - V2 contracts cover the full 120-goal delivered-product checklist without turning on paid, private, customer, legal, or external-supplier execution.

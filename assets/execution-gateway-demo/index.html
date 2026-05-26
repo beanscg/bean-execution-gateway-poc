@@ -7,48 +7,58 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f5f6f2;
+      --bg: #f6f7f4;
       --panel: #ffffff;
-      --surface: #fbfcfa;
-      --text: #1f251f;
-      --muted: #5e675e;
-      --line: #d8ddd5;
-      --accent: #176c57;
+      --surface: #f9faf7;
+      --text: #20241f;
+      --muted: #5c665d;
+      --line: #d7ded4;
+      --line-strong: #aeb9ad;
+      --accent: #116b57;
+      --accent-soft: #e9f6f1;
+      --blue: #284f9f;
+      --blue-soft: #edf3ff;
+      --amber: #8a5b00;
+      --amber-soft: #fff7df;
+      --red-soft: #fff0ec;
       --accent-ink: #ffffff;
       --bad: #9b3327;
       --warn: #85620d;
       --ok: #176c57;
       --focus: #134dd8;
       --code: #f8faf7;
+      --shadow: 0 18px 50px rgba(22, 31, 20, 0.08);
     }
     * { box-sizing: border-box; }
+    html { background: var(--bg); }
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
+      background:
+        linear-gradient(180deg, #fbfcf9 0, var(--bg) 300px);
       color: var(--text);
     }
     main {
-      width: min(1180px, calc(100vw - 32px));
+      width: min(1360px, calc(100vw - 32px));
       margin: 0 auto;
-      padding: 22px 0 42px;
+      padding: 18px 0 42px;
     }
     h1, h2, h3 {
       letter-spacing: 0;
     }
     h1 {
-      margin: 0 0 6px;
-      font-size: 26px;
+      margin: 0;
+      font-size: 22px;
       line-height: 1.1;
     }
     h2 {
-      margin: 0 0 8px;
-      font-size: 30px;
-      line-height: 1.08;
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.04;
     }
     h3 {
       margin: 0 0 8px;
-      font-size: 18px;
+      font-size: 17px;
       line-height: 1.2;
     }
     p {
@@ -67,9 +77,10 @@
       padding: 9px 12px;
       font-weight: 760;
       cursor: pointer;
+      min-height: 40px;
     }
     button:hover {
-      border-color: #b6beb3;
+      border-color: var(--line-strong);
       background: #f9fbf7;
     }
     button:focus-visible, textarea:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
@@ -89,9 +100,14 @@
       opacity: 0.58;
       cursor: wait;
     }
+    a {
+      color: var(--blue);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 3px;
+    }
     textarea {
       width: 100%;
-      min-height: 120px;
+      min-height: 136px;
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: 6px;
@@ -128,10 +144,55 @@
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 18px;
-      align-items: end;
+      align-items: center;
       border-bottom: 1px solid var(--line);
-      padding-bottom: 16px;
-      margin-bottom: 16px;
+      padding-bottom: 14px;
+      margin-bottom: 14px;
+    }
+    .brand-lockup {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-width: 0;
+    }
+    .mark {
+      width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--panel);
+      font-weight: 900;
+      color: var(--accent);
+      box-shadow: 0 4px 16px rgba(22, 31, 20, 0.05);
+    }
+    .subtitle {
+      margin-top: 3px;
+      font-size: 13px;
+    }
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 12px;
+      background: var(--panel);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 760;
+    }
+    .link-button:hover {
+      border-color: var(--line-strong);
+      background: #f9fbf7;
     }
     .pill {
       display: inline-flex;
@@ -154,31 +215,54 @@
     .dot.ok { background: var(--ok); }
     .dot.bad { background: var(--bad); }
     .notice {
-      border: 1px solid #e6d8ae;
-      background: #fff9e8;
-      color: #59440e;
-      border-radius: 8px;
-      padding: 11px 12px;
-      margin-bottom: 16px;
+      border: 1px solid #ead7a1;
+      background: var(--amber-soft);
+      color: #59420b;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
       font-size: 14px;
       line-height: 1.4;
     }
-    .hero {
+    .workspace {
       display: grid;
-      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
-      gap: 16px;
+      grid-template-columns: minmax(260px, 0.78fr) minmax(360px, 1fr) minmax(360px, 1.04fr);
+      gap: 12px;
       align-items: start;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
-    .hero-copy, .guided-panel, .result-panel, details {
+    .route-rail, .guided-panel, .result-panel, details {
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      padding: 15px;
+      box-shadow: var(--shadow);
+    }
+    .route-rail, .guided-panel, .result-panel {
+      padding: 16px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+    .hero-copy {
+      margin: 10px 0 0;
+      font-size: 15px;
+    }
+    .primary-claim {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--surface);
+      padding: 10px;
     }
     .value-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: 1fr;
       gap: 8px;
       margin-top: 12px;
     }
@@ -213,16 +297,15 @@
     }
     .flow {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
+      gap: 6px;
       margin-top: 12px;
     }
     .flow div {
       border: 1px solid var(--line);
       border-radius: 6px;
       background: var(--surface);
-      min-height: 48px;
-      padding: 9px;
+      min-height: 44px;
+      padding: 8px 9px;
       color: var(--muted);
       font-size: 13px;
     }
@@ -243,10 +326,11 @@
       min-height: 74px;
       display: grid;
       gap: 5px;
+      align-content: start;
     }
     .guide-buttons button.active {
       border-color: var(--accent);
-      background: #edf7f3;
+      background: var(--accent-soft);
     }
     .guide-buttons small {
       color: var(--muted);
@@ -269,8 +353,9 @@
       color: var(--muted);
     }
     .result-panel {
-      margin-bottom: 16px;
       min-height: 260px;
+      position: sticky;
+      top: 12px;
     }
     .memo-head {
       display: grid;
@@ -291,7 +376,7 @@
       padding: 6px 9px;
       font-size: 12px;
       font-weight: 850;
-      background: #edf7f3;
+      background: var(--accent-soft);
       color: var(--ok);
       border: 1px solid #bedccd;
     }
@@ -302,13 +387,13 @@
     }
     .memo-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+      grid-template-columns: 1fr;
       gap: 12px;
       align-items: start;
     }
     .score-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
       margin-top: 10px;
     }
@@ -318,7 +403,7 @@
     }
     .path-card.selected {
       border-color: var(--accent);
-      background: #edf7f3;
+      background: var(--accent-soft);
     }
     .path-card.blocked {
       border-color: #e8beb7;
@@ -332,6 +417,8 @@
     }
     .feedback-box {
       margin-top: 12px;
+      border-color: #ced8e9;
+      background: var(--blue-soft);
     }
     .feedback-actions {
       margin-top: 8px;
@@ -347,14 +434,19 @@
     .warnText { color: var(--warn); }
     details {
       margin-bottom: 12px;
+      padding: 0;
+      overflow: hidden;
     }
     summary {
       cursor: pointer;
       font-weight: 850;
-      font-size: 17px;
+      font-size: 16px;
+      padding: 14px 16px;
+      list-style-position: inside;
     }
     details > div {
-      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding: 14px 16px 16px;
     }
     .advanced-grid {
       display: grid;
@@ -421,11 +513,31 @@
     .tab.active {
       border-color: var(--accent);
       color: var(--accent);
-      background: #edf7f3;
+      background: var(--accent-soft);
+    }
+    @media (max-width: 1180px) {
+      .workspace {
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 1fr);
+      }
+      .route-rail {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(260px, 0.9fr);
+        gap: 12px;
+      }
+      .value-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .flow {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
     }
     @media (max-width: 960px) {
-      .topbar, .hero, .memo-grid, .advanced-grid, .open-demand-layout {
+      .topbar, .workspace, .route-rail, .memo-grid, .advanced-grid, .open-demand-layout {
         grid-template-columns: 1fr;
+      }
+      .result-panel {
+        position: static;
       }
       .guide-buttons, .value-row, .flow, .score-grid, .metrics-grid, .open-demand-detail-grid, .status {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -438,10 +550,21 @@
         padding-top: 14px;
       }
       h1 { font-size: 23px; }
-      h2 { font-size: 25px; }
+      h2 { font-size: 27px; }
+      .top-actions {
+        justify-content: stretch;
+      }
+      .top-actions .pill,
+      .top-actions .link-button {
+        width: 100%;
+        justify-content: center;
+      }
       .guide-buttons, .value-row, .flow, .score-grid, .metrics-grid, .open-demand-detail-grid, .status {
         grid-template-columns: 1fr;
       }
+      .guided-panel { order: 1; }
+      .result-panel { order: 2; }
+      .route-rail { order: 3; }
       .toolbar, .feedback-actions, .result-actions, .advanced-controls {
         align-items: stretch;
       }
@@ -454,34 +577,50 @@
 <body>
   <main>
     <header class="topbar">
-      <div>
-        <h1>Bean Execution Gateway</h1>
-        <p>Gateway to the right execution path for agent work.</p>
+      <div class="brand-lockup">
+        <div class="mark" aria-hidden="true">B</div>
+        <div>
+          <h1>Bean Execution Gateway</h1>
+          <p class="subtitle">Agent routing before compute, spend, or supplier execution.</p>
+        </div>
       </div>
-      <div class="pill"><span id="healthDot" class="dot"></span><span id="healthText">checking API</span></div>
+      <div class="top-actions">
+        <a class="link-button" href="/v0/openapi.json">OpenAPI</a>
+        <a class="link-button" href="https://github.com/beanscg/bean-execution-gateway-poc">GitHub</a>
+        <div class="pill"><span id="healthDot" class="dot"></span><span id="healthText">checking API</span></div>
+      </div>
     </header>
 
     <div class="notice">
       Public/synthetic inputs only. This demo spends $0, performs no public writes, stores no request body, and never executes external suppliers.
     </div>
 
-    <section class="hero" aria-label="Guided demo">
-      <div class="hero-copy">
+    <section class="workspace" aria-label="Guided execution gateway demo">
+      <aside class="route-rail">
+        <div>
+          <span class="eyebrow">Outcome to path</span>
         <h2>Find the execution path before an agent runs.</h2>
-        <p>Give BEAN an outcome. It compares owned-agent work, public paths, build-new decisions, and blocked supplier paths before anyone pays for compute.</p>
+          <p class="hero-copy">Give BEAN an outcome. It decides whether to use an owned agent, use an available public path, build a new agent, or block the work before anyone pays for compute.</p>
+          <div class="primary-claim">
+            <strong>Beta promise</strong>
+            <p>One route memo: recommended path, quality/speed/cost/risk scores, blocked actions, proof packet, and the next human approval.</p>
+          </div>
+        </div>
+        <div>
         <div class="value-row">
-          <div><strong>Primary answer</strong><span>Use, build, or block</span></div>
-          <div><strong>Cost guard</strong><span>$0 in this demo</span></div>
-          <div><strong>Data guard</strong><span>No private input</span></div>
+            <div><strong>Decision</strong><span>Use, build, or block</span></div>
+            <div><strong>Spend</strong><span>$0 public demo</span></div>
+            <div><strong>Input</strong><span>Public only</span></div>
         </div>
         <div class="flow" aria-label="Route flow">
-          <div><strong>1. Outcome</strong><span>public task</span></div>
-          <div><strong>2. Gates</strong><span>spend/data/write</span></div>
-          <div><strong>3. Options</strong><span>agent paths</span></div>
-          <div><strong>4. Memo</strong><span>decision packet</span></div>
-          <div><strong>5. Proof</strong><span>local check</span></div>
+            <div><strong>1 Outcome</strong><span>public task</span></div>
+            <div><strong>2 Gates</strong><span>spend/data/write</span></div>
+            <div><strong>3 Options</strong><span>agent paths</span></div>
+            <div><strong>4 Memo</strong><span>decision packet</span></div>
+            <div><strong>5 Proof</strong><span>local check</span></div>
+          </div>
         </div>
-      </div>
+      </aside>
 
       <div class="guided-panel">
         <label for="outcomeInput">Outcome</label>
@@ -493,17 +632,31 @@
         </div>
         <p class="boundary-note">Use public URLs, public task descriptions, or synthetic examples. Do not paste secrets, internal paths, customer data, or private repo details.</p>
       </div>
-    </section>
 
-    <section class="result-panel" aria-label="Decision memo">
+      <aside class="result-panel" aria-label="Decision memo">
       <div id="decisionMemo">
         <div class="memo-head">
           <div>
             <h3>Decision memo</h3>
-            <p>Run a guided route to see the recommended path, alternatives, blocked actions, proof status, and next approval.</p>
+              <p>Run a guided route to see the selected path, alternatives, blocked actions, proof status, and next approval.</p>
           </div>
           <div class="memo-status"><span>waiting</span></div>
         </div>
+          <div class="memo-grid">
+            <div class="stack">
+              <div class="path-card selected">
+                <strong>Expected output</strong>
+                <span>Agent path decision</span>
+                <p class="muted">The first useful answer is a route memo, not raw JSON.</p>
+              </div>
+              <div class="score-grid">
+                <div class="score-card"><strong>Quality</strong><span>-</span></div>
+                <div class="score-card"><strong>Speed</strong><span>-</span></div>
+                <div class="score-card"><strong>Cost</strong><span>$0</span></div>
+                <div class="score-card"><strong>Risk</strong><span>gated</span></div>
+              </div>
+            </div>
+          </div>
       </div>
       <div class="feedback-box">
         <strong>Route feedback</strong>
@@ -522,6 +675,7 @@
           <span id="routeFeedbackStatus" class="muted">No feedback sent.</span>
         </div>
       </div>
+      </aside>
     </section>
 
     <details>
