@@ -37,6 +37,7 @@ Search phrases: agent execution gateway, agent routing gateway, outcome to agent
 - Public beta readiness packet for trusted external review, including positioning, onboarding, feedback templates, support operations, learning metrics, and Stephen-only decision gates before invites or public posts.
 - First-user readiness packet for trusted beta review, including a guided public demo, decision memo output, evaluator quickstart, review guide, example results, and a 100-goal first-user readiness map.
 - Repo positioning optimized for beta/AEO review: README opens with live demo, OpenAPI, evaluator quickstart, beta boundary, agent/developer use cases, API surface, search context, and direct verification commands.
+- Actual product launch control packet: `/docs/product-launch-checklist.md` tracks 120 gates across positioning, demo UX, API, routing, public demand, supply, payments, data, security, reliability, legal, and GTM. The launch audit is `npm run launch:readiness`.
 
 ## Path Scores
 
@@ -107,6 +108,18 @@ The `/v0/v2/*` endpoints represent the full delivered-product checklist as publi
 - External execution.
 Customer traffic is also not ready. `/v0/ready` reports `production_ready: false` until authenticated tenants, durable audit logs, payment/cost controls, supplier trust, and private-context handling exist.
 Private/customer/paid product traffic is also not ready. `/v0/v2/readiness` reports `ok_for_private_customer_or_paid_traffic: false` until durable learning storage, real auth, private context, supplier execution, payment rails, legal approvals, and production operations exist.
+
+## Actual Product Launch Readiness
+
+The actual launch checklist is complete as a control document, but the product is not launch-ready for broad public, customer, private, paid, or external-supplier use. The honest readiness state is:
+
+- `product_launch_ready=false`.
+- `public_demo_ready=true`.
+- `trusted_beta_review_ready=true`.
+- `broader_public_push_ready=false`.
+- `customer_private_paid_or_supplier_ready=false`.
+
+The blocked gates are deliberate and should not be bypassed in agent summaries. Before a broader product push, BEAN needs authenticated tenants and scoped API keys, durable audit and retention storage, private context handling and tenant isolation, supplier identity and quality operations, payment/payout/KYC/tax/refund rails, monitoring and alerting, abuse queue and incident response, support ownership, legal/platform ToS review, and real trusted-beta learning.
 
 ## Public Beta Packet
 

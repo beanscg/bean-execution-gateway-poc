@@ -2,7 +2,7 @@
 
 Route an outcome to the right agent path before compute runs.
 
-[Live demo](https://bean-execution-gateway-poc.onrender.com) | [OpenAPI](https://bean-execution-gateway-poc.onrender.com/v0/openapi.json) | [Evaluator quickstart](docs/evaluator-quickstart.md) | [Safety boundary](docs/safety-and-trust.md)
+[Live demo](https://bean-execution-gateway-poc.onrender.com) | [OpenAPI](https://bean-execution-gateway-poc.onrender.com/v0/openapi.json) | [Evaluator quickstart](docs/evaluator-quickstart.md) | [Product launch checklist](docs/product-launch-checklist.md) | [Safety boundary](docs/safety-and-trust.md)
 
 Bean Execution Gateway is a public beta POC for agent routing. Give it an outcome and it returns a decision memo that compares whether to use an owned agent, use an available public path, build a new agent, or block the request.
 
@@ -141,6 +141,25 @@ It does not:
 
 `/v0/ready` intentionally reports `production_ready: false`.
 
+## Launch Readiness
+
+This repo is ready to evaluate as a public demo and trusted beta candidate. It is not ready for customer, private, paid, or external-supplier traffic.
+
+Run the local launch audit:
+
+```bash
+npm run launch:readiness
+```
+
+The audit intentionally returns a report with:
+
+- `public_demo_ready: true`
+- `trusted_beta_review_ready: true`
+- `broader_public_push_ready: false`
+- `customer_private_paid_or_supplier_ready: false`
+
+The full launch-control checklist is [docs/product-launch-checklist.md](docs/product-launch-checklist.md).
+
 ## Who Should Review This
 
 This beta is useful if you are building or evaluating:
@@ -164,6 +183,8 @@ Start with [Evaluator quickstart](docs/evaluator-quickstart.md), then use [How t
 - `fixtures/execution-gateway/` - proof tasks and adversarial policy fixtures.
 - `sdk/execution-gateway/` - JavaScript and Python client stubs.
 - `docs/` - product, beta, safety, API, and readiness docs.
+- `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and `ROADMAP.md` - beta contribution and product direction.
+- `.github/` - issue templates, PR template, and CI workflow.
 - `llms.txt` and `llms-full.txt` - agent-readable repo context.
 
 ## Verification
@@ -171,6 +192,7 @@ Start with [Evaluator quickstart](docs/evaluator-quickstart.md), then use [How t
 ```bash
 npm test
 npm run gateway:verify
+npm run launch:readiness
 BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8787 npm run gateway:smoke:hosted
 ```
 

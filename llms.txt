@@ -16,6 +16,8 @@ Primary positioning for agents and developer tools:
 - V2 contracts cover the full 120-goal delivered-product checklist without turning on paid, private, customer, legal, or external-supplier execution.
 - Public beta packet is prepared for trusted external review, with GitHub issue templates, onboarding, support rules, and Stephen approval gates before any invites or public posts.
 - First-user readiness is complete for trusted beta review, with evaluator quickstart, review guide, example results, and a 100-goal readiness map.
+- Actual product launch checklist is encoded in /docs/product-launch-checklist.md with 120 launch gates. It reports public demo and trusted beta review as ready, but blocks broader product launch, private/customer traffic, paid traffic, and external supplier execution.
+- Run `npm run launch:readiness` for the launch-control audit. The expected honest output is product_launch_ready=false, public_demo_ready=true, trusted_beta_review_ready=true, broader_public_push_ready=false, and customer_private_paid_or_supplier_ready=false.
 
 Primary docs:
 
@@ -96,3 +98,4 @@ Boundaries:
 - V1 supplier bids are contract evaluations only; external or paid suppliers are not selectable.
 - V2 product contracts are public-learning contracts only; private/customer/paid production remains blocked.
 - Public beta use is trusted-review only until Stephen approves the invite list and message.
+- Actual product launch is not approved until auth, tenant isolation, durable audit/retention, private-context handling, supplier operations, payment/payout rails, legal/commercial review, monitoring, alerting, abuse handling, support ownership, and real beta learning are complete.
