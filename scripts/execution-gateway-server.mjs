@@ -22,6 +22,9 @@ import {
   OpenDemandError,
   createOpenDemandService,
 } from './open-demand-lib.mjs';
+import {
+  createV1ControlPlane,
+} from './v1-control-plane-lib.mjs';
 
 const API_VERSION = 'v0';
 const DEMO_ASSET_PATH = path.join(rootDir, 'assets', 'execution-gateway-demo', 'index.html');
@@ -202,6 +205,18 @@ function createMetrics() {
       learning_reports: 0,
       guardrail_violations: 0,
     },
+    v1_control_plane: {
+      goals: 0,
+      readiness: 0,
+      tenants: 0,
+      context_envelopes: 0,
+      supplier_bids: 0,
+      acceptances: 0,
+      payment_quotes: 0,
+      abuse_cases: 0,
+      audit_reports: 0,
+      replay_reports: 0,
+    },
     body_too_large: 0,
     errors: 0,
   };
@@ -311,6 +326,10 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
     memoryOnlyLearning: hostedDemo,
     learningLedgerPath: hostedDemo ? undefined : path.join(path.dirname(ledgerPath), 'open-demand-learning.jsonl'),
     allowClone: !hostedDemo && process.env.BEAN_OPEN_DEMAND_ALLOW_CLONE !== '0',
+  });
+  const v1ControlPlane = createV1ControlPlane({
+    memoryOnly: hostedDemo,
+    auditLogPath: hostedDemo ? undefined : path.join(path.dirname(ledgerPath), 'v1-audit.jsonl'),
   });
   const rateLimiter = createRateLimiter({
     limitPerMinute: parsePositiveInteger(process.env.BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE, DEFAULT_RATE_LIMIT_PER_MINUTE),
@@ -454,6 +473,35 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/v1/health') {
+        reply(200, v1ControlPlane.health());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v1/goals') {
+        metrics.v1_control_plane.goals += 1;
+        reply(200, v1ControlPlane.goals());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v1/readiness') {
+        metrics.v1_control_plane.readiness += 1;
+        reply(200, v1ControlPlane.readiness());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v1/audit') {
+        metrics.v1_control_plane.audit_reports += 1;
+        reply(200, v1ControlPlane.auditSummary());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v1/replay') {
+        metrics.v1_control_plane.replay_reports += 1;
+        reply(200, v1ControlPlane.replay());
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/open-demand/learning') {
         metrics.open_demand.learning_reports += 1;
         reply(200, {
@@ -517,6 +565,84 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         const payload = await openDemand.path(body);
         metrics.open_demand.paths += 1;
         reply(200, payload);
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/tenants') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.tenants += 1;
+        reply(201, v1ControlPlane.createTenant(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/context/envelopes') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.context_envelopes += 1;
+        reply(201, v1ControlPlane.createContextEnvelope(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/supplier-bids') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.supplier_bids += 1;
+        reply(201, v1ControlPlane.submitSupplierBid(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/acceptance') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.acceptances += 1;
+        reply(201, v1ControlPlane.recordAcceptance(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/payment-quotes') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.payment_quotes += 1;
+        reply(201, v1ControlPlane.quotePayment(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v1/abuse/cases') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v1_control_plane.abuse_cases += 1;
+        reply(201, v1ControlPlane.createAbuseCase(body));
         return;
       }
 

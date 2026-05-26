@@ -185,6 +185,71 @@ Expected shape:
 }
 ```
 
+## V1 Goal Checklist
+
+```bash
+curl -s https://bean-execution-gateway-poc.onrender.com/v0/v1/goals
+```
+
+Expected shape:
+
+```json
+{
+  "schema_version": "bean.v1_goal_progress.v1",
+  "total_goals": 80,
+  "completed_local_contract_goals": 80,
+  "blocked_production_gates": [
+    "no_payment_rail_connected",
+    "no_external_supplier_execution"
+  ]
+}
+```
+
+## V1 Supplier Bid Contract
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/v1/supplier-bids \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v1-supplier-bid-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "schema_version": "bean.v1_supplier_bid_evaluation.v1",
+  "decision": "eligible_local_contract",
+  "scores": {
+    "quality": 66,
+    "speed": 98,
+    "cost": 100,
+    "risk": 100
+  },
+  "external_actions_performed": false,
+  "spend_usd": 0
+}
+```
+
+## V1 Payment Quote Gate
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/v1/payment-quotes \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v1-payment-quote-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "schema_version": "bean.v1_payment_quote.v1",
+  "requested_payable_usd": 5,
+  "payable_usd": 0,
+  "chargeable": false,
+  "payment_rail_status": "blocked_requires_payment_rail_and_operator_approval"
+}
+```
+
 ## Public Research Scan
 
 ```bash

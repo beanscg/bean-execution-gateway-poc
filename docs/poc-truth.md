@@ -13,6 +13,7 @@
 - The route engine blocks spend, paid APIs, public posting, account credentials, external supplier requests, private refs, regulated data, secret-like text, and unsafe work.
 - Allowed routes are limited to local, zero-cost executors.
 - Outcome writes in hosted mode are memory-only.
+- V1 local-contract endpoints expose the 80-goal checklist and gated contracts for tenants, context envelopes, supplier bids, acceptance, payment quotes, abuse cases, audit, and replay.
 - Local verification covers proof fixtures, adversarial fixtures, schema self-test, registry lint, zero spend, zero external writes, and zero external executions.
 
 ## Intentionally Not Implemented
@@ -22,7 +23,7 @@
 - No private repository or customer data handling.
 - No external supplier calls.
 - No automatic public comments, pull requests, posts, messages, or account mutation.
-- No live marketplace liquidity or supplier bidding.
+- No live marketplace liquidity or selectable external supplier bidding.
 - No durability guarantees for hosted-demo outcome records.
 - No customer/live-execution readiness despite public-demo readiness.
 

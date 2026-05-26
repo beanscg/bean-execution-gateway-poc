@@ -1,0 +1,8 @@
+{
+  "tenant_ref": "public-demo",
+  "mode": "public_demo",
+  "scopes": [
+    "public_demo:path",
+    "public_demo:proof"
+  ]
+}

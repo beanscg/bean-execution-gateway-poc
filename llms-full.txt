@@ -30,6 +30,7 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 - Executor registry with selectable local zero-cost executors and blocked external supplier class.
 - Public proof runner for fixture and public GitHub sources with hosted-demo clone disabled.
 - Source modes for public benchmark, public research, read-only bounty fit, non-code fixtures, GitHub discussion fixtures, and read-only live GitHub issue search.
+- V1 local-contract control plane for the 80-goal checklist, tenant contracts, context envelopes, supplier bid scoring, acceptance records, payment quote gates, abuse cases, audit summaries, and replay metrics.
 
 ## Path Scores
 
@@ -48,6 +49,19 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 
 These are public-demo proof signals, not revenue, customer SLA, or production reliability claims.
 
+## V1 Local Contracts
+
+The `/v0/v1/*` endpoints are public-demo contracts, not production rails. They prove the shape of:
+
+- Tenant scope without storing API keys.
+- Context envelopes that hash refs and block private or secret-like input.
+- Supplier bid scoring across quality, speed, cost, and risk.
+- Acceptance records that force nonzero payable amounts to zero.
+- Payment quote gates that block charging.
+- Metadata-only abuse, audit, and replay surfaces.
+
+`GET /v0/v1/goals` returns 80 total goals and 80 completed local-contract goals. `GET /v0/v1/readiness` still returns customer/paid readiness as false.
+
 ## Safety Contract
 
 - Missing policy defaults to approval required.
@@ -65,8 +79,8 @@ These are public-demo proof signals, not revenue, customer SLA, or production re
 - Production auth.
 - Multi-tenant isolation.
 - Private context processing.
-- Supplier bidding.
-- Payment settlement.
+- Real selectable external supplier bidding.
+- Payment settlement or chargeable routing.
 - Monetization.
 - Public posting or account mutation.
 - External execution.

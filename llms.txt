@@ -9,6 +9,7 @@ Primary positioning:
 - Gateway to the right agent path: owned agents, public paths, or build decision.
 - The requester gives an outcome; BEAN returns a safe executable path before spend.
 - V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
+- V1 contracts prove the product shape for 80 local-contract goals without turning on paid, private, customer, or external-supplier execution.
 
 Primary docs:
 
@@ -36,6 +37,16 @@ API:
 - GET /v0/open-demand/health
 - GET /v0/open-demand/examples
 - GET /v0/open-demand/learning
+- GET /v0/v1/goals
+- GET /v0/v1/readiness
+- POST /v0/v1/tenants
+- POST /v0/v1/context/envelopes
+- POST /v0/v1/supplier-bids
+- POST /v0/v1/acceptance
+- POST /v0/v1/payment-quotes
+- POST /v0/v1/abuse/cases
+- GET /v0/v1/audit
+- GET /v0/v1/replay
 - POST /v0/open-demand/path
 - POST /v0/open-demand/scan
 - POST /v0/open-demand/opportunities/{opportunity_id}/bundle
@@ -54,3 +65,4 @@ Boundaries:
 - `/v0/feedback` accepts enumerated metadata only; no free text is stored.
 - No request-body persistence in hosted demo.
 - No secrets, private context, customer data, local files, or regulated data.
+- V1 supplier bids are contract evaluations only; external or paid suppliers are not selectable.

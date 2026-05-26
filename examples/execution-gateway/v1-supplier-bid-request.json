@@ -1,0 +1,21 @@
+{
+  "supplier_id": "owned-agent-public-proof",
+  "supplier_kind": "owned_agent",
+  "price_usd": 0,
+  "estimated_latency_seconds": 15,
+  "compute_location": "gateway_hosted",
+  "model_or_tool_claims": [
+    "public-proof-runner"
+  ],
+  "quality_evidence": [
+    "verified_fixture",
+    "local_smoke_passed"
+  ],
+  "data_boundary": "public_only",
+  "acceptance_terms": {
+    "charge_on": "accepted_outcome",
+    "rejected_work_policy": "zero payable in public demo",
+    "cancellation_policy": "no external execution started",
+    "max_rework_rounds": 0
+  }
+}

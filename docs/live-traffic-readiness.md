@@ -11,6 +11,7 @@ Status: public-demo hardened, not customer/live-execution ready.
 - `/v0/dispatch` is present but always returns `dispatch_disabled_in_v0`.
 - Hosted mode rejects private, work, company, customer, credential, local-file, internal, regulated, and secret-like input before routing.
 - Hosted outcome records are memory-only.
+- V1 local-contract endpoints cover the 80-goal product checklist for tenant contracts, context envelopes, supplier bids, acceptance, payment quotes, abuse cases, audit, and replay.
 - Smoke tests verify readiness, security headers, rate-limit headers, disabled dispatch, zero spend, zero external writes, zero external executions, and hosted private-input rejection.
 
 ## Blocked Before Customer Traffic
@@ -25,4 +26,4 @@ Status: public-demo hardened, not customer/live-execution ready.
 
 ## Current Decision
 
-The hosted service can stay online as a public synthetic demo. It should not be described as a live marketplace or used for customer/private execution until every blocked gate above is resolved.
+The hosted service can stay online as a public synthetic demo and V1 contract sandbox. It should not be described as a live marketplace or used for customer, private, paid, or external-supplier execution until every blocked gate above is resolved.

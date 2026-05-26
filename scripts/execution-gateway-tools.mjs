@@ -547,6 +547,89 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'Public-only learning summary' } },
     },
   };
+  const v1HealthPath = {
+    get: {
+      operationId: 'getV1ControlPlaneHealth',
+      summary: 'V1 control-plane contract health',
+      description: 'Reports local public-demo contract health. No production secrets, private data, payment rail, or supplier execution is enabled.',
+      responses: { 200: { description: 'V1 contract health' } },
+    },
+  };
+  const v1GoalsPath = {
+    get: {
+      operationId: 'getV1Goals',
+      summary: 'Get the 80-goal V1 local-contract checklist',
+      responses: { 200: { description: '80 local-contract goals and production blockers' } },
+    },
+  };
+  const v1ReadinessPath = {
+    get: {
+      operationId: 'getV1Readiness',
+      summary: 'Get V1 public-demo and production readiness',
+      responses: { 200: { description: 'V1 readiness report' } },
+    },
+  };
+  const v1TenantPath = {
+    post: {
+      operationId: 'createV1TenantContract',
+      summary: 'Create a metadata-only tenant contract',
+      description: 'Creates an in-memory demo tenant contract. It never stores API keys and never enables private data or spend.',
+      responses: { 201: { description: 'Tenant contract' } },
+    },
+  };
+  const v1ContextEnvelopePath = {
+    post: {
+      operationId: 'createV1ContextEnvelope',
+      summary: 'Create a public-only context envelope',
+      description: 'Stores hashes and metadata only. Private, local, internal, or secret-like inputs are rejected by hosted-demo input screening or marked blocked.',
+      responses: { 201: { description: 'Context envelope' } },
+    },
+  };
+  const v1SupplierBidPath = {
+    post: {
+      operationId: 'submitV1SupplierBid',
+      summary: 'Evaluate a supplier bid without dispatch',
+      description: 'Scores quality, speed, cost, and risk. External suppliers, nonzero prices, non-public data, and unsupported compute remain not selectable.',
+      responses: { 201: { description: 'Supplier bid evaluation' } },
+    },
+  };
+  const v1AcceptancePath = {
+    post: {
+      operationId: 'recordV1Acceptance',
+      summary: 'Record outcome acceptance metadata',
+      description: 'Records acceptance state only. Nonzero payable amounts are blocked because no payment rail is connected.',
+      responses: { 201: { description: 'Acceptance record' } },
+    },
+  };
+  const v1PaymentQuotePath = {
+    post: {
+      operationId: 'quoteV1Payment',
+      summary: 'Quote payment status without moving money',
+      description: 'Always returns zero chargeable/payable amount in V0. Nonzero requested payments are blocked.',
+      responses: { 201: { description: 'Payment quote' } },
+    },
+  };
+  const v1AbuseCasePath = {
+    post: {
+      operationId: 'createV1AbuseCase',
+      summary: 'Queue a metadata-only abuse case',
+      responses: { 201: { description: 'Abuse case' } },
+    },
+  };
+  const v1AuditPath = {
+    get: {
+      operationId: 'getV1AuditSummary',
+      summary: 'Summarize metadata-only audit events',
+      responses: { 200: { description: 'Audit summary' } },
+    },
+  };
+  const v1ReplayPath = {
+    get: {
+      operationId: 'getV1ReplayMetrics',
+      summary: 'Summarize V1 replay and learning metrics',
+      responses: { 200: { description: 'Replay metrics' } },
+    },
+  };
   const feedbackPath = {
     post: {
       operationId: 'postFeedbackV0',
@@ -623,6 +706,17 @@ export function buildOpenApiSpec() {
       '/v0/open-demand/tasks/{task_id}/run': openDemandRunPath,
       '/v0/open-demand/tasks/{task_id}/report': openDemandReportPath,
       '/v0/open-demand/feedback': feedbackPath,
+      '/v0/v1/health': v1HealthPath,
+      '/v0/v1/goals': v1GoalsPath,
+      '/v0/v1/readiness': v1ReadinessPath,
+      '/v0/v1/tenants': v1TenantPath,
+      '/v0/v1/context/envelopes': v1ContextEnvelopePath,
+      '/v0/v1/supplier-bids': v1SupplierBidPath,
+      '/v0/v1/acceptance': v1AcceptancePath,
+      '/v0/v1/payment-quotes': v1PaymentQuotePath,
+      '/v0/v1/abuse/cases': v1AbuseCasePath,
+      '/v0/v1/audit': v1AuditPath,
+      '/v0/v1/replay': v1ReplayPath,
       '/health': healthPath,
       '/ready': readyPath,
       '/metrics': metricsPath,
@@ -645,6 +739,17 @@ export function buildOpenApiSpec() {
       '/open-demand/tasks/{task_id}/run': openDemandRunPath,
       '/open-demand/tasks/{task_id}/report': openDemandReportPath,
       '/open-demand/feedback': feedbackPath,
+      '/v1/health': v1HealthPath,
+      '/v1/goals': v1GoalsPath,
+      '/v1/readiness': v1ReadinessPath,
+      '/v1/tenants': v1TenantPath,
+      '/v1/context/envelopes': v1ContextEnvelopePath,
+      '/v1/supplier-bids': v1SupplierBidPath,
+      '/v1/acceptance': v1AcceptancePath,
+      '/v1/payment-quotes': v1PaymentQuotePath,
+      '/v1/abuse/cases': v1AbuseCasePath,
+      '/v1/audit': v1AuditPath,
+      '/v1/replay': v1ReplayPath,
     },
     components: {
       schemas: {
@@ -839,6 +944,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'scripts/execution-gateway-server.mjs',
     'scripts/open-demand-lib.mjs',
     'scripts/open-demand-proof-runner.mjs',
+    'scripts/v1-control-plane-lib.mjs',
     'scripts/work-network-lib.mjs',
     'render.yaml',
     'schemas/execution-gateway/local-api.openapi.json',
@@ -881,6 +987,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/open-demand-adapters.md',
     'docs/path-api-and-scoring.md',
     'docs/v1-product-goals.md',
+    'docs/v1-local-contract-completion.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
     'adapters/execution-gateway/slack-app-adapter.stub.md',
@@ -894,6 +1001,11 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/open-demand-public-bounty-scan-request.json',
     'examples/execution-gateway/open-demand-public-research-scan-request.json',
     'examples/execution-gateway/open-demand-feedback-request.json',
+    'examples/execution-gateway/v1-tenant-request.json',
+    'examples/execution-gateway/v1-context-envelope-request.json',
+    'examples/execution-gateway/v1-supplier-bid-request.json',
+    'examples/execution-gateway/v1-payment-quote-request.json',
+    'examples/execution-gateway/v1-abuse-case-request.json',
     'examples/execution-gateway/agent-path-build-vs-use-request.json',
     'examples/execution-gateway/non-code-public-benchmark-request.json',
     'examples/execution-gateway/outcome-record.json',

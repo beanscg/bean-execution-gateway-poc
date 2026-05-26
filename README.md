@@ -11,6 +11,7 @@ Current proof metrics:
 - Executable path rate: share of scanned public signals that can become a safe local packet.
 - Time to ranked paths: wall-clock time from demand scan to ranked agent paths.
 - Unsafe actions prevented: spend, private-data, account, public-write, and external-submission gates stopped before execution.
+- V1 local-contract completion: 80/80 product gates have public-demo contracts, with production blockers still explicit.
 
 ## What It Does Now
 
@@ -24,6 +25,7 @@ Current proof metrics:
 - Exposes proof examples through `/v0/examples`.
 - Accepts metadata-only route feedback through `/v0/feedback` and `/v0/open-demand/feedback`.
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
+- Exposes V1 local-contract control-plane endpoints for tenant scope, context envelopes, supplier bids, outcome acceptance, payment quotes, abuse cases, audit summaries, replay metrics, and the 80-goal checklist.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
 
@@ -32,6 +34,7 @@ Current proof metrics:
 - It does not execute external work.
 - It does not call suppliers, freelancers, marketplace agents, LLM APIs, payment rails, trading tools, or hosted compute providers.
 - It does not authenticate tenants, manage private context, store secrets, or process customer data.
+- It does not make supplier bids selectable when they require external execution, non-public data, or nonzero payment.
 - It does not monetize routes or charge requesters.
 - It does not claim marketplace liquidity. The supplier network is represented only as a blocked future class.
 
@@ -61,6 +64,10 @@ curl -s http://127.0.0.1:8787/v0/examples
 curl -s http://127.0.0.1:8787/v0/openapi.json
 curl -s http://127.0.0.1:8787/v0/open-demand/health
 curl -s http://127.0.0.1:8787/v0/open-demand/learning
+curl -s http://127.0.0.1:8787/v0/v1/goals
+curl -s http://127.0.0.1:8787/v0/v1/readiness
+curl -s http://127.0.0.1:8787/v0/v1/audit
+curl -s http://127.0.0.1:8787/v0/v1/replay
 curl -s -X POST http://127.0.0.1:8787/v0/path \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/open-demand-path-request.json
@@ -76,6 +83,12 @@ curl -s -X POST http://127.0.0.1:8787/v0/open-demand/feedback \
 curl -s -X POST http://127.0.0.1:8787/v0/route \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/public-issue-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/v1/supplier-bids \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v1-supplier-bid-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/v1/payment-quotes \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v1-payment-quote-request.json
 curl -s -X POST http://127.0.0.1:8787/v0/dispatch \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/public-issue-request.json
@@ -129,4 +142,5 @@ Hosted demo input scope:
 - [Open demand adapters](docs/open-demand-adapters.md)
 - [Path API and scoring](docs/path-api-and-scoring.md)
 - [V1 product goals](docs/v1-product-goals.md)
+- [V1 local-contract completion](docs/v1-local-contract-completion.md)
 - [Public demo terms](TERMS.md)

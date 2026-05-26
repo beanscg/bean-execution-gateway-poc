@@ -9,15 +9,16 @@
 ## API
 
 - Version every endpoint under `/v1`.
-- Add authenticated tenants, API keys, scopes, rate limits, and idempotency guarantees.
+- Keep the current `/v0/v1/*` endpoints as public-demo contracts until a real `/v1` cutover exists.
+- Authenticated tenants, API keys, scopes, rate limits, and idempotency guarantees have contract surfaces, but real secrets and customer tenants are still blocked.
 - Keep dry-run route decisions separate from executable dispatch. V0 exposes `/v0/dispatch` only as a disabled proof endpoint.
-- Add supplier bid schema with price, latency, compute location, model/tool claims, evidence, and acceptance terms.
-- Add outcome acceptance schema with dispute states and rework reasons.
+- Supplier bid schema now captures price, latency, compute location, model/tool claims, evidence, and acceptance terms as local contracts.
+- Outcome acceptance and payment quote schemas now record state while forcing nonzero payable amounts to zero.
 
 ## Marketplace
 
 - Start with owned local agents and verified internal tools as supply.
-- Add external supply only after quality scoring, identity, abuse controls, and payment settlement are defined.
+- Add external supply only after quality scoring, identity, abuse controls, and payment settlement move from contract-only to real rails.
 - Rank on more than price: quality, latency, cost, data-boundary fit, tool fit, reliability, and verifier confidence.
 - Avoid pay-only-on-acceptance as the default. Compute-bearing suppliers need rejected-work and cancellation rules.
 

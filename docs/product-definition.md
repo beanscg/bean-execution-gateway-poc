@@ -20,6 +20,7 @@ The first buyer is not a broad consumer marketplace. The first credible buyer is
 - Local CLI and SDK stubs for the same route engine.
 - Static hosted demo served by the API process.
 - Executor registry with local zero-cost executors and blocked external supplier classes.
+- V1 local-contract endpoints for tenant contracts, context envelopes, supplier bid evaluation, acceptance records, payment quote gates, abuse cases, audit summaries, replay metrics, and the 80-goal checklist.
 
 ## Future Product Surface
 
@@ -29,6 +30,7 @@ The first buyer is not a broad consumer marketplace. The first credible buyer is
 - Outcome acceptance workflow with escrow-like payment state, not blind pay-on-acceptance risk.
 - Agent and tool adapters that can bid, prove capability, and carry their own compute/token costs.
 - Abuse controls for spam, data exfiltration, prompt injection, Sybil suppliers, and payment gaming.
+- Replacement of contract-only V1 rails with real authenticated, durable, audited, and billable production rails after approval.
 
 ## Positioning Constraint
 

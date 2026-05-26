@@ -167,7 +167,9 @@ async function runHostedSmoke({ baseUrl }) {
     && Boolean(openapi.payload?.paths?.['/v0/route'])
     && Boolean(openapi.payload?.paths?.['/v0/path'])
     && Boolean(openapi.payload?.paths?.['/v0/ready'])
-    && Boolean(openapi.payload?.paths?.['/v0/dispatch']), { status: openapi.status });
+    && Boolean(openapi.payload?.paths?.['/v0/dispatch'])
+    && Boolean(openapi.payload?.paths?.['/v0/v1/goals'])
+    && Boolean(openapi.payload?.paths?.['/v0/v1/supplier-bids']), { status: openapi.status });
 
   const pathDecision = await fetchJson(baseUrl, '/v0/path', {
     method: 'POST',
@@ -186,6 +188,98 @@ async function runHostedSmoke({ baseUrl }) {
     && pathDecision.payload?.selected_path?.supplier_class
     && pathDecision.payload?.pricing_model?.v0_spend_usd === 0
     && pathDecision.payload?.external_actions_performed === false, pathDecision.payload?.selected_path);
+
+  const v1Goals = await fetchJson(baseUrl, '/v0/v1/goals');
+  addCheck('v1_goals_complete_as_local_contracts', v1Goals.status === 200
+    && v1Goals.payload?.total_goals === 80
+    && v1Goals.payload?.completed_local_contract_goals === 80
+    && Array.isArray(v1Goals.payload?.blocked_production_gates), v1Goals.payload);
+
+  const v1Tenant = await fetchJson(baseUrl, '/v0/v1/tenants', {
+    method: 'POST',
+    body: JSON.stringify({
+      tenant_ref: 'smoke-public-demo',
+      mode: 'public_demo',
+      scopes: ['public_demo:path', 'public_demo:proof'],
+    }),
+  });
+  addCheck('v1_tenant_contract_stores_no_api_key', v1Tenant.status === 201
+    && v1Tenant.payload?.tenant?.api_key_stored === false
+    && v1Tenant.payload?.tenant?.spend_allowed_usd === 0, v1Tenant.payload);
+
+  const v1Context = await fetchJson(baseUrl, '/v0/v1/context/envelopes', {
+    method: 'POST',
+    body: JSON.stringify({
+      classification: 'public',
+      context_refs: ['https://github.com/example/project/issues/101'],
+    }),
+  });
+  addCheck('v1_context_envelope_hashes_public_refs', v1Context.status === 201
+    && v1Context.payload?.raw_context_stored === false
+    && v1Context.payload?.vault_status === 'public_metadata_envelope_created'
+    && Array.isArray(v1Context.payload?.context_ref_hashes), v1Context.payload);
+
+  const v1Bid = await fetchJson(baseUrl, '/v0/v1/supplier-bids', {
+    method: 'POST',
+    body: JSON.stringify({
+      supplier_id: 'smoke-owned-agent',
+      supplier_kind: 'owned_agent',
+      price_usd: 0,
+      estimated_latency_seconds: 15,
+      compute_location: 'gateway_hosted',
+      quality_evidence: ['verified_fixture'],
+      data_boundary: 'public_only',
+      acceptance_terms: { charge_on: 'accepted_outcome' },
+    }),
+  });
+  addCheck('v1_supplier_bid_contract_zero_spend', v1Bid.status === 201
+    && v1Bid.payload?.decision === 'eligible_local_contract'
+    && v1Bid.payload?.external_actions_performed === false
+    && v1Bid.payload?.spend_usd === 0, v1Bid.payload);
+
+  const v1Acceptance = await fetchJson(baseUrl, '/v0/v1/acceptance', {
+    method: 'POST',
+    body: JSON.stringify({
+      outcome_id: 'smoke-outcome',
+      acceptance_state: 'accepted',
+      payable_usd: 5,
+    }),
+  });
+  addCheck('v1_acceptance_blocks_nonzero_payable', v1Acceptance.status === 201
+    && v1Acceptance.payload?.requested_payable_usd === 5
+    && v1Acceptance.payload?.payable_usd === 0
+    && v1Acceptance.payload?.settlement_status === 'blocked_no_payment_rail', v1Acceptance.payload);
+
+  const v1Payment = await fetchJson(baseUrl, '/v0/v1/payment-quotes', {
+    method: 'POST',
+    body: JSON.stringify({ requested_payable_usd: 5 }),
+  });
+  addCheck('v1_payment_quote_blocks_nonzero_payment', v1Payment.status === 201
+    && v1Payment.payload?.payable_usd === 0
+    && v1Payment.payload?.chargeable === false
+    && v1Payment.payload?.payment_rail_status === 'blocked_requires_payment_rail_and_operator_approval', v1Payment.payload);
+
+  const v1Abuse = await fetchJson(baseUrl, '/v0/v1/abuse/cases', {
+    method: 'POST',
+    body: JSON.stringify({
+      reason_code: 'supplier_execution_attempt',
+      severity: 'medium',
+      source: 'hosted-smoke',
+    }),
+  });
+  addCheck('v1_abuse_case_metadata_only', v1Abuse.status === 201
+    && v1Abuse.payload?.request_body_stored === false
+    && v1Abuse.payload?.free_text_stored === false, v1Abuse.payload);
+
+  const v1Audit = await fetchJson(baseUrl, '/v0/v1/audit');
+  addCheck('v1_audit_summary_metadata_only', v1Audit.status === 200
+    && v1Audit.payload?.request_body_stored === false
+    && v1Audit.payload?.events >= 5, v1Audit.payload);
+
+  const v1Replay = await fetchJson(baseUrl, '/v0/v1/replay');
+  addCheck('v1_replay_metadata_only', v1Replay.status === 200
+    && v1Replay.payload?.external_actions_performed === false
+    && v1Replay.payload?.spend_usd === 0, v1Replay.payload);
 
   const safe = await fetchJson(baseUrl, '/v0/route', {
     method: 'POST',
