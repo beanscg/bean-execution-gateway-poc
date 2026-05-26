@@ -165,8 +165,27 @@ async function runHostedSmoke({ baseUrl }) {
   addCheck('openapi_available', openapi.status === 200
     && openapi.payload?.openapi === '3.1.0'
     && Boolean(openapi.payload?.paths?.['/v0/route'])
+    && Boolean(openapi.payload?.paths?.['/v0/path'])
     && Boolean(openapi.payload?.paths?.['/v0/ready'])
     && Boolean(openapi.payload?.paths?.['/v0/dispatch']), { status: openapi.status });
+
+  const pathDecision = await fetchJson(baseUrl, '/v0/path', {
+    method: 'POST',
+    body: JSON.stringify({
+      outcome: {
+        goal: 'Find the safest executable path for a public agent task.',
+        task_type: 'agent_task_triage',
+        desired_artifact: 'agent_path_packet',
+      },
+      source_mode: 'fixture',
+      policy: { mode: 'free_only' },
+    }),
+  });
+  addCheck('path_api_returns_agent_path_decision', pathDecision.status === 200
+    && pathDecision.payload?.schema_version === 'bean.agent_path_decision.v1'
+    && pathDecision.payload?.selected_path?.supplier_class
+    && pathDecision.payload?.pricing_model?.v0_spend_usd === 0
+    && pathDecision.payload?.external_actions_performed === false, pathDecision.payload?.selected_path);
 
   const safe = await fetchJson(baseUrl, '/v0/route', {
     method: 'POST',
@@ -231,6 +250,11 @@ async function runHostedSmoke({ baseUrl }) {
     && Number.isInteger(metrics.payload?.metrics?.requests_total)
     && metrics.payload?.metrics?.raw_request_body == null
     && metrics.payload?.metrics?.last_request_body == null, metrics.payload);
+
+  const learning = await fetchJson(baseUrl, '/v0/open-demand/learning');
+  addCheck('public_learning_summary_metadata_only', learning.status === 200
+    && learning.payload?.request_body_persistence === false
+    && learning.payload?.learning?.memory_only === true, learning.payload?.learning);
 
   return {
     ok: checks.every((check) => check.passed),

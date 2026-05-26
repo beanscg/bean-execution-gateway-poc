@@ -191,12 +191,15 @@ function createMetrics() {
     feedback_recorded: 0,
     open_demand: {
       scans: 0,
+      paths: 0,
       bundles: 0,
       runs: 0,
+      proof_runs: 0,
       reports: 0,
       examples: 0,
       feedback: 0,
       feedback_helpful: 0,
+      learning_reports: 0,
       guardrail_violations: 0,
     },
     body_too_large: 0,
@@ -304,7 +307,11 @@ function readJsonBody(req) {
 function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false }) {
   const memoryLedger = [];
   const metrics = createMetrics();
-  const openDemand = createOpenDemandService();
+  const openDemand = createOpenDemandService({
+    memoryOnlyLearning: hostedDemo,
+    learningLedgerPath: hostedDemo ? undefined : path.join(path.dirname(ledgerPath), 'open-demand-learning.jsonl'),
+    allowClone: !hostedDemo && process.env.BEAN_OPEN_DEMAND_ALLOW_CLONE !== '0',
+  });
   const rateLimiter = createRateLimiter({
     limitPerMinute: parsePositiveInteger(process.env.BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE, DEFAULT_RATE_LIMIT_PER_MINUTE),
   });
@@ -447,6 +454,16 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/open-demand/learning') {
+        metrics.open_demand.learning_reports += 1;
+        reply(200, {
+          ok: true,
+          learning: openDemand.learning(),
+          request_body_persistence: false,
+        });
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/open-demand/latest') {
         reply(200, await openDemand.latest());
         return;
@@ -484,6 +501,25 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'POST' && (pathname === '/path' || pathname === '/open-demand/path')) {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, {
+            ok: false,
+            hosted_demo: true,
+            error: hostedRejectReason,
+            warning: HOSTED_DEMO_WARNING,
+          });
+          return;
+        }
+        const payload = await openDemand.path(body);
+        metrics.open_demand.paths += 1;
+        reply(200, payload);
+        return;
+      }
+
       if (req.method === 'POST' && pathname.startsWith('/open-demand/opportunities/') && pathname.endsWith('/bundle')) {
         const opportunityId = pathname.replace(/^\/open-demand\/opportunities\//, '').replace(/\/bundle$/, '');
         metrics.open_demand.bundles += 1;
@@ -494,7 +530,9 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
       if (req.method === 'POST' && pathname.startsWith('/open-demand/tasks/') && pathname.endsWith('/run')) {
         const taskId = pathname.replace(/^\/open-demand\/tasks\//, '').replace(/\/run$/, '');
         metrics.open_demand.runs += 1;
-        reply(201, await openDemand.run(decodeURIComponent(taskId)));
+        const payload = await openDemand.run(decodeURIComponent(taskId));
+        metrics.open_demand.proof_runs += 1;
+        reply(201, payload);
         return;
       }
 

@@ -7,6 +7,9 @@ import {
   runExecutionGateway,
 } from '../../../scripts/execution-gateway-lib.mjs';
 import {
+  createOpenDemandService,
+} from '../../../scripts/open-demand-lib.mjs';
+import {
   summarizeLedgerFile,
   summarizeRouteRun,
 } from '../../../scripts/execution-gateway-tools.mjs';
@@ -32,4 +35,13 @@ export function summarizeExecutionLedger(options = {}) {
 
 export function summarizeExecutionRoute(routeRunDir) {
   return summarizeRouteRun(path.resolve(routeRunDir));
+}
+
+export async function findAgentPath(request, options = {}) {
+  const service = createOpenDemandService({
+    fetchImpl: options.fetchImpl || fetch,
+    memoryOnlyLearning: true,
+    allowClone: false,
+  });
+  return service.path(request);
 }

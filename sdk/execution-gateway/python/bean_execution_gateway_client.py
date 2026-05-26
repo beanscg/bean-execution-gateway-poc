@@ -36,3 +36,18 @@ def summarize_ledger(ledger_path: str | None = None) -> dict[str, Any]:
         args.extend(["--ledger", ledger_path])
     result = subprocess.run(args, cwd=ROOT, check=True, capture_output=True, text=True)
     return json.loads(result.stdout)
+
+
+def find_agent_path(base_url: str, request: dict[str, Any]) -> dict[str, Any]:
+    """Call a local or hosted BEAN /v0/path endpoint with public or synthetic input."""
+    from urllib import request as urlrequest
+
+    payload = json.dumps(request).encode("utf-8")
+    req = urlrequest.Request(
+        base_url.rstrip("/") + "/v0/path",
+        data=payload,
+        headers={"content-type": "application/json"},
+        method="POST",
+    )
+    with urlrequest.urlopen(req, timeout=15) as response:
+        return json.loads(response.read().decode("utf-8"))

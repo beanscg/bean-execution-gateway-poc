@@ -16,4 +16,20 @@ const response = findExecutionPath({
 });
 ```
 
+For the agent-path API:
+
+```js
+import { findAgentPath } from './sdk/execution-gateway/js/index.mjs';
+
+const path = await findAgentPath({
+  outcome: {
+    goal: 'Find the safest executable path for a public task.',
+    task_type: 'agent_task_triage',
+    desired_artifact: 'agent_path_packet'
+  },
+  source_mode: 'fixture',
+  policy: { mode: 'free_only' }
+});
+```
+
 V0 constraints remain enforced by the core engine: no spend, no external writes, no private context, no account use, and no supplier execution.

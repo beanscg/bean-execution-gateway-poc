@@ -154,6 +154,47 @@ Expected shape:
 }
 ```
 
+## Agent Path Decision
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/path \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-path-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "api_version": "v0",
+  "schema_version": "bean.agent_path_decision.v1",
+  "selected_path": {
+    "supplier_class": "public_path",
+    "scores": {
+      "quality": 100,
+      "speed": 100,
+      "cost": 100,
+      "risk": 100,
+      "proofability": 100
+    }
+  },
+  "pricing_model": {
+    "v0_spend_usd": 0
+  },
+  "external_actions_performed": false
+}
+```
+
+## Public Research Scan
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/open-demand/scan \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-public-research-scan-request.json
+```
+
+Use `open-demand-public-bounty-scan-request.json` for read-only bounty-fit evaluation. Claiming or submitting remains gated.
+
 ## Open-Demand Feedback
 
 ```bash

@@ -26,6 +26,7 @@ API:
 - GET /v0/ready
 - GET /v0/metrics
 - GET /v0/examples
+- POST /v0/path
 - POST /v0/route
 - POST /v0/feedback
 - POST /v0/dispatch
@@ -34,6 +35,8 @@ API:
 - GET /v0/openapi.json
 - GET /v0/open-demand/health
 - GET /v0/open-demand/examples
+- GET /v0/open-demand/learning
+- POST /v0/open-demand/path
 - POST /v0/open-demand/scan
 - POST /v0/open-demand/opportunities/{opportunity_id}/bundle
 - POST /v0/open-demand/tasks/{task_id}/run

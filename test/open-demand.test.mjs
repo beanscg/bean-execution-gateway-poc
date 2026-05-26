@@ -11,6 +11,11 @@ import {
   scoreOpportunity,
 } from '../scripts/open-demand-lib.mjs';
 import { makeServer } from '../scripts/execution-gateway-server.mjs';
+import {
+  PublicLearningStore,
+  parsePublicGithubUrl,
+  runPublicProof,
+} from '../scripts/open-demand-proof-runner.mjs';
 
 function fakeFetch(_url) {
   return Promise.resolve({
@@ -27,6 +32,36 @@ function fakeFetch(_url) {
           comments: 2,
         },
       ],
+    }),
+  });
+}
+
+function fakeGithubMetadataFetch(url) {
+  const text = String(url);
+  if (text.endsWith('/issues/123')) {
+    return Promise.resolve({
+      ok: true,
+      json: async () => ({
+        number: 123,
+        title: 'Add regression test for parser bug',
+        state: 'open',
+        comments: 2,
+        labels: [{ name: 'bug' }],
+        updated_at: '2026-05-25T00:00:00Z',
+      }),
+    });
+  }
+  return Promise.resolve({
+    ok: true,
+    json: async () => ({
+      full_name: 'example/project',
+      default_branch: 'main',
+      size: 42,
+      open_issues_count: 7,
+      pushed_at: '2026-05-25T00:00:00Z',
+      archived: false,
+      disabled: false,
+      visibility: 'public',
     }),
   });
 }
@@ -88,6 +123,89 @@ test('bundle and verifier lifecycle stays local and gated', async () => {
   assert.equal(bundle.local_proof_plan.scope, 'public_or_fixture_only');
   assert.ok(bundle.local_proof_plan.stop_conditions.includes('spend_required'));
   assert.ok(report.tests_or_checks.length > 0);
+  assert.equal(report.public_proof.external_actions_performed, false);
+  assert.equal(report.public_proof.spend_usd, 0);
+});
+
+test('source-specific fixture scans expose quality speed cost risk proofability', async () => {
+  const service = createOpenDemandService({ fetchImpl: fakeFetch });
+  for (const sourceMode of ['public-benchmark', 'public-bounty', 'public-research', 'non-code-fixture', 'github-discussions']) {
+    const scan = await service.scan({ source_mode: sourceMode, limit: 3 });
+    assert.equal(scan.external_actions_performed, false);
+    assert.equal(scan.opportunities.length, 3);
+    assert.ok(scan.opportunities.every((item) => Number.isFinite(item.quality_score)));
+    assert.ok(scan.opportunities.every((item) => Number.isFinite(item.speed_score)));
+    assert.ok(scan.opportunities.every((item) => Number.isFinite(item.cost_score)));
+    assert.ok(scan.opportunities.every((item) => Number.isFinite(item.risk_score)));
+    assert.ok(scan.opportunities.every((item) => Number.isFinite(item.proofability_score)));
+  }
+});
+
+test('path API chooses an agent path and prepares the next proof step', async () => {
+  const service = createOpenDemandService({ fetchImpl: fakeFetch });
+  const path = await service.path({
+    outcome: {
+      goal: 'Find the safest way to execute a public task.',
+      task_type: 'agent_task_triage',
+      desired_artifact: 'agent_path_packet',
+    },
+    source_mode: 'fixture',
+  });
+
+  assert.equal(path.schema_version, 'bean.agent_path_decision.v1');
+  assert.equal(path.external_actions_performed, false);
+  assert.equal(path.pricing_model.v0_spend_usd, 0);
+  assert.ok(['owned_agent', 'public_path', 'build_decision'].includes(path.selected_path.supplier_class));
+  assert.equal(path.next_step.action, 'run_public_proof');
+});
+
+test('public proof runner parses and blocks unsafe source URLs', async () => {
+  assert.deepEqual(parsePublicGithubUrl('https://github.com/example/project/issues/123'), {
+    owner: 'example',
+    repo: 'project',
+    type: 'issues',
+    number: '123',
+    repository: 'example/project',
+    clone_url: 'https://github.com/example/project.git',
+    repo_url: 'https://github.com/example/project',
+  });
+  assert.equal(parsePublicGithubUrl('git@github.com:example/project.git'), null);
+  assert.equal(parsePublicGithubUrl('https://github.com/example/project/security/advisories'), null);
+});
+
+test('public proof runner returns fixture and read-only GitHub metadata proofs without writes', async () => {
+  const fixture = await runPublicProof({
+    task_id: 'task-fixture',
+    source_url: 'fixture://open-demand/public-benchmark',
+  });
+  assert.equal(fixture.status, 'fixture_public_proof');
+  assert.equal(fixture.external_actions_performed, false);
+  assert.equal(fixture.public_writes, 0);
+
+  const github = await runPublicProof({
+    task_id: 'task-github',
+    source_url: 'https://github.com/example/project/issues/123',
+  }, {
+    allowClone: false,
+    fetchImpl: fakeGithubMetadataFetch,
+    execFileImpl: async () => ({ stdout: 'abc123 refs/heads/main\n', stderr: '' }),
+  });
+  assert.equal(github.status, 'read_only_public_metadata_proof');
+  assert.equal(github.public_reads, 1);
+  assert.equal(github.public_writes, 0);
+  assert.equal(github.package_installs, 0);
+});
+
+test('public learning store summarizes memory records', () => {
+  const store = new PublicLearningStore({ memoryOnly: true });
+  store.append('scan', { selected_ids: ['a'] });
+  store.append('path_decision', { selected_opportunity_id: 'a' });
+  const summary = store.summary();
+
+  assert.equal(summary.memory_only, true);
+  assert.equal(summary.records_in_memory, 2);
+  assert.equal(summary.by_kind_memory.scan, 1);
+  assert.equal(summary.by_kind_memory.path_decision, 1);
 });
 
 test('proof examples and feedback stay metadata-only', () => {
@@ -159,6 +277,22 @@ test('public server exposes open-demand lifecycle without auth or external write
     assert.equal(health.statusCode, 200);
     assert.equal(health.body.external_actions_allowed, false);
 
+    const path = await requestJson(baseUrl, '/v0/path', {
+      method: 'POST',
+      body: {
+        outcome: {
+          goal: 'Find the safest executable path for a public task.',
+          task_type: 'agent_task_triage',
+          desired_artifact: 'agent_path_packet',
+        },
+        source_mode: 'fixture',
+      },
+    });
+    assert.equal(path.statusCode, 200);
+    assert.equal(path.body.schema_version, 'bean.agent_path_decision.v1');
+    assert.equal(path.body.external_actions_performed, false);
+    assert.equal(path.body.pricing_model.v0_spend_usd, 0);
+
     const scan = await requestJson(baseUrl, '/v0/open-demand/scan', {
       method: 'POST',
       body: { source_mode: 'fixture', limit: 6 },
@@ -201,10 +335,17 @@ test('public server exposes open-demand lifecycle without auth or external write
 
     const metrics = await requestJson(baseUrl, '/v0/metrics');
     assert.equal(metrics.statusCode, 200);
+    assert.equal(metrics.body.metrics.open_demand.paths, 1);
     assert.equal(metrics.body.metrics.open_demand.scans, 1);
     assert.equal(metrics.body.metrics.open_demand.bundles, 1);
     assert.equal(metrics.body.metrics.open_demand.runs, 1);
     assert.equal(metrics.body.metrics.open_demand.feedback, 1);
+
+    const learning = await requestJson(baseUrl, '/v0/open-demand/learning');
+    assert.equal(learning.statusCode, 200);
+    assert.equal(learning.body.request_body_persistence, false);
+    assert.equal(learning.body.learning.memory_only, true);
+    assert.ok(learning.body.learning.by_kind_memory.path_decision >= 1);
   } finally {
     await new Promise((resolve) => server.close(resolve));
   }

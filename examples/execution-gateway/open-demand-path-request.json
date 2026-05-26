@@ -1,0 +1,18 @@
+{
+  "outcome": {
+    "goal": "Find the safest executable path for a public task before anyone pays for compute.",
+    "task_type": "agent_task_triage",
+    "desired_artifact": "agent_path_packet",
+    "success_criteria": [
+      "owned, public, or build path selected",
+      "quality, speed, cost, risk, and proofability scored",
+      "zero spend",
+      "no public submission"
+    ]
+  },
+  "source_mode": "fixture",
+  "limit": 12,
+  "policy": {
+    "mode": "free_only"
+  }
+}

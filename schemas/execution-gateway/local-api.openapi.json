@@ -150,6 +150,43 @@
         }
       }
     },
+    "/v0/path": {
+      "post": {
+        "operationId": "postAgentPathDecisionV0",
+        "summary": "Turn an outcome into the best current agent path",
+        "description": "Returns owned-agent, public-path, or build-decision routing with quality, speed, cost, risk, proofability, compute-location options, and explicit stop conditions. It performs no external writes, spend, supplier calls, or public submissions.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPathRequestV0"
+              },
+              "examples": {
+                "publicOutcome": {
+                  "value": {
+                    "outcome": {
+                      "goal": "Find the safest way to solve a public issue without paying for compute yet.",
+                      "task_type": "agent_task_triage",
+                      "desired_artifact": "agent_path_packet"
+                    },
+                    "source_mode": "fixture",
+                    "policy": {
+                      "mode": "free_only"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent path decision"
+          }
+        }
+      }
+    },
     "/v0/dispatch": {
       "post": {
         "operationId": "createExecutionDispatchV0",
@@ -294,6 +331,18 @@
         }
       }
     },
+    "/v0/open-demand/learning": {
+      "get": {
+        "operationId": "getOpenDemandLearningV0",
+        "summary": "Summarize public-only learning records",
+        "description": "Returns metadata-only learning counters. Hosted demo keeps these in memory and does not persist request bodies.",
+        "responses": {
+          "200": {
+            "description": "Public-only learning summary"
+          }
+        }
+      }
+    },
     "/v0/open-demand/latest": {
       "get": {
         "operationId": "getOpenDemandLatestV0",
@@ -318,11 +367,48 @@
         }
       }
     },
+    "/v0/open-demand/path": {
+      "post": {
+        "operationId": "postAgentPathDecisionV0",
+        "summary": "Turn an outcome into the best current agent path",
+        "description": "Returns owned-agent, public-path, or build-decision routing with quality, speed, cost, risk, proofability, compute-location options, and explicit stop conditions. It performs no external writes, spend, supplier calls, or public submissions.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPathRequestV0"
+              },
+              "examples": {
+                "publicOutcome": {
+                  "value": {
+                    "outcome": {
+                      "goal": "Find the safest way to solve a public issue without paying for compute yet.",
+                      "task_type": "agent_task_triage",
+                      "desired_artifact": "agent_path_packet"
+                    },
+                    "source_mode": "fixture",
+                    "policy": {
+                      "mode": "free_only"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent path decision"
+          }
+        }
+      }
+    },
     "/v0/open-demand/scan": {
       "post": {
         "operationId": "postOpenDemandScanV0",
         "summary": "Scan public demand",
-        "description": "Scans fixture data or read-only public GitHub issues and appends negative controls.",
+        "description": "Scans fixture data, public benchmark/research/bounty fixtures, or read-only public GitHub issues and appends negative controls.",
         "requestBody": {
           "required": false,
           "content": {
@@ -335,7 +421,12 @@
                     "enum": [
                       "fixture",
                       "auto",
-                      "live-github"
+                      "live-github",
+                      "public-benchmark",
+                      "public-bounty",
+                      "public-research",
+                      "non-code-fixture",
+                      "github-discussions"
                     ]
                   },
                   "limit": {
@@ -550,6 +641,43 @@
         }
       }
     },
+    "/path": {
+      "post": {
+        "operationId": "postAgentPathDecisionV0",
+        "summary": "Turn an outcome into the best current agent path",
+        "description": "Returns owned-agent, public-path, or build-decision routing with quality, speed, cost, risk, proofability, compute-location options, and explicit stop conditions. It performs no external writes, spend, supplier calls, or public submissions.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPathRequestV0"
+              },
+              "examples": {
+                "publicOutcome": {
+                  "value": {
+                    "outcome": {
+                      "goal": "Find the safest way to solve a public issue without paying for compute yet.",
+                      "task_type": "agent_task_triage",
+                      "desired_artifact": "agent_path_packet"
+                    },
+                    "source_mode": "fixture",
+                    "policy": {
+                      "mode": "free_only"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent path decision"
+          }
+        }
+      }
+    },
     "/dispatch": {
       "post": {
         "operationId": "createExecutionDispatchV0",
@@ -694,6 +822,18 @@
         }
       }
     },
+    "/open-demand/learning": {
+      "get": {
+        "operationId": "getOpenDemandLearningV0",
+        "summary": "Summarize public-only learning records",
+        "description": "Returns metadata-only learning counters. Hosted demo keeps these in memory and does not persist request bodies.",
+        "responses": {
+          "200": {
+            "description": "Public-only learning summary"
+          }
+        }
+      }
+    },
     "/open-demand/latest": {
       "get": {
         "operationId": "getOpenDemandLatestV0",
@@ -718,11 +858,48 @@
         }
       }
     },
+    "/open-demand/path": {
+      "post": {
+        "operationId": "postAgentPathDecisionV0",
+        "summary": "Turn an outcome into the best current agent path",
+        "description": "Returns owned-agent, public-path, or build-decision routing with quality, speed, cost, risk, proofability, compute-location options, and explicit stop conditions. It performs no external writes, spend, supplier calls, or public submissions.",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AgentPathRequestV0"
+              },
+              "examples": {
+                "publicOutcome": {
+                  "value": {
+                    "outcome": {
+                      "goal": "Find the safest way to solve a public issue without paying for compute yet.",
+                      "task_type": "agent_task_triage",
+                      "desired_artifact": "agent_path_packet"
+                    },
+                    "source_mode": "fixture",
+                    "policy": {
+                      "mode": "free_only"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Agent path decision"
+          }
+        }
+      }
+    },
     "/open-demand/scan": {
       "post": {
         "operationId": "postOpenDemandScanV0",
         "summary": "Scan public demand",
-        "description": "Scans fixture data or read-only public GitHub issues and appends negative controls.",
+        "description": "Scans fixture data, public benchmark/research/bounty fixtures, or read-only public GitHub issues and appends negative controls.",
         "requestBody": {
           "required": false,
           "content": {
@@ -735,7 +912,12 @@
                     "enum": [
                       "fixture",
                       "auto",
-                      "live-github"
+                      "live-github",
+                      "public-benchmark",
+                      "public-bounty",
+                      "public-research",
+                      "non-code-fixture",
+                      "github-discussions"
                     ]
                   },
                   "limit": {
@@ -1044,6 +1226,72 @@
               "missing_supplier",
               "too_slow"
             ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "AgentPathRequestV0": {
+        "type": "object",
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "goal": {
+                "type": "string"
+              },
+              "task_type": {
+                "type": "string"
+              },
+              "desired_artifact": {
+                "type": "string"
+              },
+              "success_criteria": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "additionalProperties": true
+          },
+          "goal": {
+            "type": "string"
+          },
+          "task_type": {
+            "type": "string"
+          },
+          "desired_artifact": {
+            "type": "string"
+          },
+          "context_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_mode": {
+            "type": "string",
+            "enum": [
+              "fixture",
+              "auto",
+              "live-github",
+              "public-benchmark",
+              "public-bounty",
+              "public-research",
+              "non-code-fixture",
+              "github-discussions"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          },
+          "query": {
+            "type": "string"
+          },
+          "policy": {
+            "type": "object"
           }
         },
         "additionalProperties": false

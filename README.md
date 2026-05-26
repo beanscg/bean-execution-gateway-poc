@@ -19,6 +19,8 @@ Current proof metrics:
 - Returns a deterministic route decision with ranked local executors, stop conditions, cost fields, sanitizer findings, and verifier artifacts.
 - Records outcomes locally, or in memory only when running as the hosted public demo.
 - Scans fixture or read-only public GitHub demand through `/v0/open-demand/*`, ranks candidate tasks, builds local packets, and runs a static verifier.
+- Turns a broad outcome into a selected agent path through `/v0/path`, including owned-agent, public-path, or build-decision routing.
+- Runs bounded public proof packets for fixture and public GitHub sources with zero spend, no installs, and no external writes.
 - Exposes proof examples through `/v0/examples`.
 - Accepts metadata-only route feedback through `/v0/feedback` and `/v0/open-demand/feedback`.
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
@@ -58,9 +60,16 @@ curl -s http://127.0.0.1:8787/v0/metrics
 curl -s http://127.0.0.1:8787/v0/examples
 curl -s http://127.0.0.1:8787/v0/openapi.json
 curl -s http://127.0.0.1:8787/v0/open-demand/health
+curl -s http://127.0.0.1:8787/v0/open-demand/learning
+curl -s -X POST http://127.0.0.1:8787/v0/path \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-path-request.json
 curl -s -X POST http://127.0.0.1:8787/v0/open-demand/scan \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/open-demand-scan-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/open-demand/scan \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/open-demand-public-research-scan-request.json
 curl -s -X POST http://127.0.0.1:8787/v0/open-demand/feedback \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/open-demand-feedback-request.json
@@ -116,4 +125,8 @@ Hosted demo input scope:
 - [Live-traffic readiness](docs/live-traffic-readiness.md)
 - [Production cutover](docs/production-cutover.md)
 - [Abuse and rate-limit policy](docs/abuse-and-rate-limit-policy.md)
+- [Public proof runner](docs/public-proof-runner.md)
+- [Open demand adapters](docs/open-demand-adapters.md)
+- [Path API and scoring](docs/path-api-and-scoring.md)
+- [V1 product goals](docs/v1-product-goals.md)
 - [Public demo terms](TERMS.md)

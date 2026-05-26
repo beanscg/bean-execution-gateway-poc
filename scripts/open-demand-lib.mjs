@@ -1,7 +1,14 @@
 import crypto from 'node:crypto';
 
+import {
+  PublicLearningStore,
+  runPublicProof,
+} from './open-demand-proof-runner.mjs';
+
 const LANE_OSS_CODE = 'oss_code';
 const LANE_NON_CODE_OPEN_GIG = 'non_code_open_gig';
+const LANE_PUBLIC_RESEARCH = 'public_research';
+const LANE_PUBLIC_BOUNTY_READONLY = 'public_bounty_readonly';
 
 const DECISION_EXECUTE_LOCAL_TRAINING = 'execute_local_training';
 const DECISION_DRAFT_REVIEW_PACKET = 'draft_review_packet';
@@ -139,6 +146,17 @@ const FEEDBACK_REASON_CODES = [
   'too_slow',
 ];
 
+const SOURCE_MODES = [
+  'fixture',
+  'live-github',
+  'auto',
+  'public-benchmark',
+  'public-bounty',
+  'public-research',
+  'non-code-fixture',
+  'github-discussions',
+];
+
 const FIXTURE_OPPORTUNITIES = [
   {
     id: 'fixture_oss_docs_test',
@@ -196,6 +214,62 @@ const FIXTURE_OPPORTUNITIES = [
     private_data_required: false,
     ai_assistance_policy: 'allowed',
     expected_training_records: ['dataset_task_bundle', 'solver_run', 'score_result', 'learning_outcome'],
+  },
+  {
+    id: 'fixture_public_research_task',
+    lane: LANE_PUBLIC_RESEARCH,
+    source_type: 'public_research_prompt',
+    source_name: 'demo_fixture',
+    source_url: 'fixture://open-demand/public-research',
+    title: 'Public research task with cited output requirement',
+    body_excerpt: 'Use public sources only to compare documented approaches and produce a cited local brief.',
+    labels: ['research', 'public-sources'],
+    comments: 0,
+    payout_profile: 'unpaid',
+    cash_potential_usd_min: 0,
+    cash_potential_usd_max: 0,
+    non_cash_value: ['non-code agent benchmark', 'citation-quality training'],
+    public_signal: true,
+    clear_acceptance: true,
+    local_verifiable: true,
+    repeatable: true,
+    agent_executable: true,
+    account_required: false,
+    identity_required: false,
+    external_submission_required: false,
+    public_post_required: false,
+    spend_required_usd: 0,
+    private_data_required: false,
+    ai_assistance_policy: 'allowed',
+    expected_training_records: ['research_bundle', 'source_list', 'local_brief', 'learning_outcome'],
+  },
+  {
+    id: 'fixture_public_bounty_readonly',
+    lane: LANE_PUBLIC_BOUNTY_READONLY,
+    source_type: 'public_bounty_listing',
+    source_name: 'demo_fixture',
+    source_url: 'fixture://open-demand/public-bounty-readonly',
+    title: 'Public bounty listing that can be evaluated read-only',
+    body_excerpt: 'Evaluate bounty fit and proof plan locally. Claiming or submitting remains gated.',
+    labels: ['bounty', 'readonly'],
+    comments: 3,
+    payout_profile: 'possibly_paid_human_gated',
+    cash_potential_usd_min: 0,
+    cash_potential_usd_max: 200,
+    non_cash_value: ['bounty fit signal', 'market demand signal'],
+    public_signal: true,
+    clear_acceptance: true,
+    local_verifiable: true,
+    repeatable: true,
+    agent_executable: true,
+    account_required: true,
+    identity_required: true,
+    external_submission_required: true,
+    public_post_required: false,
+    spend_required_usd: 0,
+    private_data_required: false,
+    ai_assistance_policy: 'unknown',
+    expected_training_records: ['bounty_fit_packet', 'proof_plan', 'human_gate'],
   },
   {
     id: 'negative_control_private_data',
@@ -306,6 +380,8 @@ function humanBlockers(opportunity) {
 }
 
 function scoreOpportunity(opportunity) {
+  const blockers = hardBlockers(opportunity);
+  const needsHuman = humanBlockers(opportunity);
   const trainabilityScore =
     boolScore(opportunity.public_signal, 18) +
     boolScore(opportunity.clear_acceptance, 18) +
@@ -320,8 +396,38 @@ function scoreOpportunity(opportunity) {
     boolScore(!opportunity.account_required, 10) +
     boolScore(!opportunity.external_submission_required, 10) +
     boolScore(!opportunity.private_data_required, 10);
-  const blockers = hardBlockers(opportunity);
-  const needsHuman = humanBlockers(opportunity);
+  const qualityScore =
+    boolScore(opportunity.clear_acceptance, 25) +
+    boolScore(opportunity.local_verifiable, 25) +
+    boolScore(opportunity.repeatable, 20) +
+    Math.min(Number(opportunity.comments || 0) * 3, 15) +
+    Math.min((opportunity.labels || []).length * 3, 15);
+  const speedScore =
+    boolScore(opportunity.local_verifiable, 35) +
+    boolScore(!opportunity.account_required, 25) +
+    boolScore(!opportunity.external_submission_required, 25) +
+    boolScore((opportunity.body_excerpt || '').length <= 700, 15);
+  const costScore = Number(opportunity.spend_required_usd || 0) === 0
+    ? 100
+    : Math.max(0, 100 - Number(opportunity.spend_required_usd || 0));
+  const riskScore = Math.max(0, 100 - (blockers.length * 35) - (needsHuman.length * 12));
+  const proofabilityScore =
+    boolScore(opportunity.public_signal, 20) +
+    boolScore(opportunity.local_verifiable, 35) +
+    boolScore(opportunity.clear_acceptance, 25) +
+    boolScore(opportunity.repeatable, 20);
+  const learningValueScore =
+    Math.min((opportunity.expected_training_records || []).length * 14, 56) +
+    boolScore(opportunity.public_signal, 18) +
+    boolScore(opportunity.repeatable, 16) +
+    boolScore(opportunity.lane !== LANE_OSS_CODE, 10);
+  const routeClassification = blockers.length
+    ? 'reject'
+    : needsHuman.length
+      ? 'public_path_human_gated'
+      : opportunity.local_verifiable
+        ? 'owned_agent_or_local_runner'
+        : 'build_or_inspect_more';
   let decision = DECISION_REJECT;
   if (blockers.length) decision = DECISION_REJECT;
   else if (executionReadinessScore >= 80 && !needsHuman.length) decision = DECISION_EXECUTE_LOCAL_TRAINING;
@@ -332,6 +438,14 @@ function scoreOpportunity(opportunity) {
     trainability_score: trainabilityScore,
     execution_readiness_score: executionReadinessScore,
     earning_score: Math.min(Number(opportunity.cash_potential_usd_max || 0), 100),
+    quality_score: Math.min(qualityScore, 100),
+    speed_score: Math.min(speedScore, 100),
+    cost_score: Math.min(costScore, 100),
+    risk_score: Math.min(riskScore, 100),
+    proofability_score: Math.min(proofabilityScore, 100),
+    learning_value_score: Math.min(learningValueScore, 100),
+    route_classification: routeClassification,
+    compute_location_options: ['requester_hosted', 'gateway_hosted_local_proof'],
     hard_blockers: blockers,
     human_blockers: needsHuman,
     decision,
@@ -346,6 +460,9 @@ function rankOpportunities(opportunities) {
       const leftRejected = left.decision === DECISION_REJECT ? 1 : 0;
       const rightRejected = right.decision === DECISION_REJECT ? 1 : 0;
       if (leftRejected !== rightRejected) return leftRejected - rightRejected;
+      const leftComposite = left.quality_score + left.speed_score + left.cost_score + left.risk_score + left.proofability_score + left.learning_value_score;
+      const rightComposite = right.quality_score + right.speed_score + right.cost_score + right.risk_score + right.proofability_score + right.learning_value_score;
+      if (leftComposite !== rightComposite) return rightComposite - leftComposite;
       if (left.trainability_score !== right.trainability_score) return right.trainability_score - left.trainability_score;
       if (left.execution_readiness_score !== right.execution_readiness_score) return right.execution_readiness_score - left.execution_readiness_score;
       return String(left.id).localeCompare(String(right.id));
@@ -436,9 +553,38 @@ async function discoverLiveGithub(limit, query, { fetchImpl = fetch } = {}) {
   return (payload.items || []).slice(0, limit).map((item) => githubIssueToOpportunity(item));
 }
 
+function sourceFixtureOpportunities(sourceMode, limit) {
+  const sourceFilters = {
+    'public-benchmark': (item) => item.source_type === 'public_benchmark_or_practice_dataset',
+    'public-bounty': (item) => item.source_type === 'public_bounty_listing',
+    'public-research': (item) => item.source_type === 'public_research_prompt',
+    'non-code-fixture': (item) => item.lane !== LANE_OSS_CODE,
+  };
+  const filter = sourceFilters[sourceMode];
+  if (!filter) return fixtureOpportunities(limit);
+  const source = FIXTURE_OPPORTUNITIES.filter(filter);
+  const rows = [];
+  for (let index = 0; rows.length < limit; index += 1) {
+    const item = { ...source[index % source.length] };
+    const cycle = Math.floor(index / Math.max(source.length, 1)) + 1;
+    item.id = `${item.id}_${String(cycle).padStart(2, '0')}`;
+    rows.push(item);
+  }
+  return rows;
+}
+
 async function discoverOpportunities({ sourceMode, limit, query, fetchImpl }) {
-  if (sourceMode === 'fixture') {
-    return [fixtureOpportunities(limit), { source_mode: 'fixture', network_read_only: false }];
+  if (['fixture', 'public-benchmark', 'public-bounty', 'public-research', 'non-code-fixture'].includes(sourceMode)) {
+    return [sourceFixtureOpportunities(sourceMode, limit), { source_mode: sourceMode, network_read_only: false }];
+  }
+  if (sourceMode === 'github-discussions') {
+    const fixtures = sourceFixtureOpportunities('public-research', limit).map((item) => ({
+      ...item,
+      source_type: 'public_github_discussion',
+      source_name: 'fixture_github_discussions',
+      title: item.title.replace('Public research', 'Public discussion'),
+    }));
+    return [fixtures, { source_mode: 'github_discussions_fixture', network_read_only: false }];
   }
   try {
     const live = await discoverLiveGithub(limit, query, { fetchImpl });
@@ -664,6 +810,7 @@ function runStaticSolver(bundle, attemptIndex) {
 }
 
 function buildEvidencePacket(bundle, run) {
+  const proof = run.public_proof || null;
   return {
     schema_version: 'bean.open_demand_evidence_packet.v1',
     packet_id: `evidence-${stableDigest(run.run_id)}`,
@@ -675,8 +822,9 @@ function buildEvidencePacket(bundle, run) {
     solver_status: run.status,
     verifier_status: run.verifier?.passed ? 'passed' : 'failed',
     maintainer_safe_summary: 'Prototype packet only. No PR, issue comment, bounty claim, account action, spend, or external submission has been performed.',
-    tests_or_checks: bundle.verification_plan || [],
-    known_risks: bundle.human_blockers?.length ? bundle.human_blockers : ['Patch quality has not been proven by a real repository test run yet.'],
+    tests_or_checks: proof?.repository_inspection?.local_check_candidates || bundle.verification_plan || [],
+    known_risks: bundle.human_blockers?.length ? bundle.human_blockers : proof?.stop_conditions || ['External submission has not been attempted.'],
+    public_proof: proof,
     submission_state: 'not_submitted_human_approval_required',
     blocked_actions: BLOCKED_ACTIONS,
     external_actions_performed: false,
@@ -757,14 +905,75 @@ function normalizeFeedback(input = {}) {
   };
 }
 
-function createOpenDemandService({ fetchImpl = fetch } = {}) {
+function normalizeOutcome(input = {}) {
+  const outcome = input.outcome && typeof input.outcome === 'object'
+    ? input.outcome
+    : {
+        goal: input.goal || 'Find the safest executable path for a public outcome.',
+        task_type: input.task_type || 'agent_task_triage',
+        desired_artifact: input.desired_artifact || 'agent_path_packet',
+      };
+  return {
+    goal: String(outcome.goal || 'Find the safest executable path for a public outcome.').slice(0, 1000),
+    task_type: String(outcome.task_type || 'agent_task_triage').slice(0, 120),
+    desired_artifact: String(outcome.desired_artifact || 'agent_path_packet').slice(0, 160),
+    success_criteria: Array.isArray(outcome.success_criteria)
+      ? outcome.success_criteria.map((item) => String(item).slice(0, 200)).slice(0, 8)
+      : [],
+  };
+}
+
+function supplierClassFor(opportunity) {
+  if (!opportunity) return 'build_decision';
+  if (opportunity.decision === DECISION_REJECT) return 'blocked';
+  if (opportunity.lane === LANE_OSS_CODE || opportunity.source_type?.startsWith('public_')) return 'public_path';
+  if (opportunity.local_verifiable && !opportunity.human_blockers?.length) return 'owned_agent';
+  return 'build_decision';
+}
+
+function compactOpportunityForPath(opportunity) {
+  if (!opportunity) return null;
+  return {
+    opportunity_id: opportunity.id,
+    title: opportunity.title,
+    lane: opportunity.lane,
+    source_type: opportunity.source_type,
+    source_url: opportunity.source_url || '',
+    supplier_class: supplierClassFor(opportunity),
+    route_classification: opportunity.route_classification,
+    decision: opportunity.decision,
+    scores: {
+      quality: opportunity.quality_score || 0,
+      speed: opportunity.speed_score || 0,
+      cost: opportunity.cost_score || 0,
+      risk: opportunity.risk_score || 0,
+      proofability: opportunity.proofability_score || 0,
+      learning_value: opportunity.learning_value_score || 0,
+      trainability: opportunity.trainability_score || 0,
+      execution_readiness: opportunity.execution_readiness_score || 0,
+    },
+    compute_location_options: opportunity.compute_location_options || [],
+    human_blockers: opportunity.human_blockers || [],
+    hard_blockers: opportunity.hard_blockers || [],
+    cash_potential_usd_min: opportunity.cash_potential_usd_min || 0,
+    cash_potential_usd_max: opportunity.cash_potential_usd_max || 0,
+  };
+}
+
+function createOpenDemandService({
+  fetchImpl = fetch,
+  learningLedgerPath,
+  memoryOnlyLearning = true,
+  allowClone = process.env.BEAN_OPEN_DEMAND_ALLOW_CLONE !== '0',
+} = {}) {
   let state = null;
   const feedbackRecords = [];
+  const learningStore = new PublicLearningStore({ ledgerPath: learningLedgerPath, memoryOnly: memoryOnlyLearning });
   async function scan({ source_mode: sourceMode = 'fixture', limit = 20, query = GITHUB_SEARCH_QUERY } = {}) {
     const started = Date.now();
     const bounded = boundedLimit(limit);
-    if (!['fixture', 'live-github', 'auto'].includes(sourceMode)) {
-      throw new OpenDemandError('source_mode must be fixture, live-github, or auto');
+    if (!SOURCE_MODES.includes(sourceMode)) {
+      throw new OpenDemandError('source_mode must be fixture, live-github, auto, public-benchmark, public-bounty, public-research, non-code-fixture, or github-discussions');
     }
     const [opportunities, source] = await discoverOpportunities({ sourceMode, limit: bounded, query, fetchImpl });
     const ranked = rankOpportunities(opportunities);
@@ -782,7 +991,74 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
       reports: {},
       feedback_records: feedbackRecords,
     };
+    learningStore.append('scan', {
+      source,
+      metrics: state.metrics,
+      hero_metrics: heroMetrics(ranked, { scanDurationMs }),
+      selected_ids: ranked.filter((item) => item.decision !== DECISION_REJECT).map((item) => item.id).slice(0, 20),
+    });
     return publicScan(state);
+  }
+
+  async function path(input = {}) {
+    const outcome = normalizeOutcome(input);
+    const contextRefs = Array.isArray(input.context_refs) ? input.context_refs.map((item) => String(item).slice(0, 500)).slice(0, 8) : [];
+    const sourceMode = SOURCE_MODES.includes(input.source_mode) ? input.source_mode : 'fixture';
+    const current = await scan({
+      source_mode: sourceMode,
+      limit: input.limit || 12,
+      query: input.query || GITHUB_SEARCH_QUERY,
+    });
+    const selected = current.opportunities.find((item) => item.decision !== DECISION_REJECT) || current.opportunities[0] || null;
+    const alternatives = current.opportunities
+      .filter((item) => item.id !== selected?.id)
+      .slice(0, 4)
+      .map(compactOpportunityForPath);
+    const selectedPath = compactOpportunityForPath(selected);
+    const taskBundle = selected && selected.decision !== DECISION_REJECT
+      ? buildTaskBundle(selected, selected.rank || 0)
+      : null;
+    if (taskBundle) state.bundles[taskBundle.task_id] = taskBundle;
+    const response = {
+      schema_version: 'bean.agent_path_decision.v1',
+      path_id: `path-${stableDigest(`${outcome.goal}:${selected?.id || 'none'}:${Date.now()}`, 16)}`,
+      created_at: Math.floor(Date.now() / 1000),
+      outcome,
+      context_refs: contextRefs,
+      selected_path: selectedPath,
+      alternatives,
+      next_step: taskBundle
+        ? {
+            action: 'run_public_proof',
+            task_id: taskBundle.task_id,
+            endpoint: `/v0/open-demand/tasks/${encodeURIComponent(taskBundle.task_id)}/run`,
+            approval_required_before_external_submission: true,
+          }
+        : {
+            action: 'inspect_or_reject',
+            reason: 'No non-rejected path was available in the current scan.',
+          },
+      guardrails: GUARDRAILS,
+      blocked_actions: BLOCKED_ACTIONS,
+      pricing_model: {
+        v0_spend_usd: 0,
+        future_shape: 'micro outcome-priced routing with requester-owned, supplier-owned, or gateway-owned compute explicitly selected before execution.',
+        no_surprise_compute: true,
+      },
+      external_actions_performed: false,
+      request_body_persistence: false,
+      source: current.source,
+      hero_metrics: current.hero_metrics,
+    };
+    learningStore.append('path_decision', {
+      path_id: response.path_id,
+      source_mode: sourceMode,
+      selected_opportunity_id: selected?.id || null,
+      supplier_class: selectedPath?.supplier_class || null,
+      route_classification: selectedPath?.route_classification || null,
+      scores: selectedPath?.scores || {},
+    });
+    return response;
   }
 
   async function latest() {
@@ -796,6 +1072,12 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
     if (!opportunity) throw new OpenDemandError('opportunity not found', 404);
     const taskBundle = buildTaskBundle(opportunity, opportunity.rank || 0);
     state.bundles[taskBundle.task_id] = taskBundle;
+    learningStore.append('bundle', {
+      task_id: taskBundle.task_id,
+      opportunity_id: taskBundle.opportunity_id,
+      route_classification: opportunity.route_classification,
+      scores: taskBundle.scores,
+    });
     return { bundle: taskBundle, guardrails: GUARDRAILS };
   }
 
@@ -810,10 +1092,28 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
       }
     }
     if (!taskBundle) throw new OpenDemandError('task bundle not found', 404);
-    const solverRun = runStaticSolver(taskBundle, Object.keys(state.runs).length + 1);
+    const publicProof = await runPublicProof(taskBundle, { fetchImpl, allowClone });
+    const solverRun = {
+      ...runStaticSolver(taskBundle, Object.keys(state.runs).length + 1),
+      runner: 'public_proof_runner',
+      public_proof: publicProof,
+      status: publicProof.status === 'failed' || publicProof.status === 'blocked'
+        ? 'review_packet_ready_human_gated'
+        : publicProof.status,
+    };
     const report = buildEvidencePacket(taskBundle, solverRun);
     state.runs[solverRun.run_id] = solverRun;
     state.reports[taskId] = report;
+    learningStore.append('proof_run', {
+      task_id: taskBundle.task_id,
+      run_id: solverRun.run_id,
+      status: solverRun.status,
+      proof_status: publicProof.status,
+      source_kind: publicProof.source_kind,
+      spend_usd: publicProof.spend_usd,
+      public_writes: publicProof.public_writes,
+      external_actions_performed: publicProof.external_actions_performed,
+    });
     return { run: solverRun, report, guardrails: GUARDRAILS };
   }
 
@@ -838,6 +1138,13 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
     const record = normalizeFeedback(input);
     feedbackRecords.push(record);
     if (state) state.feedback_records = feedbackRecords;
+    learningStore.append('feedback', {
+      target_type: record.target_type,
+      target_id: record.target_id,
+      helpful: record.helpful,
+      reason_code: record.reason_code,
+      saved_time_estimate_minutes: record.saved_time_estimate_minutes,
+    });
     return {
       accepted: true,
       feedback: record,
@@ -864,6 +1171,10 @@ function createOpenDemandService({ fetchImpl = fetch } = {}) {
       };
     },
     examples,
+    learning() {
+      return learningStore.summary();
+    },
+    path,
     latest,
     opportunities: latest,
     scan,
@@ -883,6 +1194,7 @@ export {
   HERO_METRIC_DEFINITIONS,
   OpenDemandError,
   PROOF_EXAMPLES,
+  SOURCE_MODES,
   buildTaskBundle,
   createOpenDemandService,
   githubIssueToOpportunity,

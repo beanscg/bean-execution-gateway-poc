@@ -435,6 +435,11 @@
             Source
             <select id="openDemandSource">
               <option value="fixture">Fixture</option>
+              <option value="public-benchmark">Public benchmark</option>
+              <option value="public-research">Public research</option>
+              <option value="public-bounty">Public bounty read-only</option>
+              <option value="non-code-fixture">Non-code fixtures</option>
+              <option value="github-discussions">GitHub discussions fixture</option>
               <option value="auto">Live GitHub with fallback</option>
               <option value="live-github">Live GitHub only</option>
             </select>
@@ -700,7 +705,7 @@
         <button class="opportunity-card${item.id === selectedOpportunityId ? ' selected' : ''}" data-opportunity-id="${escapeHtml(item.id)}">
           <strong>${escapeHtml(item.title)}</strong>
           <small>${escapeHtml(item.repository || item.source_type || item.lane)}</small>
-          <small>${escapeHtml(decisionText(item.decision))} · train ${escapeHtml(item.trainability_score ?? 0)} · ready ${escapeHtml(item.execution_readiness_score ?? 0)}</small>
+          <small>${escapeHtml(decisionText(item.decision))} · Q ${escapeHtml(item.quality_score ?? 0)} · S ${escapeHtml(item.speed_score ?? 0)} · proof ${escapeHtml(item.proofability_score ?? 0)}</small>
         </button>
       `).join('') || 'No opportunities found.';
 
@@ -710,14 +715,20 @@
       }
       const bundle = openDemandBundle(selected.id);
       const report = bundle ? openDemandReport(bundle.task_id) : null;
+      const proof = report?.public_proof || null;
       openDemandDetail.innerHTML = `
         <h3>${escapeHtml(selected.title)}</h3>
         <p>${escapeHtml(selected.body_excerpt || selected.title)}</p>
         <div class="open-demand-detail-grid">
           <div><strong>Lane</strong><span>${escapeHtml(selected.lane)}</span></div>
-          <div><strong>Decision</strong><span>${escapeHtml(decisionText(selected.decision))}</span></div>
+          <div><strong>Route</strong><span>${escapeHtml(selected.route_classification || decisionText(selected.decision))}</span></div>
+          <div><strong>Quality</strong><span>${escapeHtml(selected.quality_score ?? 0)}</span></div>
+          <div><strong>Speed</strong><span>${escapeHtml(selected.speed_score ?? 0)}</span></div>
+          <div><strong>Proof</strong><span>${escapeHtml(selected.proofability_score ?? 0)}</span></div>
+          <div><strong>Cost</strong><span>${escapeHtml(selected.cost_score ?? 0)}</span></div>
+          <div><strong>Risk</strong><span>${escapeHtml(selected.risk_score ?? 0)}</span></div>
           <div><strong>Human gates</strong><span>${escapeHtml((selected.human_blockers || []).join(', ') || 'none')}</span></div>
-          <div><strong>Hard blockers</strong><span>${escapeHtml((selected.hard_blockers || []).join(', ') || 'none')}</span></div>
+          <div><strong>Proof status</strong><span>${escapeHtml(proof?.status || 'not run')}</span></div>
           <div><strong>Cash</strong><span>$${escapeHtml(selected.cash_potential_usd_min ?? 0)}-$${escapeHtml(selected.cash_potential_usd_max ?? 0)}</span></div>
         </div>
         <div class="open-demand-actions">

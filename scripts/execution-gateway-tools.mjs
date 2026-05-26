@@ -464,7 +464,7 @@ export function buildOpenApiSpec() {
     post: {
       operationId: 'postOpenDemandScanV0',
       summary: 'Scan public demand',
-      description: 'Scans fixture data or read-only public GitHub issues and appends negative controls.',
+      description: 'Scans fixture data, public benchmark/research/bounty fixtures, or read-only public GitHub issues and appends negative controls.',
       requestBody: {
         required: false,
         content: {
@@ -472,7 +472,10 @@ export function buildOpenApiSpec() {
             schema: {
               type: 'object',
               properties: {
-                source_mode: { type: 'string', enum: ['fixture', 'auto', 'live-github'] },
+                source_mode: {
+                  type: 'string',
+                  enum: ['fixture', 'auto', 'live-github', 'public-benchmark', 'public-bounty', 'public-research', 'non-code-fixture', 'github-discussions'],
+                },
                 limit: { type: 'integer', minimum: 1, maximum: 50 },
                 query: { type: 'string' },
               },
@@ -482,6 +485,35 @@ export function buildOpenApiSpec() {
         },
       },
       responses: { 200: { description: 'Ranked open-demand opportunities' } },
+    },
+  };
+  const pathPath = {
+    post: {
+      operationId: 'postAgentPathDecisionV0',
+      summary: 'Turn an outcome into the best current agent path',
+      description: 'Returns owned-agent, public-path, or build-decision routing with quality, speed, cost, risk, proofability, compute-location options, and explicit stop conditions. It performs no external writes, spend, supplier calls, or public submissions.',
+      requestBody: {
+        required: false,
+        content: {
+          'application/json': {
+            schema: { $ref: '#/components/schemas/AgentPathRequestV0' },
+            examples: {
+              publicOutcome: {
+                value: {
+                  outcome: {
+                    goal: 'Find the safest way to solve a public issue without paying for compute yet.',
+                    task_type: 'agent_task_triage',
+                    desired_artifact: 'agent_path_packet',
+                  },
+                  source_mode: 'fixture',
+                  policy: { mode: 'free_only' },
+                },
+              },
+            },
+          },
+        },
+      },
+      responses: { 200: { description: 'Agent path decision' } },
     },
   };
   const openDemandBundlePath = {
@@ -505,6 +537,14 @@ export function buildOpenApiSpec() {
       operationId: 'getOpenDemandReportV0',
       summary: 'Get evidence packet',
       responses: { 200: { description: 'Evidence packet' } },
+    },
+  };
+  const openDemandLearningPath = {
+    get: {
+      operationId: 'getOpenDemandLearningV0',
+      summary: 'Summarize public-only learning records',
+      description: 'Returns metadata-only learning counters. Hosted demo keeps these in memory and does not persist request bodies.',
+      responses: { 200: { description: 'Public-only learning summary' } },
     },
   };
   const feedbackPath = {
@@ -565,6 +605,7 @@ export function buildOpenApiSpec() {
       '/v0/ready': readyPath,
       '/v0/metrics': metricsPath,
       '/v0/route': routePath,
+      '/v0/path': pathPath,
       '/v0/dispatch': dispatchPath,
       '/v0/outcomes': outcomePath,
       '/v0/ledger/summary': ledgerPath,
@@ -573,8 +614,10 @@ export function buildOpenApiSpec() {
       '/v0/feedback': feedbackPath,
       '/v0/open-demand/health': openDemandHealthPath,
       '/v0/open-demand/examples': examplesPath,
+      '/v0/open-demand/learning': openDemandLearningPath,
       '/v0/open-demand/latest': openDemandLatestPath,
       '/v0/open-demand/opportunities': openDemandLatestPath,
+      '/v0/open-demand/path': pathPath,
       '/v0/open-demand/scan': openDemandScanPath,
       '/v0/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
       '/v0/open-demand/tasks/{task_id}/run': openDemandRunPath,
@@ -584,6 +627,7 @@ export function buildOpenApiSpec() {
       '/ready': readyPath,
       '/metrics': metricsPath,
       '/route': routePath,
+      '/path': pathPath,
       '/dispatch': dispatchPath,
       '/outcomes': outcomePath,
       '/ledger/summary': ledgerPath,
@@ -592,8 +636,10 @@ export function buildOpenApiSpec() {
       '/feedback': feedbackPath,
       '/open-demand/health': openDemandHealthPath,
       '/open-demand/examples': examplesPath,
+      '/open-demand/learning': openDemandLearningPath,
       '/open-demand/latest': openDemandLatestPath,
       '/open-demand/opportunities': openDemandLatestPath,
+      '/open-demand/path': pathPath,
       '/open-demand/scan': openDemandScanPath,
       '/open-demand/opportunities/{opportunity_id}/bundle': openDemandBundlePath,
       '/open-demand/tasks/{task_id}/run': openDemandRunPath,
@@ -683,6 +729,33 @@ export function buildOpenApiSpec() {
           },
           additionalProperties: false,
         },
+        AgentPathRequestV0: {
+          type: 'object',
+          properties: {
+            outcome: {
+              type: 'object',
+              properties: {
+                goal: { type: 'string' },
+                task_type: { type: 'string' },
+                desired_artifact: { type: 'string' },
+                success_criteria: { type: 'array', items: { type: 'string' } },
+              },
+              additionalProperties: true,
+            },
+            goal: { type: 'string' },
+            task_type: { type: 'string' },
+            desired_artifact: { type: 'string' },
+            context_refs: { type: 'array', items: { type: 'string' } },
+            source_mode: {
+              type: 'string',
+              enum: ['fixture', 'auto', 'live-github', 'public-benchmark', 'public-bounty', 'public-research', 'non-code-fixture', 'github-discussions'],
+            },
+            limit: { type: 'integer', minimum: 1, maximum: 50 },
+            query: { type: 'string' },
+            policy: { type: 'object' },
+          },
+          additionalProperties: false,
+        },
       },
     },
   };
@@ -696,6 +769,7 @@ export function buildArtifactManifest({ outDir, files, generatedAt = new Date().
     spend_usd: 0,
     external_writes: 0,
     external_executions: 0,
+    hosted_demo_request_body_persistence: false,
     files: files.map((file) => {
       const absolute = path.resolve(file);
       return {
@@ -764,6 +838,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'scripts/execution-gateway-tools.mjs',
     'scripts/execution-gateway-server.mjs',
     'scripts/open-demand-lib.mjs',
+    'scripts/open-demand-proof-runner.mjs',
     'scripts/work-network-lib.mjs',
     'render.yaml',
     'schemas/execution-gateway/local-api.openapi.json',
@@ -802,6 +877,10 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/production-cutover.md',
     'docs/abuse-and-rate-limit-policy.md',
     'docs/evidence.md',
+    'docs/public-proof-runner.md',
+    'docs/open-demand-adapters.md',
+    'docs/path-api-and-scoring.md',
+    'docs/v1-product-goals.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
     'adapters/execution-gateway/slack-app-adapter.stub.md',
@@ -811,6 +890,9 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/blocked-paid-public-write-request.json',
     'examples/execution-gateway/private-input-rejected-request.json',
     'examples/execution-gateway/open-demand-scan-request.json',
+    'examples/execution-gateway/open-demand-path-request.json',
+    'examples/execution-gateway/open-demand-public-bounty-scan-request.json',
+    'examples/execution-gateway/open-demand-public-research-scan-request.json',
     'examples/execution-gateway/open-demand-feedback-request.json',
     'examples/execution-gateway/agent-path-build-vs-use-request.json',
     'examples/execution-gateway/non-code-public-benchmark-request.json',

@@ -13,6 +13,7 @@
     { "method": "GET", "path": "/v0/ready", "purpose": "Readiness and production gate status" },
     { "method": "GET", "path": "/v0/metrics", "purpose": "Metadata-only runtime metrics" },
     { "method": "GET", "path": "/v0/examples", "purpose": "Return proof examples and hero metric definitions" },
+    { "method": "POST", "path": "/v0/path", "purpose": "Return the best current owned-agent, public-path, or build-decision route for an outcome" },
     { "method": "POST", "path": "/v0/route", "purpose": "Return route decision for a public or synthetic outcome request" },
     { "method": "POST", "path": "/v0/feedback", "purpose": "Record metadata-only route usefulness feedback" },
     { "method": "POST", "path": "/v0/dispatch", "purpose": "Disabled dispatch endpoint that proves V0 never executes externally" },
@@ -20,6 +21,8 @@
     { "method": "GET", "path": "/v0/ledger/summary", "purpose": "Summarize outcome records" },
     { "method": "GET", "path": "/v0/openapi.json", "purpose": "OpenAPI contract" },
     { "method": "GET", "path": "/v0/open-demand/examples", "purpose": "Return open-demand proof examples" },
+    { "method": "GET", "path": "/v0/open-demand/learning", "purpose": "Summarize public-only learning counters" },
+    { "method": "POST", "path": "/v0/open-demand/path", "purpose": "Alias for the agent path decision endpoint" },
     { "method": "POST", "path": "/v0/open-demand/scan", "purpose": "Scan fixture or read-only public GitHub demand" },
     { "method": "POST", "path": "/v0/open-demand/opportunities/{opportunity_id}/bundle", "purpose": "Build a local task packet" },
     { "method": "POST", "path": "/v0/open-demand/tasks/{task_id}/run", "purpose": "Run static verifier and evidence packet loop" },
@@ -29,6 +32,16 @@
     "executable_path_rate",
     "time_to_ranked_paths_seconds",
     "unsafe_actions_prevented"
+  ],
+  "path_scores_v0": [
+    "quality",
+    "speed",
+    "cost",
+    "risk",
+    "proofability",
+    "learning_value",
+    "trainability",
+    "execution_readiness"
   ],
   "guarantees_v0": {
     "spend_usd": 0,

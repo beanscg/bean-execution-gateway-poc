@@ -15,17 +15,30 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 - `/v0/ready` readiness and production gate status.
 - `/v0/metrics` metadata-only counters.
 - `/v0/examples` proof examples and hero metric definitions.
+- `/v0/path` outcome-to-agent-path decision.
 - `/v0/feedback` metadata-only route usefulness feedback.
 - `/v0/dispatch` disabled dispatch proof endpoint.
 - `/v0/outcomes` memory-only hosted outcome records or local ledger writes.
 - `/v0/ledger/summary` outcome ledger summaries.
 - `/v0/openapi.json` OpenAPI contract.
+- `/v0/open-demand/learning` public-only learning counters.
 - `/v0/open-demand/scan` public-demand scan with negative controls.
 - `/v0/open-demand/opportunities/{opportunity_id}/bundle` local task packet generation.
-- `/v0/open-demand/tasks/{task_id}/run` static verifier and evidence packet generation.
+- `/v0/open-demand/tasks/{task_id}/run` public proof runner and evidence packet generation.
 - CLI route, evaluate, verify, OpenAPI, registry lint, and hosted smoke commands.
 - JS SDK wrapper and Python local stub.
 - Executor registry with selectable local zero-cost executors and blocked external supplier class.
+- Public proof runner for fixture and public GitHub sources with hosted-demo clone disabled.
+- Source modes for public benchmark, public research, read-only bounty fit, non-code fixtures, GitHub discussion fixtures, and read-only live GitHub issue search.
+
+## Path Scores
+
+- Quality: clarity, local verifiability, repeatability, labels/comments.
+- Speed: local verifiability and absence of account or submission gates.
+- Cost: zero-spend preference.
+- Risk: hard blockers and human gates.
+- Proofability: public signal, acceptance clarity, repeatability, and local proof options.
+- Learning value: repeatability and useful training record potential.
 
 ## Hero Metrics
 

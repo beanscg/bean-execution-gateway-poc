@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-25T17:59:34.146Z",
+  "generated_at": "2026-05-26T00:28:21.229Z",
   "out_dir": ".",
   "local_only": true,
   "spend_usd": 0,
@@ -8,299 +8,379 @@
   "hosted_demo_request_body_persistence": false,
   "files": [
     {
+      "path": ".gitignore",
+      "exists": true,
+      "sha256": "f4b0753482dbf0074ffc5d9968d71d812820a6da0ac0d4021f51fe6d23270acb"
+    },
+    {
       "path": "AGENTS.md",
       "exists": true,
-      "sha256": "e35d1357eddc442f73fcb010fa8352c5ea52ecddb057f91c9e81f8d1d6d5f396"
+      "sha256": "f1ad6973b0f2e09fbb5eb01291f268b8c3623abd06a0a6c3f89ea8999e444d4d"
     },
     {
       "path": "LICENSE",
       "exists": true,
-      "sha256": "062e860ed14d1613b969fc2a3e760f9ea445aab060068713ff0b7f5224224327"
+      "sha256": "b9b6d1f128a572bc41543c33cea7419fe307d6c383265ab6b150534cc3a27ede"
     },
     {
       "path": "PRIVACY.md",
       "exists": true,
-      "sha256": "9cb13e5ddeabde52bdcef2cb00752af052c0c5cdd876a16dcad981d40c8f3a46"
+      "sha256": "5d0d1faf294d1fccd1bb37c4ebf7d1c5e5889c7db53d190fa512b5e50355a395"
     },
     {
       "path": "README.md",
       "exists": true,
-      "sha256": "be6637f2c0ae0df62a28c14d9f9fa2b4c8f80929342be4d98a441dd51917b228"
+      "sha256": "3ef916e0d4fa73f82b32f9dab25dd5f4c399950e8f10627cbdf27c5d50e14027"
     },
     {
       "path": "SECURITY.md",
       "exists": true,
-      "sha256": "6ab28c4ca9f17293510e926d04f88d6ffb7982b461af21dcc0f5ef621ec1cfbb"
+      "sha256": "99ddaad2a62b64c551e5bf70a85f67feca57f9659f613b1d2ba0b73d51702af3"
     },
     {
       "path": "TERMS.md",
       "exists": true,
-      "sha256": "1b9cde739a1fa5d2b7ff8c9a61258fb53048198f850f4f7e28e489d1d930028b"
+      "sha256": "4f819b1bf66ba83d57ecfd930e78441fa8365a4dc59a41730f841658ebc6463c"
     },
     {
       "path": "adapters/execution-gateway/github-app-adapter.stub.md",
       "exists": true,
-      "sha256": "a4540c665909e3f20a3bf2de3de45a125d77eba93bb66d03a05f4b314cd1be5a"
+      "sha256": "05b2797c6c9dc287193b33437b7677207820098ec6630235141ff9c7491cd145"
     },
     {
       "path": "adapters/execution-gateway/mcp-adapter.stub.md",
       "exists": true,
-      "sha256": "35fdf24b687721b4b5bb3a9c083f0c83c7484c352f6c3fa3d1451f2c0df9caa8"
+      "sha256": "8f5f13022dcc1f1c9555755fee71afcc0d822edb3ba51691fa1ec161fe1c6de4"
     },
     {
       "path": "adapters/execution-gateway/slack-app-adapter.stub.md",
       "exists": true,
-      "sha256": "94ebfab229e81725754c5496aa84a2f82a3c9e49f3ac5d1797555d38a3e4e9e2"
+      "sha256": "70275d93a3f5ecd9689bb063d31530e19e786ee1289fbeabf8a1641b1c0ed56f"
     },
     {
       "path": "adapters/execution-gateway/workflow-platform-adapter.stub.md",
       "exists": true,
-      "sha256": "48f98b7b1ead3fe4eacdef5f712f0054ecab12e7c2f86d78a1767494921d0411"
+      "sha256": "941a28668588173d37740bd795a41a42f7ecb63842fc805737a415533b4a67c1"
     },
     {
       "path": "assets/execution-gateway-demo/index.html",
       "exists": true,
-      "sha256": "7878ec0693f1a7872ecd154aef5ea65b3a58cda596d50d0efc66c2ef1e77e229"
+      "sha256": "0b0f07084062d0b96466bc0631f1490f9a40780c68b7041a8482bb4574510f62"
     },
     {
       "path": "capability-manifest.json",
       "exists": true,
-      "sha256": "ffdd88f427e775d79fd9f685f1724659d2b3f5e28130eadc46402b1e340dc6fe"
+      "sha256": "2a697cb73625d25644086f8e7927c2358b0130f3c7aded4533228c0cebe8f09b"
     },
     {
       "path": "data/execution-gateway/registry.json",
       "exists": true,
-      "sha256": "f32d9f26daf5bb845448f2255f0ae397932dc0eda98cb81fcef4618879760140"
+      "sha256": "0017111d5cf6242d14ad63b47c50e8140fd4e26cc5a3c3f569a9f2308014ced3"
     },
     {
       "path": "docs/abuse-and-rate-limit-policy.md",
       "exists": true,
-      "sha256": "d8eea7486820d118d293faee4631ca463ba94e36388ca45b6a6b23964e5da0b1"
+      "sha256": "4182bf4b7eca4c174c8d2cd00b05713d020189151c86ff9ec86db74adb4d3624"
     },
     {
       "path": "docs/api-examples.md",
       "exists": true,
-      "sha256": "d3b58b9f21cfc15826f2afb6d40f8fa9aff7da24db37d4368a87bb4aa09cae4b"
+      "sha256": "38f60948b637625a97d552054eb1779962cece4df86a9471a930a6e8aadcfb5c"
     },
     {
       "path": "docs/evidence.md",
       "exists": true,
-      "sha256": "89a047a33d0d40eebf94fa5b728fd9425a8f9644e2e6cd661354c29f0e12257b"
+      "sha256": "281853c9f727d856e9cbb3bfa84794fcb62682dbd7298645cd1154107b163823"
     },
     {
       "path": "docs/live-traffic-readiness.md",
       "exists": true,
-      "sha256": "ac52f44cbd0e3a9048a3374833a3276336f1d0e40dc1dbbc5fc6ea0da44a651c"
+      "sha256": "e37da7360f3d42490bf536ff5ccf942418d948462f7f94c1b4b153d6f6e3ec16"
+    },
+    {
+      "path": "docs/open-demand-adapters.md",
+      "exists": true,
+      "sha256": "1643b06a4bc05d3c890ef54af35600a0fbeb18e80d86fd56641a153745c14aaa"
+    },
+    {
+      "path": "docs/path-api-and-scoring.md",
+      "exists": true,
+      "sha256": "0804aab3486b63141a5586bab45bd58da0c3e8e1b610061141154b67abf2bfcd"
     },
     {
       "path": "docs/poc-truth.md",
       "exists": true,
-      "sha256": "9c77e8f8f7b8b241f7968cf3b725ae5e8931d228e07578e6ddc07c73d7525acf"
+      "sha256": "fcc18362e02651118b03bd81566d780a7885b7423a89a7bf77ed613dfc034ac1"
     },
     {
       "path": "docs/pre-discovery-readiness.md",
       "exists": true,
-      "sha256": "bd1f5e64823de86976c484f76984dffd85de410a778c4cff1e50b1fdddcd2224"
+      "sha256": "bf60906a049635a79720732951061ab5a5abfdfdbc6f60860368d83c59c1b9f4"
     },
     {
       "path": "docs/product-definition.md",
       "exists": true,
-      "sha256": "c78920655bcb2b3e7a93cf9297f857faab27eccd014a9b65bba206805c35cbb8"
+      "sha256": "9d45df604d702cc3fd066ef88af73b2d51b2d4f44de162dff11ae746554b0827"
     },
     {
       "path": "docs/production-cutover.md",
       "exists": true,
-      "sha256": "ab85faa02f5050c07e2dfddb19718458c135afead4d0eb592257a319c5e6c665"
+      "sha256": "92daed03f2d4574a81734fcf2685b60ccaf5285dc10ef79d8d9abd661d1df384"
+    },
+    {
+      "path": "docs/public-launch-packet.md",
+      "exists": true,
+      "sha256": "e6aa070ee787cf174a88e455e370f73c7e36b8542df5f239fe4847a2256dae72"
+    },
+    {
+      "path": "docs/public-proof-runner.md",
+      "exists": true,
+      "sha256": "127b686c959fe2b26ec35da42f493658f8fd84ad7f4932c4fcaa6a37f33e70d3"
     },
     {
       "path": "docs/safety-and-trust.md",
       "exists": true,
-      "sha256": "35812644b66f09d0bd3096c7faec904fdc0cf6bdb77c58b0200ef77cb8fa9566"
+      "sha256": "86497738adcf0679e0258784b4ed98db7051e7a3c37c86617479abfd0aac9f42"
+    },
+    {
+      "path": "docs/v1-product-goals.md",
+      "exists": true,
+      "sha256": "15aaa25f0a5e07304d1e807e2248053343b99bc06c3ee45e7a3b4a1f38d12598"
     },
     {
       "path": "docs/v1-readiness.md",
       "exists": true,
-      "sha256": "f97a4094680ebfcba8a0b598db503284fd90925239eab824d7e0f9bbb503986f"
+      "sha256": "f508571122d5bd0f62eb4476fe853d2ffff4acabbadb49b4c6c81676d872f317"
+    },
+    {
+      "path": "examples/execution-gateway/agent-path-build-vs-use-request.json",
+      "exists": true,
+      "sha256": "be114fe8fe8fada4aa8f2362aa8c486a2794ddd82bd7ccfd82cfcc0e6735bb98"
     },
     {
       "path": "examples/execution-gateway/blocked-paid-public-write-request.json",
       "exists": true,
-      "sha256": "77d432f73fd4bae791c76a2059a83fcfd2e8fb4896d2cf1d005f9f6abdae2a6f"
+      "sha256": "b52660392979528c644d9dd8d49936239b71e09b2b14960a96ea0b301420aa74"
     },
     {
       "path": "examples/execution-gateway/dispatch-disabled-response.example.json",
       "exists": true,
-      "sha256": "8881dbe2fed3b6e3de1d5074936999ec47444fb6fddc659aef83a0754dcf5255"
+      "sha256": "6a5b6b47f69f08e0748ddbcf4ba2d9d57be4f379e5e22c2ff47e84a79652c8aa"
     },
     {
       "path": "examples/execution-gateway/hosted-private-rejection-response.example.json",
       "exists": true,
-      "sha256": "6391931245546efd6ece786e45fd841a1dbd981ab0c651db3e2b6782ddda629e"
+      "sha256": "e4c3880a8637321e90fb089c3f3eda22ea2321bc6717bf49472121bf459c160c"
     },
     {
       "path": "examples/execution-gateway/ledger-summary.example.json",
       "exists": true,
-      "sha256": "5dbf3813a686dffaf1ced173afa03880667e98210c8080675104849b7abcaf57"
+      "sha256": "770561781ada96ad7361f8b414e3f4f7031f30d20d46e76d93cd3b4fef293b6c"
     },
     {
       "path": "examples/execution-gateway/metrics-response.example.json",
       "exists": true,
-      "sha256": "043f186d84f67162943b6b03ded719692037c8667146ea380a11345f88907244"
+      "sha256": "c542759babf132b4abb3faba8f30f3c2896e83c4b29d89a98bb46924eda0658b"
+    },
+    {
+      "path": "examples/execution-gateway/non-code-public-benchmark-request.json",
+      "exists": true,
+      "sha256": "a020588bcc45293775b8de1252ac9928e73a1270d9848282913087ac9834f827"
+    },
+    {
+      "path": "examples/execution-gateway/open-demand-feedback-request.json",
+      "exists": true,
+      "sha256": "6c66ff2e633db264b901512e4464293e8b4dd364da06205dad8450b0e06d5d6f"
+    },
+    {
+      "path": "examples/execution-gateway/open-demand-path-request.json",
+      "exists": true,
+      "sha256": "36318035c814175df84ba6690acb3625fee258167cb7a944d96290508a08de0d"
+    },
+    {
+      "path": "examples/execution-gateway/open-demand-public-bounty-scan-request.json",
+      "exists": true,
+      "sha256": "adacbf953d5d7ec53b7c3c75eab9eff41cd1da197443d4118520b8a014e17172"
+    },
+    {
+      "path": "examples/execution-gateway/open-demand-public-research-scan-request.json",
+      "exists": true,
+      "sha256": "c3a1942214a6f3772c2dd7d0b6ea5a9686f8b19cfdd8b775fce3b05832c3a476"
+    },
+    {
+      "path": "examples/execution-gateway/open-demand-scan-request.json",
+      "exists": true,
+      "sha256": "1b19c66342110fff46d21c070c52fd9038c9f82ed4b6255facec1784ffad9957"
     },
     {
       "path": "examples/execution-gateway/outcome-record.json",
       "exists": true,
-      "sha256": "6a7c6425f1d887b6cb50d5f35b4c2bf15230cb3119ad2070db70cbd27b4cb0b4"
+      "sha256": "c99cbb3d4841df43ce7217ba706eb6610f990351bd38596961b2689934f91e63"
     },
     {
       "path": "examples/execution-gateway/private-input-rejected-request.json",
       "exists": true,
-      "sha256": "354e8d452b7621914bd8dce56fed94b1b638ca83b90d75bdc9e169e0ccf8cd9c"
+      "sha256": "4e67d6398fbac3a0bb2f7e48e08210fbe8dc3193844040ead38383408f3b7499"
     },
     {
       "path": "examples/execution-gateway/public-issue-request.json",
       "exists": true,
-      "sha256": "912e7d578f5cd83a3f80303687ba2bcb1223b00c6937a8025c42989321d28fdc"
+      "sha256": "6d8b06edbd314b50512a2437c8911686e16d494899d705da2aec34df9a2f22a2"
     },
     {
       "path": "examples/execution-gateway/readiness-response.example.json",
       "exists": true,
-      "sha256": "bbb8df6c3e2c3a272ab5f7b5e1a2796d0ca85fc95e0827ced570408ba5bed967"
+      "sha256": "eba13940ec62c84bd2e11cfbf13361acbd6b8d2f69be73f8d4bf9e6e1f09b7b4"
     },
     {
       "path": "examples/execution-gateway/route-allowed-response.example.json",
       "exists": true,
-      "sha256": "dadd793ce9b8fc9d0cb8d98d0652bbe024b81332e6267f435bc5db0ad748ce0b"
+      "sha256": "c7ce2b5d446a7907701b3d05be36d6475b5eec37e89a25112df79f1c2ccc0941"
     },
     {
       "path": "examples/execution-gateway/route-denied-response.example.json",
       "exists": true,
-      "sha256": "2758a19cc8b6c772e92b01a60d4cbef40a033106d61e673700f91ec940b72699"
+      "sha256": "e985e4f4bfb75c79dd5278fb48a1d4eeadb4d448b9f7f646030be85b55feaf9e"
     },
     {
       "path": "fixtures/execution-gateway/adversarial-fixtures.json",
       "exists": true,
-      "sha256": "bc0f083e3f1d5cff1464671765f9366b9d74664ce9d738f069c938f0b9861da3"
+      "sha256": "74d54a9213e27773a3d6485ee3e3be680994d94a5baf5697269bf465aef1860c"
     },
     {
       "path": "fixtures/execution-gateway/generated-proof-tasks.json",
       "exists": true,
-      "sha256": "06cfeeabaef5704122db733db2bc852c42268c5896c3ce2bbd0b833a3d75bdaf"
+      "sha256": "1a33252bfa7ea849e9aa3bb2d8c658e53afbc77b6fff6d5f4e275a87f4f1020f"
     },
     {
       "path": "fixtures/execution-gateway/proof-tasks.json",
       "exists": true,
-      "sha256": "a85bc465d07b19e3da909d023b6e2ae8c8d91094dec8cbd191c5a4b1260125af"
+      "sha256": "7c8ef84e53525023b3bf249975bf583a21e3101035d37ba431fde2b8966b4eaf"
     },
     {
       "path": "fixtures/execution-gateway/sample-request.json",
       "exists": true,
-      "sha256": "e81929a7f8fccab49ebda9ed7ce849ed72c2cbbc74adddc6deeddb0e7dce5c85"
+      "sha256": "909873c87b0c99e70976b05333b67c536af4bc544a1f74cf5ae942198d3a7a2d"
     },
     {
       "path": "llms-full.txt",
       "exists": true,
-      "sha256": "13ea8b0626d935205d2af23afd89945cad85840490d3640980d58ad5b73aa6b2"
+      "sha256": "6f761a1e105f5f6f9c783abfc3dffd63c660fcc20888edd58f2112dccf43e5f8"
     },
     {
       "path": "llms.txt",
       "exists": true,
-      "sha256": "5e9c173508c6667e811cef9dbcd94ce5ee933d75302722bbb85053265e566026"
+      "sha256": "f086ae8305a1e24dfd732e0a9103a2a9b09dd1217761ebca775f1a1e3a4d95e0"
     },
     {
       "path": "package.json",
       "exists": true,
-      "sha256": "8aba0bac2f1e5d33e46fc9a406fa3d49f8fb764d95e90f8ab6c7762a70faae51"
+      "sha256": "457dd71bb90941b44c3ecf30e7fbda2e7d6ebe29d6c0ade34b6f42b7f690f075"
     },
     {
       "path": "render.yaml",
       "exists": true,
-      "sha256": "10cf59e273e70deedef697c1572f43eab75db7bee808623fa6035229a506dad6"
+      "sha256": "3ccc47480873bd486a33e69961e5c3ea56f9f2a03146b3bc7a3b1865cc6279be"
     },
     {
       "path": "schemas/execution-gateway/dispatch_request.schema.json",
       "exists": true,
-      "sha256": "8889735f4c9c510131f413abff6ae43f8c8f4439525a73e53b134d0b2987886e"
+      "sha256": "2dd5d653d13070c422d8409adc0e0821bb8bdeb8ada982a757a16ae77f7b6f7e"
     },
     {
       "path": "schemas/execution-gateway/executor_registry_entry.schema.json",
       "exists": true,
-      "sha256": "ce7d2f4f20aff85d05fc2348691af73605c504c7592fdf991d59b10891b0db0e"
+      "sha256": "63e5f644910d2ca36883f5d80e578124d31ce0d327fbf8130edc5e7ce62abedb"
     },
     {
       "path": "schemas/execution-gateway/local-api.openapi.json",
       "exists": true,
-      "sha256": "840fd5356385e3f6cec33d97743af1f26ca7187897e4b87245844f812882cc76"
+      "sha256": "04bb10bb34ff6d8293ae740324696ad1902959cbbea37c9a516885a0248bcc0e"
     },
     {
       "path": "schemas/execution-gateway/outcome_acceptance.schema.json",
       "exists": true,
-      "sha256": "f4a276dd09d4307ae4ca2f6b7967fd0b02b68ed655e95522a95776e3d1569a7b"
+      "sha256": "13b1cb974600363f8b74551644f650910d562d89b01d00de8b018f915d6c20e2"
     },
     {
       "path": "schemas/execution-gateway/outcome_record.schema.json",
       "exists": true,
-      "sha256": "044680346faae30f92013afdb9749e4b1ff970b3bc25e04ca6af2bfa59e8cfc3"
+      "sha256": "41db32053765475cdd7b29c5532ac130af7aa305d850050a5827922b3decefe4"
     },
     {
       "path": "schemas/execution-gateway/request.schema.json",
       "exists": true,
-      "sha256": "535b4bbdbdc514e3b47e2eb5c4099b86cc2a710129fdced56d5c4ecfc0544017"
+      "sha256": "c840be8a370b7e11322a9f4575bdb030349a58852f18044e7e7efc5837219a38"
     },
     {
       "path": "schemas/execution-gateway/response.schema.json",
       "exists": true,
-      "sha256": "8611e4c3469be2559d27623ec07725334b42e929f3d84f42275fb9fd73c7abbe"
+      "sha256": "f62ca07ed1ab7b967f15e8af2dcb4d24a702a6a5e0e3c2fda3ab598030990c64"
     },
     {
       "path": "schemas/execution-gateway/supplier_bid.schema.json",
       "exists": true,
-      "sha256": "6d9adf54a7afd729d9ec4128000ac9773c815f4025255f5bb2f48bbc94eb2c76"
+      "sha256": "7415b7823705d2b1567c8e4224dc518dca5637a7ce9c677de395e92c2b485152"
     },
     {
       "path": "scripts/execution-gateway-lib.mjs",
       "exists": true,
-      "sha256": "75e721ff29f2f3a7d155007c96488116bf671233a68c1690b98ad9bc77a32868"
+      "sha256": "3aecc6a7231a53fbf29ad40bfd9e14dfe574e36b897e90d899e3ba305af333f5"
     },
     {
       "path": "scripts/execution-gateway-server.mjs",
       "exists": true,
-      "sha256": "dcb7c73051cfe2e9997427a6cd4a6684a1932a877a917845da476623fefcda06"
+      "sha256": "40d380f757cf684c62514c3474e7fb91e8dcc5ff51486c0dbbc14454b880ea79"
     },
     {
       "path": "scripts/execution-gateway-tools.mjs",
       "exists": true,
-      "sha256": "16d131bfda8226445762640d8e3cdbf0dcafe22918993af2ab9019a4819191e3"
+      "sha256": "f641c655d3342472d0a31417d5c827afbf97b807bfacae948f44789eee37776a"
     },
     {
       "path": "scripts/execution-gateway.mjs",
       "exists": true,
-      "sha256": "40ad068b2e4a3ef459079143cbcd44a0a0289b7818f1c525a35a04a6e09a47ed"
+      "sha256": "a0a2b2b1e4b2b5b2d29b9fff04f0992c41710d9117d9e4ec83bfc04889be0d06"
+    },
+    {
+      "path": "scripts/open-demand-lib.mjs",
+      "exists": true,
+      "sha256": "558839198081daaa90731fabca5ef323cc5f97433edca489ee36b95671f91e07"
+    },
+    {
+      "path": "scripts/open-demand-proof-runner.mjs",
+      "exists": true,
+      "sha256": "102a81a83ec3fea5053535b49825aa8f7455567699d547f348fbad80c2cfdfeb"
     },
     {
       "path": "scripts/work-network-lib.mjs",
       "exists": true,
-      "sha256": "645b1a4fe745e0395f1a6fd20ee019ef70280e2138effa7a4884d98e7e7972d1"
+      "sha256": "8943a2be434adc38a8c49dae3084d21bb7dc4fb4bd92ede43c294266ead91678"
     },
     {
       "path": "sdk/execution-gateway/js/README.md",
       "exists": true,
-      "sha256": "295fb17e050a9e4167825f82d9ecd7d730cbcba01b8a7129869e79d4289e9ea0"
+      "sha256": "e4a920af3c7ecacb1930269c8a2e03c955a39cda3baa61424120b72e358fd28f"
     },
     {
       "path": "sdk/execution-gateway/js/index.mjs",
       "exists": true,
-      "sha256": "8914f244c012f6c874998943a60d2112849ade3ad189524bbce3624595c284a9"
+      "sha256": "f66a277370fe4ca2a7f1dda02fb4f4829a9d6c6f59be3cc35467408eee0a42d8"
     },
     {
       "path": "sdk/execution-gateway/python/README.md",
       "exists": true,
-      "sha256": "5e6169425a9c6ba77cc9015627d2380093d4b591c05d423a4dcaff0a6d2f2f7d"
+      "sha256": "9587ff2a3c1baea5e4978b93c9365abedd8a51ab53510fd50b5bfef6376949e1"
     },
     {
       "path": "sdk/execution-gateway/python/bean_execution_gateway_client.py",
       "exists": true,
-      "sha256": "6001eb0076c199bdf6f2aaab289e5b8204e4db4dbdaa2fbf208649b58fbd090a"
+      "sha256": "ef0bc7a161f50e29cc6877c7d0477047e44287acfb450210efcd6e036c08bbb0"
+    },
+    {
+      "path": "test/open-demand.test.mjs",
+      "exists": true,
+      "sha256": "7437d91ac38268e86a5dd4eed9fefc70ef08295fbbb927a2b47ceb1c7b628829"
     }
   ]
 }
