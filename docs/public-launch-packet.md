@@ -1,6 +1,6 @@
 # Public Launch Packet
 
-Status: not launched. Use this only after verification and live smoke pass.
+Status: public beta packet prepared, not launched. Use this only after verification, live smoke, and Stephen approval of the audience and message.
 
 ## Product Claim
 
@@ -18,6 +18,7 @@ Bean Execution Gateway is a gateway to the right agent path. A requester gives a
 - Metadata-only feedback loop.
 - V2 120-goal product-delivery contract map.
 - Public-learning intake and route decisions that do not store raw prompt text.
+- Public beta docs, onboarding, issue templates, feedback path, support plan, launch stop conditions, and decision packet.
 
 ## Hero Metrics
 
@@ -39,6 +40,7 @@ These are proof signals only. They are not revenue, production SLA, or marketpla
 8. Record metadata-only feedback.
 9. Open `/v0/v2/goals` to show the full product map.
 10. Open `/v0/v2/readiness` to show the remaining private, paid, supplier, legal, and ops gates.
+11. Open `docs/public-beta-readiness.md` to show the external-use checklist and the items that still require Stephen approval.
 
 ## Not Ready To Claim
 
@@ -58,3 +60,10 @@ These are proof signals only. They are not revenue, production SLA, or marketpla
 - Any private, work, company, customer, secret, credential, local-file, internal, or regulated data is needed.
 - Any public post, PR, issue comment, account creation, supplier call, or paid API is required.
 - Any claim would imply production readiness, marketplace liquidity, or revenue that does not exist.
+
+## Narrow Beta Conditions
+
+- Audience is 5-10 trusted technical users.
+- Feedback channel is GitHub Issues plus metadata-only API feedback.
+- Every user sees the public/synthetic-only boundary before using the demo.
+- Stephen approves the invite list and first message before any outreach.

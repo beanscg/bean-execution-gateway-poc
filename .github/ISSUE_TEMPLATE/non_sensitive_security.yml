@@ -1,0 +1,29 @@
+name: Non-sensitive security feedback
+description: Report public, non-sensitive security or boundary feedback.
+title: "[Non-sensitive security]: "
+labels: ["non-sensitive-security", "safety-boundary"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include exploit payloads against real systems, secrets, private data, customer data, or confidential details. If the report needs secrecy, do not file it here.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Security headers
+        - Rate limiting
+        - Private-input rejection
+        - Documentation warning
+        - Disabled dispatch boundary
+        - Other non-sensitive issue
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Public detail
+      description: Keep this non-sensitive and reproducible with public/synthetic input.
+    validations:
+      required: true

@@ -32,6 +32,7 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 - Source modes for public benchmark, public research, read-only bounty fit, non-code fixtures, GitHub discussion fixtures, and read-only live GitHub issue search.
 - V1 local-contract control plane for the 80-goal checklist, tenant contracts, context envelopes, supplier bid scoring, acceptance records, payment quote gates, abuse cases, audit summaries, and replay metrics.
 - V2 product-delivery control plane for the 120-goal full-product checklist, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, operations, quality, commercial, and go-to-market packets.
+- Public beta readiness packet for trusted external review, including positioning, onboarding, feedback templates, support operations, learning metrics, and Stephen-only decision gates before invites or public posts.
 
 ## Path Scores
 
@@ -102,6 +103,12 @@ The `/v0/v2/*` endpoints represent the full delivered-product checklist as publi
 - External execution.
 Customer traffic is also not ready. `/v0/ready` reports `production_ready: false` until authenticated tenants, durable audit logs, payment/cost controls, supplier trust, and private-context handling exist.
 Private/customer/paid product traffic is also not ready. `/v0/v2/readiness` reports `ok_for_private_customer_or_paid_traffic: false` until durable learning storage, real auth, private context, supplier execution, payment rails, legal approvals, and production operations exist.
+
+## Public Beta Packet
+
+The public beta packet is prepared but not launched. Use `docs/public-beta-readiness.md` as the source of truth for the 80-item beta readiness map. Use `docs/public-beta-onboarding.md` for the first-user script, `docs/public-beta-positioning.md` for safe and forbidden claims, `docs/public-beta-feedback-and-support.md` for GitHub Issues and metadata-only feedback handling, and `docs/public-beta-decision-packet.md` for Stephen approvals.
+
+Agents should not invite users, post publicly, submit issues on behalf of users, add paid services, collect private contact data, or claim marketplace readiness without explicit operator approval.
 
 ## Best Next Work
 

@@ -1,0 +1,35 @@
+name: Bug report
+description: Report a non-sensitive bug in the public demo or docs.
+title: "[Bug]: "
+labels: ["bug", "beta-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Public demo only. Do not include secrets, private data, customer data, internal URLs, or local file paths.
+  - type: input
+    id: area
+    attributes:
+      label: Area
+      placeholder: "demo UI, /v0/route, /v0/v2/readiness, docs, OpenAPI"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary confirmation
+      options:
+        - label: This report contains only public or synthetic information.
+          required: true

@@ -6,6 +6,7 @@
   "description": "Public POC gateway that routes outcome requests through policy, cost, context-risk, supplier, and verifier gates before agent execution.",
   "homepage": "https://bean-execution-gateway-poc.onrender.com",
   "repository": "https://github.com/beanscg/bean-execution-gateway-poc",
+  "public_beta_status": "prepared_for_trusted_external_review",
   "input_scope": ["public", "synthetic"],
   "blocked_input_scope": ["private", "secret", "regulated", "customer_data", "company_data", "local_file", "internal"],
   "endpoints": [
@@ -88,8 +89,19 @@
     "v2_raw_prompt_storage": false,
     "v2_external_supplier_execution": false,
     "v2_payment_transfer": false,
-    "customer_traffic_ready": false
+    "customer_traffic_ready": false,
+    "public_beta_invites_sent": false,
+    "public_posts_sent": false
   },
+  "public_beta_docs": [
+    "docs/public-beta-readiness.md",
+    "docs/public-beta-positioning.md",
+    "docs/public-beta-onboarding.md",
+    "docs/public-beta-feedback-and-support.md",
+    "docs/public-beta-operations.md",
+    "docs/public-beta-decision-packet.md",
+    "docs/public-beta-learning-metrics.md"
+  ],
   "policy_blocks": [
     "requires_private_repo_access",
     "requires_paid_api",

@@ -10,6 +10,8 @@ The public hosted demo is for public or synthetic inputs only.
 - Rejects private, work, company, customer, credential, local-file, internal, and regulated-data signals before route processing.
 - Exposes metadata-only metrics and does not expose request bodies through `/v0/metrics`.
 - Returns request IDs for tracing without storing raw submitted payloads.
+- Feedback endpoints accept enumerated metadata and reject free-text fields.
+- Public GitHub issue feedback is public by definition; do not include sensitive data in an issue.
 
 ## Local Use
 

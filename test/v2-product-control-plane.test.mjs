@@ -139,6 +139,17 @@ test('v2 feedback rejects free text fields', () => {
   );
 });
 
+test('v2 gtm packet is prepared for public beta without claiming marketplace readiness', () => {
+  const service = createProductControlPlane({ memoryOnly: true });
+  const packet = service.gtmPacket();
+
+  assert.equal(packet.public_beta_status, 'prepared_for_trusted_external_review');
+  assert.equal(packet.launch_copy_status, 'prepared_requires_operator_approval_before_public_post');
+  assert.equal(packet.beta_cohort_status, 'prepared_not_invited');
+  assert.ok(packet.public_beta_limits.includes('no_paid_execution'));
+  assert.ok(packet.public_beta_limits.includes('no_external_supplier_execution'));
+});
+
 test('public server exposes v2 product contracts without external actions', async () => {
   const server = makeServer({
     routeOutDir: '/tmp/bean-v2-test-routes',

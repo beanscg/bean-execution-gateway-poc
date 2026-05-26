@@ -428,7 +428,7 @@
       <div class="open-demand-head">
         <div>
           <h2>Product Delivery Contract</h2>
-          <p>Inspect the full product map, public-learning readiness, and the gates still blocking private, paid, customer, and supplier traffic.</p>
+          <p>Inspect the full product map, trusted-beta status, public-learning readiness, and the gates still blocking private, paid, customer, and supplier traffic.</p>
         </div>
         <div class="open-demand-controls">
           <button id="productRefresh">Refresh</button>
@@ -704,12 +704,12 @@
         ]);
         productMetrics.innerHTML = [
           ['Contract goals', `${goals.completed_contract_goals ?? 0}/${goals.total_goals ?? 0}`],
+          ['Public beta', gtm.public_beta_status || 'prepared'],
           ['Public learning', readiness.ok_for_public_learning_traffic ? 'ready' : 'blocked'],
           ['Private/paid traffic', readiness.ok_for_private_customer_or_paid_traffic ? 'ready' : 'blocked'],
-          ['Learning records', learning.records?.events ?? 0],
           ['Launch copy', gtm.launch_copy_status || 'draft required'],
         ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
-        productStatus.textContent = `Production blockers: ${(readiness.product_blockers || []).join(', ')}`;
+        productStatus.textContent = `Trusted beta is prepared, not launched. Production blockers: ${(readiness.product_blockers || []).join(', ')}`;
       } catch (error) {
         productStatus.textContent = error.message;
       } finally {

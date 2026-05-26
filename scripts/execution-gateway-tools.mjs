@@ -1127,6 +1127,13 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/v1-product-goals.md',
     'docs/v1-local-contract-completion.md',
     'docs/v2-product-delivery-goals.md',
+    'docs/public-beta-readiness.md',
+    'docs/public-beta-positioning.md',
+    'docs/public-beta-onboarding.md',
+    'docs/public-beta-feedback-and-support.md',
+    'docs/public-beta-operations.md',
+    'docs/public-beta-decision-packet.md',
+    'docs/public-beta-learning-metrics.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
     'adapters/execution-gateway/slack-app-adapter.stub.md',
@@ -1160,6 +1167,11 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/dispatch-disabled-response.example.json',
     'examples/execution-gateway/readiness-response.example.json',
     'examples/execution-gateway/metrics-response.example.json',
+    '.github/ISSUE_TEMPLATE/config.yml',
+    '.github/ISSUE_TEMPLATE/bug_report.yml',
+    '.github/ISSUE_TEMPLATE/feature_request.yml',
+    '.github/ISSUE_TEMPLATE/non_sensitive_security.yml',
+    '.github/ISSUE_TEMPLATE/route_feedback.yml',
   ];
   const manifestFiles = [];
   for (const relative of files) {

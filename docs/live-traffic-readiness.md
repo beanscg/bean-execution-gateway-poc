@@ -1,6 +1,6 @@
 # Live-Traffic Readiness
 
-Status: public-demo and public-learning contracts hardened, not customer/live-execution ready.
+Status: public-demo and public-learning contracts hardened. Trusted public beta is prepared but not launched. Customer/private/paid/live-execution traffic is not ready.
 
 ## Completed In V0
 
@@ -14,6 +14,7 @@ Status: public-demo and public-learning contracts hardened, not customer/live-ex
 - V1 local-contract endpoints cover the 80-goal product checklist for tenant contracts, context envelopes, supplier bids, acceptance, payment quotes, abuse cases, audit, and replay.
 - V2 product-delivery endpoints cover the 120-goal fully delivered product checklist as public-demo contracts.
 - V2 public-learning traffic can produce metadata-only demand, route, feedback, trust, and replay records without storing raw prompts.
+- Public beta docs, onboarding, feedback templates, support plan, decision packet, and launch stop conditions are prepared.
 - Smoke tests verify readiness, security headers, rate-limit headers, disabled dispatch, zero spend, zero external writes, zero external executions, and hosted private-input rejection.
 
 ## Blocked Before Customer Traffic
@@ -28,4 +29,4 @@ Status: public-demo and public-learning contracts hardened, not customer/live-ex
 
 ## Current Decision
 
-The hosted service can stay online as a public synthetic demo, public-learning surface, and V1/V2 contract sandbox. It should not be described as a live marketplace or used for customer, private, paid, or external-supplier execution until every blocked gate above is resolved.
+The hosted service can stay online as a public synthetic demo, public-learning surface, V1/V2 contract sandbox, and trusted-beta review target. It should not be described as a live marketplace or used for customer, private, paid, or external-supplier execution until every blocked gate above is resolved.

@@ -6,6 +6,16 @@ Live demo: https://bean-execution-gateway-poc.onrender.com
 
 Positioning: BEAN is not a live marketplace yet. It is a gateway that helps an agent decide whether to use an owned agent, use an available public path, or build a new agent before anyone pays for compute.
 
+Public beta status: prepared for trusted external review, not broadly launched and not ready for private/customer/paid traffic. Start with [Public beta readiness](docs/public-beta-readiness.md) and [Public beta onboarding](docs/public-beta-onboarding.md).
+
+## Start Here
+
+1. Open the [live demo](https://bean-execution-gateway-poc.onrender.com).
+2. Use only public or synthetic inputs.
+3. Run a proof example or open-demand fixture scan.
+4. File non-sensitive feedback through GitHub Issues or the metadata-only feedback controls.
+5. Read [Public beta readiness](docs/public-beta-readiness.md) before inviting anyone else.
+
 Current proof metrics:
 
 - Executable path rate: share of scanned public signals that can become a safe local packet.
@@ -28,6 +38,7 @@ Current proof metrics:
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
 - Exposes V1 local-contract control-plane endpoints for tenant scope, context envelopes, supplier bids, outcome acceptance, payment quotes, abuse cases, audit summaries, replay metrics, and the 80-goal checklist.
 - Exposes V2 product-delivery endpoints for the 120-goal product map, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, ops, quality, commercial, and GTM readiness.
+- Ships a public beta packet with positioning, onboarding, feedback templates, support operations, decision gates, and learning metrics.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
 
@@ -140,6 +151,16 @@ Hosted demo input scope:
 - `/v0/ready` intentionally reports `production_ready: false`.
 - `/v0/v2/readiness` intentionally reports `ok_for_private_customer_or_paid_traffic: false`.
 
+## Public Beta Boundary
+
+The current external-use target is a narrow trusted beta, not a broad launch.
+
+- Invite 5-10 technical users only after Stephen approves the invite list and message.
+- Use GitHub Issues for non-sensitive bugs, route feedback, and feature requests.
+- Do not accept private, customer, work, secret, credential, regulated, paid, or external-supplier requests.
+- Treat every route as advice plus proof, not permission to execute outside the demo.
+- Review feedback weekly before changing positioning or expanding distribution.
+
 ## Docs
 
 - [Product definition](docs/product-definition.md)
@@ -149,6 +170,13 @@ Hosted demo input scope:
 - [V1 readiness](docs/v1-readiness.md)
 - [Pre-discovery readiness](docs/pre-discovery-readiness.md)
 - [Public launch packet](docs/public-launch-packet.md)
+- [Public beta readiness](docs/public-beta-readiness.md)
+- [Public beta positioning](docs/public-beta-positioning.md)
+- [Public beta onboarding](docs/public-beta-onboarding.md)
+- [Public beta feedback and support](docs/public-beta-feedback-and-support.md)
+- [Public beta operations](docs/public-beta-operations.md)
+- [Public beta decision packet](docs/public-beta-decision-packet.md)
+- [Public beta learning metrics](docs/public-beta-learning-metrics.md)
 - [Live-traffic readiness](docs/live-traffic-readiness.md)
 - [Production cutover](docs/production-cutover.md)
 - [Abuse and rate-limit policy](docs/abuse-and-rate-limit-policy.md)

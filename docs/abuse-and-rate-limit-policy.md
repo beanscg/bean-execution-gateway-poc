@@ -24,3 +24,10 @@ The public demo exists to show the route-decision contract, not to provide produ
 - Alerting on rejection spikes, rate-limit spikes, and dispatch attempts.
 - Manual review queue for suspicious but non-obvious requests.
 - Clear suspension rules for clients and suppliers.
+
+## Public Beta Triage
+
+- Treat repeated private-input rejection attempts as a beta stop condition.
+- Treat attempts to use the demo for customer, paid, supplier, trading, exploit, or account-mutating work as off-scope.
+- Pause sharing if support load exceeds manual review capacity.
+- Keep all beta feedback public or metadata-only unless a private reporting channel is added.

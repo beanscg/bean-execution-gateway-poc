@@ -1,0 +1,49 @@
+name: Route feedback
+description: Share non-sensitive feedback about a BEAN route decision.
+title: "[Route feedback]: "
+labels: ["beta-feedback", "route-quality"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include private, customer, work, secret, credential, regulated, internal, or local-file data.
+  - type: dropdown
+    id: useful
+    attributes:
+      label: Was the route useful?
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure"
+    validations:
+      required: true
+  - type: dropdown
+    id: path
+    attributes:
+      label: Which path did BEAN recommend?
+      options:
+        - Owned agent/local proof
+        - Public/open path
+        - Build decision
+        - Blocked external supplier
+        - No route
+        - Not sure
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Boundary confirmation
+      options:
+        - label: This issue contains only public or synthetic information.
+          required: true
+        - label: I am not asking BEAN to spend money, post publicly, mutate an account, or execute an external supplier.
+          required: true
+  - type: textarea
+    id: public_context
+    attributes:
+      label: Public context
+      description: Use only public links or synthetic examples.
+      placeholder: "Example: public repo issue URL, fixture name, or synthetic scenario."
+    validations:
+      required: false

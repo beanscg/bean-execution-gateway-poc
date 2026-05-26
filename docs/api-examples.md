@@ -32,6 +32,31 @@ Key fields:
 }
 ```
 
+## Public Beta Readiness
+
+The public beta packet is documented in the repo, not exposed as a mutable production system. The live API exposes its current GTM status through V2:
+
+```bash
+curl -s https://bean-execution-gateway-poc.onrender.com/v0/v2/gtm
+```
+
+Expected beta fields:
+
+```json
+{
+  "public_beta_status": "prepared_for_trusted_external_review",
+  "launch_copy_status": "prepared_requires_operator_approval_before_public_post",
+  "beta_cohort_status": "prepared_not_invited",
+  "public_beta_limits": [
+    "public_or_synthetic_inputs_only",
+    "no_private_customer_work_or_secret_data",
+    "no_paid_execution",
+    "no_external_supplier_execution",
+    "no_public_posting_or_invites_without_operator_approval"
+  ]
+}
+```
+
 ## Proof Examples
 
 ```bash

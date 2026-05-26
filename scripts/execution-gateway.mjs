@@ -405,8 +405,10 @@ async function runHostedSmoke({ baseUrl }) {
 
   const v2Gtm = await fetchJson(baseUrl, '/v0/v2/gtm');
   addCheck('v2_gtm_packet_available_without_public_post', v2Gtm.status === 200
-    && v2Gtm.payload?.launch_copy_status === 'draft_required_before_public_post'
-    && v2Gtm.payload?.feedback_collection_status === 'metadata_only_api_available', v2Gtm.payload);
+    && v2Gtm.payload?.launch_copy_status === 'prepared_requires_operator_approval_before_public_post'
+    && v2Gtm.payload?.feedback_collection_status === 'metadata_api_and_github_issue_templates_available'
+    && v2Gtm.payload?.public_beta_status === 'prepared_for_trusted_external_review'
+    && v2Gtm.payload?.beta_cohort_status === 'prepared_not_invited', v2Gtm.payload);
 
   const safe = await fetchJson(baseUrl, '/v0/route', {
     method: 'POST',

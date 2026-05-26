@@ -14,6 +14,8 @@ Open a public GitHub issue only for non-sensitive security feedback. Do not incl
 
 For sensitive reports, do not use the public demo or public issue tracker until a private reporting channel is added.
 
+Use the "Non-sensitive security feedback" issue template only for public, low-risk findings such as broken headers, confusing warnings, or documentation gaps. If a report needs secrecy, stop and wait for a private channel.
+
 ## Current Security Boundaries
 
 - Hosted demo rejects private and secret-like input before route processing.

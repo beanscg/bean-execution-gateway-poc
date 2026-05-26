@@ -11,6 +11,7 @@ Primary positioning:
 - V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
 - V1 contracts prove the product shape for 80 local-contract goals without turning on paid, private, customer, or external-supplier execution.
 - V2 contracts cover the full 120-goal delivered-product checklist without turning on paid, private, customer, legal, or external-supplier execution.
+- Public beta packet is prepared for trusted external review, with GitHub issue templates, onboarding, support rules, and Stephen approval gates before any invites or public posts.
 
 Primary docs:
 
@@ -20,6 +21,9 @@ Primary docs:
 - Safety and trust: /docs/safety-and-trust.md
 - V1 readiness: /docs/v1-readiness.md
 - V2 product delivery goals: /docs/v2-product-delivery-goals.md
+- Public beta readiness: /docs/public-beta-readiness.md
+- Public beta onboarding: /docs/public-beta-onboarding.md
+- Public beta positioning: /docs/public-beta-positioning.md
 - Capability manifest: /capability-manifest.json
 - Agent instructions: /AGENTS.md
 
@@ -83,3 +87,4 @@ Boundaries:
 - No secrets, private context, customer data, local files, or regulated data.
 - V1 supplier bids are contract evaluations only; external or paid suppliers are not selectable.
 - V2 product contracts are public-learning contracts only; private/customer/paid production remains blocked.
+- Public beta use is trusted-review only until Stephen approves the invite list and message.

@@ -741,13 +741,21 @@ function createProductControlPlane({ memoryOnly = true, eventLogPath } = {}) {
       first_user: 'agent platforms, developer tools, and internal automation teams that already receive generic outcome prompts',
       demo_narrative: 'Submit an outcome; BEAN chooses owned agent, public path, build decision, or blocked external supplier path before anyone pays for compute.',
       public_examples_status: 'available',
-      github_repo_polish_status: 'ready_for_discovery_polish',
+      github_repo_polish_status: 'public_beta_packet_prepared',
       agent_docs_status: 'llms_txt_and_openapi_available',
-      launch_copy_status: 'draft_required_before_public_post',
-      partner_outreach_status: 'candidate_list_required',
-      feedback_collection_status: 'metadata_only_api_available',
-      beta_cohort_status: 'not_started',
+      launch_copy_status: 'prepared_requires_operator_approval_before_public_post',
+      partner_outreach_status: 'prepared_requires_operator_selection_before_invites',
+      feedback_collection_status: 'metadata_api_and_github_issue_templates_available',
+      beta_cohort_status: 'prepared_not_invited',
       conversion_path_status: 'public_demo_to_authenticated_beta_contract',
+      public_beta_status: 'prepared_for_trusted_external_review',
+      public_beta_limits: [
+        'public_or_synthetic_inputs_only',
+        'no_private_customer_work_or_secret_data',
+        'no_paid_execution',
+        'no_external_supplier_execution',
+        'no_public_posting_or_invites_without_operator_approval',
+      ],
     };
   }
 
