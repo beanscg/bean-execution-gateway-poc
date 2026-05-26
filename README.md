@@ -1,28 +1,33 @@
 # Bean Execution Gateway
 
-Bean Execution Gateway is a public POC for routing outcome requests through policy, cost, safety, and verifier gates before an agent chooses an execution path.
+Bean Execution Gateway helps an agent choose the safest execution path for an outcome before it runs.
 
 Live demo: https://bean-execution-gateway-poc.onrender.com
 
-Positioning: BEAN is not a live marketplace yet. It is a gateway that helps an agent decide whether to use an owned agent, use an available public path, or build a new agent before anyone pays for compute.
+Positioning: BEAN is not a live marketplace yet. It is a gateway that helps an agent decide whether to use an owned agent, use an available public path, build a new agent, or block the request before anyone pays for compute.
 
-Public beta status: prepared for trusted external review, not broadly launched and not ready for private/customer/paid traffic. Start with [Public beta readiness](docs/public-beta-readiness.md) and [Public beta onboarding](docs/public-beta-onboarding.md).
+Public beta status: prepared for trusted external review, not broadly launched and not ready for private/customer/paid traffic. Start with [Evaluator quickstart](docs/evaluator-quickstart.md), [How to review](docs/how-to-review.md), and [First-user readiness](docs/first-user-readiness.md).
 
 ## Start Here
 
 1. Open the [live demo](https://bean-execution-gateway-poc.onrender.com).
 2. Use only public or synthetic inputs.
-3. Run a proof example or open-demand fixture scan.
-4. File non-sensitive feedback through GitHub Issues or the metadata-only feedback controls.
-5. Read [Public beta readiness](docs/public-beta-readiness.md) before inviting anyone else.
+3. Click one guided route: Use public path, Use or build, or Block risky work.
+4. Read the decision memo.
+5. Run the proof packet if one is available.
+6. File metadata-only feedback from the memo.
 
-Current proof metrics:
+## What It Proves
 
-- Executable path rate: share of scanned public signals that can become a safe local packet.
-- Time to ranked paths: wall-clock time from demand scan to ranked agent paths.
-- Unsafe actions prevented: spend, private-data, account, public-write, and external-submission gates stopped before execution.
-- V1 local-contract completion: 80/80 product gates have public-demo contracts, with production blockers still explicit.
-- V2 product-delivery completion: 120/120 full-product goals have public-demo contracts, with production blockers still explicit.
+- An outcome can become a ranked execution-path decision.
+- The result can compare owned-agent, public-path, build-new, and blocked supplier options.
+- The memo can show quality, speed, cost, risk, proofability, blocked actions, and human approval gates.
+- The hosted demo can reject private-like input before routing.
+- Feedback can be collected as metadata only.
+
+## Why Not Just Ask ChatGPT, Cursor, Or Claude?
+
+Those tools can solve tasks. BEAN decides whether a task should be executed, which path should run, what proof is needed, and which spend/data/public-write gates stop execution. It is the routing and control layer around agent work, not another chat surface.
 
 ## What It Does Now
 
@@ -39,6 +44,7 @@ Current proof metrics:
 - Exposes V1 local-contract control-plane endpoints for tenant scope, context envelopes, supplier bids, outcome acceptance, payment quotes, abuse cases, audit summaries, replay metrics, and the 80-goal checklist.
 - Exposes V2 product-delivery endpoints for the 120-goal product map, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, ops, quality, commercial, and GTM readiness.
 - Ships a public beta packet with positioning, onboarding, feedback templates, support operations, decision gates, and learning metrics.
+- Ships a first-user readiness packet with guided demo, decision memo, evaluator docs, and review questions.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
 
@@ -164,6 +170,10 @@ The current external-use target is a narrow trusted beta, not a broad launch.
 ## Docs
 
 - [Product definition](docs/product-definition.md)
+- [Evaluator quickstart](docs/evaluator-quickstart.md)
+- [How to review](docs/how-to-review.md)
+- [Example results](docs/example-results.md)
+- [First-user readiness](docs/first-user-readiness.md)
 - [POC truth pass](docs/poc-truth.md)
 - [API examples](docs/api-examples.md)
 - [Safety and trust](docs/safety-and-trust.md)

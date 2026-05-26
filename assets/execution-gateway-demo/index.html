@@ -7,17 +7,19 @@
   <style>
     :root {
       color-scheme: light;
-      --bg: #f6f7f4;
+      --bg: #f5f6f2;
       --panel: #ffffff;
-      --text: #202420;
-      --muted: #5d675f;
-      --line: #d9ded7;
+      --surface: #fbfcfa;
+      --text: #1f251f;
+      --muted: #5e675e;
+      --line: #d8ddd5;
       --accent: #176c57;
       --accent-ink: #ffffff;
-      --bad: #9d3d30;
-      --warn: #8d650c;
+      --bad: #9b3327;
+      --warn: #85620d;
       --ok: #176c57;
-      --code: #fbfcfa;
+      --focus: #134dd8;
+      --code: #f8faf7;
     }
     * { box-sizing: border-box; }
     body {
@@ -27,11 +29,102 @@
       color: var(--text);
     }
     main {
-      max-width: 1200px;
+      width: min(1180px, calc(100vw - 32px));
       margin: 0 auto;
-      padding: 24px 16px 36px;
+      padding: 22px 0 42px;
     }
-    header {
+    h1, h2, h3 {
+      letter-spacing: 0;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 26px;
+      line-height: 1.1;
+    }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.08;
+    }
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+    p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    button, select, textarea, input {
+      font: inherit;
+    }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 9px 12px;
+      font-weight: 760;
+      cursor: pointer;
+    }
+    button:hover {
+      border-color: #b6beb3;
+      background: #f9fbf7;
+    }
+    button:focus-visible, textarea:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible {
+      outline: 3px solid rgba(19, 77, 216, 0.24);
+      outline-offset: 2px;
+      border-color: var(--focus);
+    }
+    button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+    button.ghost {
+      background: transparent;
+    }
+    button:disabled {
+      opacity: 0.58;
+      cursor: wait;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 11px 12px;
+      color: var(--text);
+      background: var(--code);
+      line-height: 1.42;
+    }
+    select, input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 9px 10px;
+    }
+    label {
+      display: block;
+      font-weight: 760;
+      margin-bottom: 7px;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 12px;
+      background: var(--code);
+      font: 12.5px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      min-height: 180px;
+    }
+    .topbar {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 18px;
@@ -39,17 +132,6 @@
       border-bottom: 1px solid var(--line);
       padding-bottom: 16px;
       margin-bottom: 16px;
-    }
-    h1 {
-      font-size: 28px;
-      line-height: 1.12;
-      margin: 0 0 8px;
-      letter-spacing: 0;
-    }
-    p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.45;
     }
     .pill {
       display: inline-flex;
@@ -60,7 +142,7 @@
       background: var(--panel);
       padding: 8px 11px;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 760;
       white-space: nowrap;
     }
     .dot {
@@ -81,37 +163,51 @@
       font-size: 14px;
       line-height: 1.4;
     }
-    .hero-overview {
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+      gap: 16px;
+      align-items: start;
       margin-bottom: 16px;
     }
-    .hero-overview h2 {
-      margin: 0 0 7px;
-      font-size: 24px;
-      line-height: 1.12;
-      letter-spacing: 0;
+    .hero-copy, .guided-panel, .result-panel, details {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      padding: 15px;
     }
-    .hero-metrics {
+    .value-row {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
-      margin: 12px 0;
+      margin-top: 12px;
     }
-    .hero-metrics div {
+    .value-row div,
+    .metric,
+    .score-card,
+    .path-card,
+    .feedback-box {
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 11px;
+      background: var(--surface);
+      padding: 10px;
       min-width: 0;
-      background: #fbfcfa;
     }
-    .hero-metrics strong {
+    .value-row strong,
+    .metric strong,
+    .score-card strong,
+    .path-card strong,
+    .feedback-box strong {
       display: block;
-      font-size: 12px;
       color: var(--muted);
-      margin-bottom: 7px;
+      font-size: 12px;
+      margin-bottom: 6px;
     }
-    .hero-metrics span {
+    .value-row span,
+    .metric span,
+    .score-card span,
+    .path-card span {
       display: block;
-      font-size: 19px;
       font-weight: 850;
       overflow-wrap: anywhere;
     }
@@ -119,99 +215,163 @@
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .flow div {
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 8px;
-      font-size: 13px;
+      background: var(--surface);
+      min-height: 48px;
+      padding: 9px;
       color: var(--muted);
-      background: #fff;
-      min-height: 44px;
+      font-size: 13px;
     }
-    .example-rail {
+    .flow strong {
+      display: block;
+      color: var(--text);
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+    .guide-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .guide-buttons button {
+      text-align: left;
+      min-height: 74px;
+      display: grid;
+      gap: 5px;
+    }
+    .guide-buttons button.active {
+      border-color: var(--accent);
+      background: #edf7f3;
+    }
+    .guide-buttons small {
+      color: var(--muted);
+      font-weight: 560;
+      line-height: 1.35;
+    }
+    .toolbar, .feedback-actions, .result-actions, .advanced-controls, .open-demand-actions {
       display: flex;
       gap: 8px;
+      align-items: center;
       flex-wrap: wrap;
+    }
+    .toolbar {
       margin-top: 12px;
+      justify-content: space-between;
     }
-    .example-rail button {
+    .boundary-note {
+      margin-top: 9px;
       font-size: 13px;
-      background: #fbfcfa;
+      color: var(--muted);
     }
-    .open-demand {
+    .result-panel {
       margin-bottom: 16px;
+      min-height: 260px;
     }
-    .open-demand-head {
+    .memo-head {
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       gap: 12px;
-      align-items: end;
+      align-items: start;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
       margin-bottom: 12px;
     }
-    .open-demand-head h2 {
-      margin: 0 0 5px;
-      font-size: 22px;
-      line-height: 1.15;
-      letter-spacing: 0;
+    .memo-status {
+      text-align: right;
+      min-width: 160px;
     }
-    .open-demand-controls {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: end;
-      justify-content: flex-end;
-    }
-    .open-demand-controls label {
-      margin: 0;
-      min-width: 180px;
+    .memo-status span {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 6px 9px;
       font-size: 12px;
+      font-weight: 850;
+      background: #edf7f3;
+      color: var(--ok);
+      border: 1px solid #bedccd;
+    }
+    .memo-status span.blocked {
+      background: #fff0ed;
+      color: var(--bad);
+      border-color: #e8beb7;
+    }
+    .memo-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .stack {
+      display: grid;
+      gap: 8px;
+    }
+    .path-card.selected {
+      border-color: var(--accent);
+      background: #edf7f3;
+    }
+    .path-card.blocked {
+      border-color: #e8beb7;
+      background: #fff7f5;
+    }
+    .list {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .feedback-box {
+      margin-top: 12px;
+    }
+    .feedback-actions {
+      margin-top: 8px;
+    }
+    .feedback-actions select {
+      width: min(100%, 260px);
+    }
+    .muted {
       color: var(--muted);
     }
-    input,
-    select {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      padding: 9px 10px;
-      font: inherit;
+    .okText { color: var(--ok); }
+    .badText { color: var(--bad); }
+    .warnText { color: var(--warn); }
+    details {
+      margin-bottom: 12px;
     }
-    .open-demand-metrics,
-    .open-demand-detail-grid {
+    summary {
+      cursor: pointer;
+      font-weight: 850;
+      font-size: 17px;
+    }
+    details > div {
+      margin-top: 12px;
+    }
+    .advanced-grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 0.85fr) minmax(420px, 1.15fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .metrics-grid,
+    .open-demand-detail-grid,
+    .status {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 8px;
-      margin-bottom: 12px;
+      margin: 10px 0;
     }
-    .open-demand-metrics div,
-    .open-demand-detail-grid div {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 10px;
-      min-width: 0;
-    }
-    .open-demand-metrics strong,
-    .open-demand-detail-grid strong {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 6px;
-    }
-    .open-demand-metrics span,
-    .open-demand-detail-grid span {
-      display: block;
-      font-size: 15px;
-      font-weight: 800;
-      overflow-wrap: anywhere;
-    }
-    .open-demand-layout {
-      display: grid;
-      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
-      gap: 12px;
-      align-items: start;
+    .status {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
     .opportunity-list {
       display: grid;
@@ -224,137 +384,34 @@
       text-align: left;
       display: grid;
       gap: 5px;
-      min-height: 70px;
-      background: #fbfcfa;
+      min-height: 72px;
+      background: var(--surface);
     }
     .opportunity-card.selected {
       border-color: var(--accent);
-      background: #eef7f3;
+      background: #edf7f3;
     }
-    .opportunity-card strong,
-    .open-demand-detail h3 {
-      overflow-wrap: anywhere;
-    }
-    .opportunity-card small,
-    .open-demand-status,
-    .open-demand-detail p {
-      color: var(--muted);
-      line-height: 1.4;
+    .open-demand-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
     }
     .open-demand-detail {
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fbfcfa;
+      background: var(--surface);
       padding: 12px;
       min-height: 220px;
     }
-    .open-demand-detail h3 {
-      margin: 0 0 8px;
-      font-size: 20px;
-      letter-spacing: 0;
-    }
-    .open-demand-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 10px;
-    }
-    .feedback-line {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .feedback-line button {
-      padding: 7px 9px;
-      font-size: 13px;
-    }
-    .open-demand-report {
-      margin-top: 10px;
-      min-height: 120px;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(320px, 0.84fr) minmax(420px, 1.16fr);
-      gap: 16px;
-      align-items: start;
-    }
-    section, aside {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 15px;
-    }
-    label {
-      display: block;
-      font-weight: 750;
-      margin-bottom: 8px;
-    }
-    textarea {
-      width: 100%;
-      min-height: 430px;
-      resize: vertical;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 12px;
+    .json-request {
+      min-height: 390px;
       font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      color: var(--text);
-      background: var(--code);
-    }
-    .toolbar {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-    button {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--text);
-      padding: 9px 12px;
-      font-weight: 750;
-      cursor: pointer;
-    }
-    button.primary {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: var(--accent-ink);
-    }
-    button:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
-    .status {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-    .metric {
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 10px;
-      min-height: 72px;
-    }
-    .metric strong {
-      display: block;
-      font-size: 12px;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-    .metric span {
-      font-size: 15px;
-      font-weight: 800;
-      overflow-wrap: anywhere;
     }
     .tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 10px;
+      margin: 10px 0;
       flex-wrap: wrap;
     }
     .tab {
@@ -364,87 +421,114 @@
     .tab.active {
       border-color: var(--accent);
       color: var(--accent);
+      background: #edf7f3;
     }
-    pre {
-      min-height: 334px;
-      margin: 0;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 12px;
-      background: var(--code);
-      font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    @media (max-width: 960px) {
+      .topbar, .hero, .memo-grid, .advanced-grid, .open-demand-layout {
+        grid-template-columns: 1fr;
+      }
+      .guide-buttons, .value-row, .flow, .score-grid, .metrics-grid, .open-demand-detail-grid, .status {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .memo-status { text-align: left; }
     }
-    .okText { color: var(--ok); }
-    .badText { color: var(--bad); }
-    .warnText { color: var(--warn); }
-    @media (max-width: 920px) {
-      header { grid-template-columns: 1fr; align-items: start; }
-      .grid, .open-demand-head, .open-demand-layout { grid-template-columns: 1fr; }
-      .status, .open-demand-metrics, .open-demand-detail-grid, .hero-metrics, .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .open-demand-controls { justify-content: stretch; }
-      .open-demand-controls label { min-width: 100%; }
-    }
-    @media (max-width: 520px) {
-      .status, .open-demand-metrics, .open-demand-detail-grid, .hero-metrics, .flow { grid-template-columns: 1fr; }
-      h1 { font-size: 24px; }
+    @media (max-width: 560px) {
+      main {
+        width: min(100vw - 22px, 1180px);
+        padding-top: 14px;
+      }
+      h1 { font-size: 23px; }
+      h2 { font-size: 25px; }
+      .guide-buttons, .value-row, .flow, .score-grid, .metrics-grid, .open-demand-detail-grid, .status {
+        grid-template-columns: 1fr;
+      }
+      .toolbar, .feedback-actions, .result-actions, .advanced-controls {
+        align-items: stretch;
+      }
+      .toolbar button, .feedback-actions button, .result-actions button, .advanced-controls button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <main>
-    <header>
+    <header class="topbar">
       <div>
         <h1>Bean Execution Gateway</h1>
-        <p>Gateway to the right agent path: your agents, public agents, or the build decision.</p>
+        <p>Gateway to the right execution path for agent work.</p>
       </div>
       <div class="pill"><span id="healthDot" class="dot"></span><span id="healthText">checking API</span></div>
     </header>
 
     <div class="notice">
-      Public demo boundary: zero spend, no external writes, no supplier execution, no request-body persistence. Do not paste private, work, company, customer, secret, credential, local-file, internal, or regulated data.
+      Public/synthetic inputs only. This demo spends $0, performs no public writes, stores no request body, and never executes external suppliers.
     </div>
 
-    <section class="hero-overview">
-      <h2>Turn an outcome into an executable path before anyone pays for compute.</h2>
-      <p>BEAN scans public demand, chooses the safest next path, packages the local proof step, and stops before spend, account mutation, public posting, or external supplier execution.</p>
-      <div class="hero-metrics" id="heroMetrics">
-        <div><strong>Executable path rate</strong><span>-</span></div>
-        <div><strong>Time to ranked paths</strong><span>-</span></div>
-        <div><strong>Unsafe actions prevented</strong><span>-</span></div>
+    <section class="hero" aria-label="Guided demo">
+      <div class="hero-copy">
+        <h2>Find the execution path before an agent runs.</h2>
+        <p>Give BEAN an outcome. It compares owned-agent work, public paths, build-new decisions, and blocked supplier paths before anyone pays for compute.</p>
+        <div class="value-row">
+          <div><strong>Primary answer</strong><span>Use, build, or block</span></div>
+          <div><strong>Cost guard</strong><span>$0 in this demo</span></div>
+          <div><strong>Data guard</strong><span>No private input</span></div>
+        </div>
+        <div class="flow" aria-label="Route flow">
+          <div><strong>1. Outcome</strong><span>public task</span></div>
+          <div><strong>2. Gates</strong><span>spend/data/write</span></div>
+          <div><strong>3. Options</strong><span>agent paths</span></div>
+          <div><strong>4. Memo</strong><span>decision packet</span></div>
+          <div><strong>5. Proof</strong><span>local check</span></div>
+        </div>
       </div>
-      <div class="flow">
-        <div>1. Outcome</div>
-        <div>2. Route</div>
-        <div>3. Discover</div>
-        <div>4. Packet</div>
-        <div>5. Verify</div>
+
+      <div class="guided-panel">
+        <label for="outcomeInput">Outcome</label>
+        <textarea id="outcomeInput" spellcheck="false">Find the safest zero-spend way to solve a public agent task and produce a local proof packet.</textarea>
+        <div class="guide-buttons" id="guideButtons"></div>
+        <div class="toolbar">
+          <button class="primary" id="runGuide">Run guided route</button>
+          <button id="clearOutcome" class="ghost">Reset text</button>
+        </div>
+        <p class="boundary-note">Use public URLs, public task descriptions, or synthetic examples. Do not paste secrets, internal paths, customer data, or private repo details.</p>
       </div>
-      <div class="example-rail" id="proofExamples"></div>
     </section>
 
-    <section class="open-demand">
-      <div class="open-demand-head">
-        <div>
-          <h2>Product Delivery Contract</h2>
-          <p>Inspect the full product map, trusted-beta status, public-learning readiness, and the gates still blocking private, paid, customer, and supplier traffic.</p>
-        </div>
-        <div class="open-demand-controls">
-          <button id="productRefresh">Refresh</button>
+    <section class="result-panel" aria-label="Decision memo">
+      <div id="decisionMemo">
+        <div class="memo-head">
+          <div>
+            <h3>Decision memo</h3>
+            <p>Run a guided route to see the recommended path, alternatives, blocked actions, proof status, and next approval.</p>
+          </div>
+          <div class="memo-status"><span>waiting</span></div>
         </div>
       </div>
-      <div class="open-demand-metrics" id="productMetrics"></div>
-      <div class="open-demand-status" id="productStatus">Loading product contract</div>
+      <div class="feedback-box">
+        <strong>Route feedback</strong>
+        <p class="muted">Feedback stores metadata only: target id hash, helpful flag, reason code, route choice, and latency bucket.</p>
+        <div class="feedback-actions">
+          <select id="feedbackReason" aria-label="Feedback reason">
+            <option value="routed_to_useful_path">routed to useful path</option>
+            <option value="blocked_correctly">blocked correctly</option>
+            <option value="bad_route">bad route</option>
+            <option value="unclear_value">unclear value</option>
+            <option value="missing_supplier">missing option</option>
+            <option value="too_slow">too slow</option>
+          </select>
+          <button data-route-feedback="true">Useful</button>
+          <button data-route-feedback="false">Not useful</button>
+          <span id="routeFeedbackStatus" class="muted">No feedback sent.</span>
+        </div>
+      </div>
     </section>
 
-    <section class="open-demand">
-      <div class="open-demand-head">
-        <div>
-          <h2>Open Demand Prototype</h2>
-          <p>Scan public work signals, rank agent-solvable tasks, and build local evidence packets.</p>
-        </div>
-        <div class="open-demand-controls">
+    <details>
+      <summary>Public demand discovery</summary>
+      <div>
+        <p>Scan public fixtures and read-only public signals, then build local evidence packets. External submission remains blocked.</p>
+        <div class="advanced-controls">
           <label>
             Source
             <select id="openDemandSource">
@@ -458,84 +542,150 @@
               <option value="live-github">Live GitHub only</option>
             </select>
           </label>
-          <button class="primary" id="openDemandScan">Scan</button>
+          <button class="primary" id="openDemandScan">Scan public demand</button>
+        </div>
+        <div class="metrics-grid" id="openDemandMetrics"></div>
+        <p class="muted" id="openDemandStatus">Loading public demand prototype.</p>
+        <div class="open-demand-layout">
+          <div class="opportunity-list" id="openDemandOpportunities"></div>
+          <div class="open-demand-detail" id="openDemandDetail"></div>
         </div>
       </div>
-      <div class="open-demand-metrics" id="openDemandMetrics"></div>
-      <div class="open-demand-status" id="openDemandStatus">Loading open demand prototype</div>
-      <div class="open-demand-layout">
-        <div class="opportunity-list" id="openDemandOpportunities"></div>
-        <div class="open-demand-detail" id="openDemandDetail"></div>
+    </details>
+
+    <details>
+      <summary>API route inspector</summary>
+      <div class="advanced-grid">
+        <section>
+          <label for="request">Request JSON</label>
+          <textarea id="request" class="json-request" spellcheck="false"></textarea>
+          <div class="toolbar">
+            <button class="primary" id="route">Route JSON</button>
+            <button id="safe">Safe sample</button>
+            <button id="blocked">Blocked sample</button>
+            <button id="privateReject">Private reject</button>
+          </div>
+        </section>
+        <aside>
+          <div class="status">
+            <div class="metric"><strong>Policy</strong><span id="policy">-</span></div>
+            <div class="metric"><strong>Executor</strong><span id="executor">-</span></div>
+            <div class="metric"><strong>Cost</strong><span id="cost">0 USD</span></div>
+            <div class="metric"><strong>Stops</strong><span id="stops">-</span></div>
+            <div class="metric"><strong>Persistence</strong><span id="persistence">-</span></div>
+            <div class="metric"><strong>Version</strong><span id="version">v0</span></div>
+          </div>
+          <div class="tabs">
+            <button class="tab active" data-view="summary">Summary</button>
+            <button class="tab" data-view="json">JSON</button>
+          </div>
+          <pre id="output">Route a public or synthetic request to see the API response.</pre>
+        </aside>
       </div>
-    </section>
+    </details>
 
-    <div class="grid">
-      <section>
-        <label for="request">Request JSON</label>
-        <textarea id="request" spellcheck="false"></textarea>
-        <div class="toolbar">
-          <button class="primary" id="route">Route</button>
-          <button id="safe">Safe sample</button>
-          <button id="blocked">Blocked sample</button>
-          <button id="privateReject">Private reject</button>
+    <details>
+      <summary>Readiness and beta boundary</summary>
+      <div>
+        <p>Trusted beta can use public or synthetic inputs only. Private/customer/paid traffic remains blocked.</p>
+        <div class="advanced-controls">
+          <button id="productRefresh">Refresh readiness</button>
         </div>
-      </section>
-
-      <aside>
-        <div class="status">
-          <div class="metric"><strong>Policy</strong><span id="policy">-</span></div>
-          <div class="metric"><strong>Executor</strong><span id="executor">-</span></div>
-          <div class="metric"><strong>Cost</strong><span id="cost">0 USD</span></div>
-          <div class="metric"><strong>Stops</strong><span id="stops">-</span></div>
-          <div class="metric"><strong>Persistence</strong><span id="persistence">-</span></div>
-          <div class="metric"><strong>Version</strong><span id="version">v0</span></div>
-        </div>
-        <div class="tabs">
-          <button class="tab active" data-view="summary">Summary</button>
-          <button class="tab" data-view="json">JSON</button>
-        </div>
-        <pre id="output">Route a public or synthetic request to see the API response.</pre>
-        <div class="feedback-line">
-          <span id="routeFeedbackStatus">Route feedback is metadata only.</span>
-          <button data-route-feedback="true">Useful route</button>
-          <button data-route-feedback="false">Not useful</button>
-        </div>
-      </aside>
-    </div>
+        <div class="metrics-grid" id="productMetrics"></div>
+        <p class="muted" id="productStatus">Loading readiness.</p>
+      </div>
+    </details>
   </main>
 
   <script>
     const apiRoot = window.location.protocol === 'file:' ? 'http://127.0.0.1:8787' : '';
+    const defaultOutcomeText = 'Find the safest zero-spend way to solve a public agent task and produce a local proof packet.';
+
+    const guidedExamples = {
+      public_path: {
+        label: 'Use public path',
+        detail: 'Rank a safe public task and prepare proof.',
+        mode: 'path',
+        source_mode: 'fixture',
+        goal: 'Find a public task that an agent can safely turn into a local proof packet.',
+        request: {
+          outcome: {
+            goal: 'Find a public task that an agent can safely turn into a local proof packet.',
+            task_type: 'agent_task_triage',
+            desired_artifact: 'agent_path_packet',
+          },
+          context_refs: ['https://github.com/example/project/issues/101'],
+          source_mode: 'fixture',
+          limit: 8,
+          policy: { mode: 'free_only' },
+        },
+      },
+      build_vs_use: {
+        label: 'Use or build',
+        detail: 'Compare owned agent, public path, and build-new.',
+        mode: 'path',
+        source_mode: 'public-research',
+        goal: 'Decide whether to use an existing public path or build a new agent for a public research task.',
+        request: {
+          outcome: {
+            goal: 'Decide whether to use an existing public path or build a new agent for a public research task.',
+            task_type: 'agent_task_triage',
+            desired_artifact: 'build_vs_use_decision',
+          },
+          context_refs: ['fixture://open-demand/public-research'],
+          source_mode: 'public-research',
+          limit: 8,
+          policy: { mode: 'free_only' },
+        },
+      },
+      blocked_risk: {
+        label: 'Block risky work',
+        detail: 'Show paid or public-write gates firing.',
+        mode: 'route',
+        goal: 'Use a paid API and post a public comment after solving this public issue.',
+        request: {
+          outcome: {
+            goal: 'Use a paid API and post a public comment after solving this public issue.',
+            task_type: 'agent_task_triage',
+            desired_artifact: 'blocked_packet',
+            success_criteria: ['paid API blocked', 'public post blocked'],
+          },
+          context_refs: ['https://github.com/example/project/issues/102'],
+          policy: { mode: 'free_only' },
+        },
+      },
+    };
+
     const safeSample = {
       outcome: {
         goal: 'Triage a public GitHub issue and produce a local next-step packet.',
         task_type: 'issue_triage',
         desired_artifact: 'triage_packet',
-        success_criteria: ['local artifact', 'verifier plan', 'no public comment']
+        success_criteria: ['local artifact', 'verifier plan', 'no public comment'],
       },
       context_refs: ['https://github.com/example/project/issues/101'],
-      policy: { mode: 'free_only' }
+      policy: { mode: 'free_only' },
     };
-    const blockedSample = {
-      outcome: {
-        goal: 'Use a paid API and post a comment on the public issue.',
-        task_type: 'agent_task_triage',
-        desired_artifact: 'blocked_packet',
-        success_criteria: ['paid API blocked', 'public post blocked']
-      },
-      context_refs: ['https://github.com/example/project/issues/102'],
-      policy: { mode: 'free_only' }
-    };
+    const blockedSample = guidedExamples.blocked_risk.request;
     const privateRejectSample = {
       outcome: {
         goal: 'Review a private repo issue and create a patch plan.',
         task_type: 'patch_plan',
-        desired_artifact: 'blocked_packet'
+        desired_artifact: 'blocked_packet',
       },
       context_refs: ['private://github/example/internal-repo/issues/9'],
-      policy: { mode: 'free_only' }
+      policy: { mode: 'free_only' },
     };
 
+    const outcomeInput = document.querySelector('#outcomeInput');
+    const guideButtons = document.querySelector('#guideButtons');
+    const runGuide = document.querySelector('#runGuide');
+    const clearOutcome = document.querySelector('#clearOutcome');
+    const decisionMemo = document.querySelector('#decisionMemo');
+    const feedbackReason = document.querySelector('#feedbackReason');
+    const routeFeedbackStatus = document.querySelector('#routeFeedbackStatus');
+    const healthDot = document.querySelector('#healthDot');
+    const healthText = document.querySelector('#healthText');
     const requestEl = document.querySelector('#request');
     const outputEl = document.querySelector('#output');
     const routeButton = document.querySelector('#route');
@@ -545,29 +695,22 @@
     const stopsEl = document.querySelector('#stops');
     const persistenceEl = document.querySelector('#persistence');
     const versionEl = document.querySelector('#version');
-    const healthDot = document.querySelector('#healthDot');
-    const healthText = document.querySelector('#healthText');
     const openDemandSource = document.querySelector('#openDemandSource');
     const openDemandScan = document.querySelector('#openDemandScan');
     const openDemandMetrics = document.querySelector('#openDemandMetrics');
     const openDemandStatus = document.querySelector('#openDemandStatus');
     const openDemandOpportunities = document.querySelector('#openDemandOpportunities');
     const openDemandDetail = document.querySelector('#openDemandDetail');
-    const heroMetrics = document.querySelector('#heroMetrics');
-    const proofExamples = document.querySelector('#proofExamples');
-    const routeFeedbackStatus = document.querySelector('#routeFeedbackStatus');
     const productRefresh = document.querySelector('#productRefresh');
     const productMetrics = document.querySelector('#productMetrics');
     const productStatus = document.querySelector('#productStatus');
+
+    let activeGuide = 'public_path';
+    let activeDecision = null;
     let openDemand = null;
-    let examples = [];
     let selectedOpportunityId = '';
     let lastPayload = null;
     let activeView = 'summary';
-
-    function loadSample(sample) {
-      requestEl.value = JSON.stringify(sample, null, 2);
-    }
 
     function escapeHtml(value) {
       return String(value ?? '')
@@ -578,8 +721,263 @@
         .replaceAll("'", '&#039;');
     }
 
+    function prettyLabel(value) {
+      return String(value || 'unknown').replaceAll('_', ' ');
+    }
+
+    function loadSample(sample) {
+      requestEl.value = JSON.stringify(sample, null, 2);
+    }
+
     function setMetricClass(element, className) {
       element.className = className || '';
+    }
+
+    function renderGuideButtons() {
+      guideButtons.innerHTML = Object.entries(guidedExamples).map(([id, item]) => `
+        <button type="button" class="${id === activeGuide ? 'active' : ''}" data-guide="${escapeHtml(id)}">
+          <span>${escapeHtml(item.label)}</span>
+          <small>${escapeHtml(item.detail)}</small>
+        </button>
+      `).join('');
+    }
+
+    function statusClass(status) {
+      return ['blocked', 'rejected', 'reject'].includes(status) ? 'blocked' : '';
+    }
+
+    function decisionTitleForPath(payload) {
+      const selected = payload?.selected_path;
+      if (!selected) return 'No route selected';
+      const kind = prettyLabel(selected.supplier_class);
+      return `${kind}: ${selected.title || selected.opportunity_id || 'selected path'}`;
+    }
+
+    function decisionTitleForRoute(payload) {
+      if (payload?.error) return 'Rejected before routing';
+      const decision = payload?.decision || {};
+      if (decision.policy_state === 'blocked') return 'Blocked by policy gates';
+      return `${prettyLabel(decision.policy_state)}: ${decision.selected_executor_id || 'local route'}`;
+    }
+
+    function renderScoreCards(scores = {}) {
+      const rows = [
+        ['Quality', scores.quality],
+        ['Speed', scores.speed],
+        ['Cost', scores.cost],
+        ['Risk', scores.risk],
+        ['Proof', scores.proofability],
+        ['Learning', scores.learning_value],
+        ['Trainable', scores.trainability],
+        ['Ready', scores.execution_readiness],
+      ];
+      return `<div class="score-grid">${rows.map(([label, value]) => `
+        <div class="score-card"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value ?? '-')}</span></div>
+      `).join('')}</div>`;
+    }
+
+    function renderPathDecision(payload) {
+      const selected = payload.selected_path || {};
+      const alternatives = payload.alternatives || [];
+      const blockers = [
+        ...(selected.human_blockers || []),
+        ...(selected.hard_blockers || []),
+      ];
+      const status = selected.decision === 'reject' ? 'blocked' : 'ready';
+      const approval = selected.supplier_class === 'external_supplier'
+        ? 'External supplier execution requires identity, payment, dispute, and legal gates.'
+        : payload.next_step?.action === 'run_public_proof'
+          ? 'Run the local proof packet, then a human can decide whether external follow-up is appropriate.'
+          : 'Inspect alternatives before any external action.';
+      activeDecision = {
+        target_type: 'route_decision',
+        target_id: payload.path_id,
+        chosen_route: selected.supplier_class || selected.route_classification || 'unknown',
+        blocked_reason: blockers[0] || null,
+      };
+      decisionMemo.innerHTML = `
+        <div class="memo-head">
+          <div>
+            <h3>${escapeHtml(decisionTitleForPath(payload))}</h3>
+            <p>BEAN selected the best currently executable path without spend, public writes, private data, or external supplier execution.</p>
+          </div>
+          <div class="memo-status"><span class="${statusClass(status)}">${escapeHtml(status)}</span></div>
+        </div>
+        <div class="memo-grid">
+          <div class="stack">
+            <div class="path-card selected">
+              <strong>Recommended path</strong>
+              <span>${escapeHtml(prettyLabel(selected.supplier_class))}</span>
+              <p class="muted">${escapeHtml(selected.title || selected.source_type || selected.opportunity_id || 'Selected route')}</p>
+            </div>
+            ${renderScoreCards(selected.scores || {})}
+            <div class="path-card">
+              <strong>What a human approves next</strong>
+              <p class="muted">${escapeHtml(approval)}</p>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="path-card">
+              <strong>Proof packet</strong>
+              <p class="muted">${escapeHtml(payload.next_step?.task_id || 'No task packet yet')}</p>
+              <div class="result-actions">
+                <button id="runProof" ${payload.next_step?.task_id ? '' : 'disabled'}>Run proof</button>
+                <button id="copyMemo">Copy memo</button>
+              </div>
+            </div>
+            <div class="path-card ${blockers.length ? 'blocked' : ''}">
+              <strong>Blocked or gated actions</strong>
+              <ul class="list">
+                ${(blockers.length ? blockers : payload.blocked_actions || ['external supplier execution', 'paid API call', 'public write']).slice(0, 8).map((item) => `<li>${escapeHtml(prettyLabel(item))}</li>`).join('')}
+              </ul>
+            </div>
+            <div class="path-card">
+              <strong>Alternatives</strong>
+              <ul class="list">
+                ${alternatives.slice(0, 4).map((item) => `<li>${escapeHtml(prettyLabel(item?.supplier_class))}: ${escapeHtml(item?.title || item?.opportunity_id || 'alternative')}</li>`).join('') || '<li>none</li>'}
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+      const runProof = document.querySelector('#runProof');
+      if (runProof && payload.next_step?.task_id) runProof.addEventListener('click', () => runProofPacket(payload.next_step.task_id));
+      const copyMemo = document.querySelector('#copyMemo');
+      if (copyMemo) copyMemo.addEventListener('click', () => copyDecisionMemo(payload));
+    }
+
+    function renderRouteDecision(payload, status = 200) {
+      const decision = payload?.decision || {};
+      const stops = payload?.stop_conditions || [];
+      const blocked = Boolean(payload?.error || decision.policy_state === 'blocked' || stops.length);
+      activeDecision = {
+        target_type: 'route_decision',
+        target_id: payload?.route_run_id || payload?.http_request_id || 'route-demo',
+        chosen_route: decision.selected_executor_id || 'none',
+        blocked_reason: stops[0] || payload?.error || null,
+      };
+      decisionMemo.innerHTML = `
+        <div class="memo-head">
+          <div>
+            <h3>${escapeHtml(decisionTitleForRoute(payload))}</h3>
+            <p>${escapeHtml(payload?.warning || payload?.local_server_note || 'Route decision only. This is not permission to execute external work.')}</p>
+          </div>
+          <div class="memo-status"><span class="${blocked ? 'blocked' : ''}">${escapeHtml(blocked ? 'blocked' : 'allowed')}</span></div>
+        </div>
+        <div class="memo-grid">
+          <div class="stack">
+            <div class="path-card ${blocked ? 'blocked' : 'selected'}">
+              <strong>Policy decision</strong>
+              <span>${escapeHtml(payload?.error || `${decision.policy_state || '-'} / ${decision.policy_decision || '-'}`)}</span>
+              <p class="muted">HTTP ${escapeHtml(status)}</p>
+            </div>
+            <div class="score-grid">
+              <div class="score-card"><strong>Executor</strong><span>${escapeHtml(decision.selected_executor_id || 'none')}</span></div>
+              <div class="score-card"><strong>Cost</strong><span>${escapeHtml(payload?.cost?.estimated_total_cost_usd ?? 0)} USD</span></div>
+              <div class="score-card"><strong>Stops</strong><span>${escapeHtml(stops.length || (payload?.error ? 1 : 0))}</span></div>
+              <div class="score-card"><strong>Stored body</strong><span>${escapeHtml(payload?.persistence?.artifacts_persisted === false || payload?.persisted_to_disk === false ? 'no' : 'no body log')}</span></div>
+            </div>
+            <div class="path-card">
+              <strong>What a human approves next</strong>
+              <p class="muted">${blocked ? 'A human must change policy or remove the risky requirement before any execution.' : 'A human can inspect the local verifier packet before any external action.'}</p>
+            </div>
+          </div>
+          <div class="stack">
+            <div class="path-card ${stops.length || payload?.error ? 'blocked' : ''}">
+              <strong>Blocked or gated actions</strong>
+              <ul class="list">${(stops.length ? stops : payload?.error ? [payload.error] : ['external public write', 'paid API call', 'supplier execution']).map((item) => `<li>${escapeHtml(prettyLabel(item))}</li>`).join('')}</ul>
+            </div>
+            <div class="path-card">
+              <strong>Proof status</strong>
+              <p class="muted">${escapeHtml(payload?.artifact_refs?.verifier_md || 'No external proof run performed in hosted demo.')}</p>
+              <div class="result-actions"><button id="copyMemo">Copy memo</button></div>
+            </div>
+          </div>
+        </div>
+      `;
+      const copyMemo = document.querySelector('#copyMemo');
+      if (copyMemo) copyMemo.addEventListener('click', () => copyDecisionMemo(payload));
+    }
+
+    async function runGuidedDemo() {
+      const example = guidedExamples[activeGuide];
+      const request = JSON.parse(JSON.stringify(example.request));
+      if (request.outcome && outcomeInput.value.trim()) request.outcome.goal = outcomeInput.value.trim();
+      runGuide.disabled = true;
+      decisionMemo.innerHTML = `
+        <div class="memo-head">
+          <div><h3>Routing outcome</h3><p>Checking policy, path options, cost, risk, and proofability.</p></div>
+          <div class="memo-status"><span>running</span></div>
+        </div>
+      `;
+      try {
+        const endpoint = example.mode === 'path' ? '/v0/path' : '/v0/route';
+        const response = await fetch(`${apiRoot}${endpoint}`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(request),
+        });
+        const payload = await response.json();
+        lastPayload = { payload, status: response.status };
+        if (example.mode === 'path' && response.ok) renderPathDecision(payload);
+        else renderRouteDecision(payload, response.status);
+      } catch (error) {
+        renderRouteDecision({ api_version: 'v0', error: error.message }, 0);
+      } finally {
+        runGuide.disabled = false;
+      }
+    }
+
+    async function runProofPacket(taskId) {
+      const proofButton = document.querySelector('#runProof');
+      if (proofButton) proofButton.disabled = true;
+      try {
+        const response = await fetch(`${apiRoot}/v0/open-demand/tasks/${encodeURIComponent(taskId)}/run`, { method: 'POST' });
+        const payload = await response.json();
+        const existing = decisionMemo.innerHTML;
+        decisionMemo.innerHTML = `${existing}<div class="path-card"><strong>Proof result</strong><pre>${escapeHtml(JSON.stringify(payload.report || payload.run || payload, null, 2))}</pre></div>`;
+      } catch (error) {
+        routeFeedbackStatus.textContent = error.message;
+      } finally {
+        if (proofButton) proofButton.disabled = false;
+      }
+    }
+
+    async function copyDecisionMemo(payload) {
+      const text = JSON.stringify(payload, null, 2);
+      try {
+        await navigator.clipboard.writeText(text);
+        routeFeedbackStatus.textContent = 'Memo copied.';
+      } catch (_error) {
+        routeFeedbackStatus.textContent = 'Copy unavailable in this browser.';
+      }
+    }
+
+    async function sendDecisionFeedback(helpful) {
+      if (!activeDecision) {
+        routeFeedbackStatus.textContent = 'Run a route first.';
+        return;
+      }
+      try {
+        const response = await fetch(`${apiRoot}/v0/v2/feedback`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({
+            target_type: activeDecision.target_type,
+            target_id: activeDecision.target_id,
+            helpful,
+            route_useful: helpful,
+            reason_code: feedbackReason.value,
+            chosen_route: activeDecision.chosen_route,
+            latency_bucket: 'under_30s',
+            blocked_reason: activeDecision.blocked_reason,
+          }),
+        });
+        const payload = await response.json();
+        routeFeedbackStatus.textContent = response.ok ? `Feedback saved (${payload.feedback_summary?.total ?? 1} total).` : payload.error || 'Feedback rejected.';
+      } catch (error) {
+        routeFeedbackStatus.textContent = error.message;
+      }
     }
 
     function summarize(payload, status) {
@@ -589,7 +987,7 @@
           `HTTP ${status}`,
           `error: ${payload.error}`,
           `warning: ${payload.warning || 'none'}`,
-          `api_version: ${payload.api_version || 'unknown'}`
+          `api_version: ${payload.api_version || 'unknown'}`,
         ].join('\n');
       }
       const decision = payload.decision || {};
@@ -602,7 +1000,7 @@
         `chargeable: ${payload.chargeable === true ? 'yes' : 'no'}`,
         `estimated_total_cost_usd: ${cost.estimated_total_cost_usd ?? 0}`,
         `stops: ${(payload.stop_conditions || []).join(', ') || 'none'}`,
-        `persistence: ${payload.persistence?.artifacts_persisted === false ? 'memory only' : 'local artifacts if not hosted'}`
+        `persistence: ${payload.persistence?.artifacts_persisted === false ? 'memory only' : 'local artifacts if not hosted'}`,
       ].join('\n');
     }
 
@@ -631,12 +1029,14 @@
         const response = await fetch(`${apiRoot}/v0/route`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(input)
+          body: JSON.stringify(input),
         });
         const payload = await response.json();
         render(payload, response.status);
+        renderRouteDecision(payload, response.status);
       } catch (error) {
         render({ api_version: 'v0', error: error.message }, 0);
+        renderRouteDecision({ api_version: 'v0', error: error.message }, 0);
       } finally {
         routeButton.disabled = false;
       }
@@ -649,22 +1049,17 @@
         const ok = response.ok && payload.ok && payload.spend_usd === 0;
         healthDot.className = ok ? 'dot ok' : 'dot bad';
         healthText.textContent = ok ? 'api online, zero spend' : 'api unhealthy';
-      } catch (error) {
+      } catch (_error) {
         healthDot.className = 'dot bad';
         healthText.textContent = 'api unavailable';
       }
     }
 
-    function openDemandOpportunity(id) {
-      return (openDemand?.opportunities || []).find((item) => item.id === id) || null;
-    }
-
-    function openDemandBundle(opportunityId) {
-      return (openDemand?.bundles || []).find((item) => item.opportunity_id === opportunityId) || null;
-    }
-
-    function openDemandReport(taskId) {
-      return (openDemand?.reports || []).find((item) => item.task_id === taskId) || null;
+    function sourceText(source) {
+      const mode = source?.source_mode || 'unknown';
+      if (mode === 'live_github_with_negative_controls') return 'live GitHub';
+      if (mode === 'fixture_fallback') return 'fixture fallback';
+      return mode.replaceAll('_', ' ');
     }
 
     function decisionText(decision) {
@@ -675,54 +1070,6 @@
       return decision || 'unknown';
     }
 
-    function sourceText(source) {
-      const mode = source?.source_mode || 'unknown';
-      if (mode === 'live_github_with_negative_controls') return 'live GitHub';
-      if (mode === 'fixture_fallback') return 'fixture fallback';
-      return mode.replaceAll('_', ' ');
-    }
-
-    function renderHeroMetrics(metrics = {}) {
-      const pathRate = metrics.executable_path_rate == null ? '-' : `${Math.round(metrics.executable_path_rate * 100)}%`;
-      const time = metrics.time_to_ranked_paths_seconds == null ? '-' : `${metrics.time_to_ranked_paths_seconds}s`;
-      heroMetrics.innerHTML = [
-        ['Executable path rate', pathRate],
-        ['Time to ranked paths', time],
-        ['Unsafe actions prevented', metrics.unsafe_actions_prevented ?? '-'],
-      ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
-    }
-
-    async function loadProductStatus() {
-      productRefresh.disabled = true;
-      productStatus.textContent = 'Loading product contract...';
-      try {
-        const [goals, readiness, learning, gtm] = await Promise.all([
-          fetch(`${apiRoot}/v0/v2/goals`).then((response) => response.json()),
-          fetch(`${apiRoot}/v0/v2/readiness`).then((response) => response.json()),
-          fetch(`${apiRoot}/v0/v2/learning`).then((response) => response.json()),
-          fetch(`${apiRoot}/v0/v2/gtm`).then((response) => response.json())
-        ]);
-        productMetrics.innerHTML = [
-          ['Contract goals', `${goals.completed_contract_goals ?? 0}/${goals.total_goals ?? 0}`],
-          ['Public beta', gtm.public_beta_status || 'prepared'],
-          ['Public learning', readiness.ok_for_public_learning_traffic ? 'ready' : 'blocked'],
-          ['Private/paid traffic', readiness.ok_for_private_customer_or_paid_traffic ? 'ready' : 'blocked'],
-          ['Launch copy', gtm.launch_copy_status || 'draft required'],
-        ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
-        productStatus.textContent = `Trusted beta is prepared, not launched. Production blockers: ${(readiness.product_blockers || []).join(', ')}`;
-      } catch (error) {
-        productStatus.textContent = error.message;
-      } finally {
-        productRefresh.disabled = false;
-      }
-    }
-
-    function renderExamples() {
-      proofExamples.innerHTML = examples.slice(0, 5).map((item) => `
-        <button data-example-id="${escapeHtml(item.id)}">${escapeHtml(item.title)}</button>
-      `).join('');
-    }
-
     function renderOpenDemand() {
       if (!openDemand) {
         openDemandMetrics.innerHTML = '';
@@ -731,23 +1078,25 @@
         return;
       }
       const metrics = openDemand.metrics || {};
-      renderHeroMetrics(openDemand.hero_metrics || {});
       openDemandMetrics.innerHTML = [
         ['Source', sourceText(openDemand.source)],
         ['Scanned', metrics.opportunities_scanned ?? 0],
         ['Selected', metrics.selected_candidates ?? 0],
-        ['Path precision', metrics.candidate_precision_top_10 ?? 0],
+        ['Path rate', openDemand.hero_metrics?.executable_path_rate == null ? '-' : `${Math.round(openDemand.hero_metrics.executable_path_rate * 100)}%`],
         ['Risk stops', openDemand.hero_metrics?.unsafe_actions_prevented ?? 0],
-      ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
+      ].map(([label, value]) => `<div class="metric"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
 
       const opportunities = openDemand.opportunities || [];
-      const selected = openDemandOpportunity(selectedOpportunityId) || opportunities.find((item) => item.decision !== 'reject') || opportunities[0] || null;
+      const selected = opportunities.find((item) => item.id === selectedOpportunityId)
+        || opportunities.find((item) => item.decision !== 'reject')
+        || opportunities[0]
+        || null;
       selectedOpportunityId = selected?.id || '';
       openDemandOpportunities.innerHTML = opportunities.slice(0, 12).map((item) => `
         <button class="opportunity-card${item.id === selectedOpportunityId ? ' selected' : ''}" data-opportunity-id="${escapeHtml(item.id)}">
           <strong>${escapeHtml(item.title)}</strong>
           <small>${escapeHtml(item.repository || item.source_type || item.lane)}</small>
-          <small>${escapeHtml(decisionText(item.decision))} · Q ${escapeHtml(item.quality_score ?? 0)} · S ${escapeHtml(item.speed_score ?? 0)} · proof ${escapeHtml(item.proofability_score ?? 0)}</small>
+          <small>${escapeHtml(decisionText(item.decision))} - Q ${escapeHtml(item.quality_score ?? 0)} - S ${escapeHtml(item.speed_score ?? 0)} - proof ${escapeHtml(item.proofability_score ?? 0)}</small>
         </button>
       `).join('') || 'No opportunities found.';
 
@@ -755,46 +1104,32 @@
         openDemandDetail.textContent = 'Run a scan to load opportunities.';
         return;
       }
-      const bundle = openDemandBundle(selected.id);
-      const report = bundle ? openDemandReport(bundle.task_id) : null;
-      const proof = report?.public_proof || null;
+      const bundle = (openDemand.bundles || []).find((item) => item.opportunity_id === selected.id);
+      const report = (openDemand.reports || []).find((item) => item.task_id === bundle?.task_id);
       openDemandDetail.innerHTML = `
         <h3>${escapeHtml(selected.title)}</h3>
         <p>${escapeHtml(selected.body_excerpt || selected.title)}</p>
         <div class="open-demand-detail-grid">
-          <div><strong>Lane</strong><span>${escapeHtml(selected.lane)}</span></div>
-          <div><strong>Route</strong><span>${escapeHtml(selected.route_classification || decisionText(selected.decision))}</span></div>
-          <div><strong>Quality</strong><span>${escapeHtml(selected.quality_score ?? 0)}</span></div>
-          <div><strong>Speed</strong><span>${escapeHtml(selected.speed_score ?? 0)}</span></div>
-          <div><strong>Proof</strong><span>${escapeHtml(selected.proofability_score ?? 0)}</span></div>
-          <div><strong>Cost</strong><span>${escapeHtml(selected.cost_score ?? 0)}</span></div>
-          <div><strong>Risk</strong><span>${escapeHtml(selected.risk_score ?? 0)}</span></div>
-          <div><strong>Human gates</strong><span>${escapeHtml((selected.human_blockers || []).join(', ') || 'none')}</span></div>
-          <div><strong>Proof status</strong><span>${escapeHtml(proof?.status || 'not run')}</span></div>
-          <div><strong>Cash</strong><span>$${escapeHtml(selected.cash_potential_usd_min ?? 0)}-$${escapeHtml(selected.cash_potential_usd_max ?? 0)}</span></div>
+          ${[
+            ['Lane', selected.lane],
+            ['Route', selected.route_classification || decisionText(selected.decision)],
+            ['Quality', selected.quality_score ?? 0],
+            ['Speed', selected.speed_score ?? 0],
+            ['Proof', selected.proofability_score ?? 0],
+            ['Cost', selected.cost_score ?? 0],
+            ['Risk', selected.risk_score ?? 0],
+            ['Human gates', (selected.human_blockers || []).join(', ') || 'none'],
+            ['Proof status', report?.public_proof?.status || 'not run'],
+            ['Cash', `$${selected.cash_potential_usd_min ?? 0}-$${selected.cash_potential_usd_max ?? 0}`],
+          ].map(([label, value]) => `<div class="metric"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('')}
         </div>
         <div class="open-demand-actions">
           <button data-open-demand-action="bundle" data-opportunity-id="${escapeHtml(selected.id)}">Build packet</button>
           <button data-open-demand-action="run" data-task-id="${escapeHtml(bundle?.task_id || '')}" ${bundle ? '' : 'disabled'}>Run verifier</button>
           <button disabled>External submission gated</button>
         </div>
-        <div class="feedback-line">
-          <span>Was this path useful?</span>
-          <button data-open-demand-action="feedback" data-helpful="true" data-target-id="${escapeHtml(selected.id)}">Useful</button>
-          <button data-open-demand-action="feedback" data-helpful="false" data-target-id="${escapeHtml(selected.id)}">Not useful</button>
-        </div>
-        ${bundle ? `<pre class="open-demand-report">${escapeHtml(JSON.stringify(report || bundle, null, 2))}</pre>` : ''}
+        ${bundle ? `<pre>${escapeHtml(JSON.stringify(report || bundle, null, 2))}</pre>` : ''}
       `;
-    }
-
-    async function loadExamples() {
-      try {
-        const payload = await (await fetch(`${apiRoot}/v0/examples`)).json();
-        examples = payload.examples || [];
-        renderExamples();
-      } catch (error) {
-        examples = [];
-      }
     }
 
     async function loadOpenDemandLatest() {
@@ -810,12 +1145,12 @@
 
     async function scanOpenDemand() {
       openDemandScan.disabled = true;
-      openDemandStatus.textContent = 'Scanning open demand...';
+      openDemandStatus.textContent = 'Scanning public demand...';
       try {
         const response = await fetch(`${apiRoot}/v0/open-demand/scan`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ source_mode: openDemandSource.value, limit: 12 })
+          body: JSON.stringify({ source_mode: openDemandSource.value, limit: 12 }),
         });
         openDemand = await response.json();
         selectedOpportunityId = '';
@@ -853,20 +1188,41 @@
       renderOpenDemand();
     }
 
-    async function sendFeedback(payload, statusElement) {
+    async function loadProductStatus() {
+      productRefresh.disabled = true;
+      productStatus.textContent = 'Loading readiness...';
       try {
-        const response = await fetch(`${apiRoot}/v0/open-demand/feedback`, {
-          method: 'POST',
-          headers: { 'content-type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const body = await response.json();
-        statusElement.textContent = response.ok ? `Feedback saved (${body.feedback_summary?.total ?? 1} total).` : body.error || 'Feedback rejected.';
+        const [goals, readiness, gtm] = await Promise.all([
+          fetch(`${apiRoot}/v0/v2/goals`).then((response) => response.json()),
+          fetch(`${apiRoot}/v0/v2/readiness`).then((response) => response.json()),
+          fetch(`${apiRoot}/v0/v2/gtm`).then((response) => response.json()),
+        ]);
+        productMetrics.innerHTML = [
+          ['Product goals', `${goals.completed_contract_goals ?? 0}/${goals.total_goals ?? 0}`],
+          ['Trusted beta', gtm.public_beta_status || 'prepared'],
+          ['Public learning', readiness.ok_for_public_learning_traffic ? 'ready' : 'blocked'],
+          ['Private/paid', readiness.ok_for_private_customer_or_paid_traffic ? 'ready' : 'blocked'],
+          ['Invites', gtm.beta_cohort_status || 'not started'],
+        ].map(([label, value]) => `<div class="metric"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
+        productStatus.textContent = `Production blockers: ${(readiness.product_blockers || []).join(', ')}`;
       } catch (error) {
-        statusElement.textContent = error.message;
+        productStatus.textContent = error.message;
+      } finally {
+        productRefresh.disabled = false;
       }
     }
 
+    guideButtons.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-guide]');
+      if (!button) return;
+      activeGuide = button.dataset.guide;
+      outcomeInput.value = guidedExamples[activeGuide].goal;
+      renderGuideButtons();
+    });
+    runGuide.addEventListener('click', runGuidedDemo);
+    clearOutcome.addEventListener('click', () => {
+      outcomeInput.value = defaultOutcomeText;
+    });
     document.querySelector('#safe').addEventListener('click', () => loadSample(safeSample));
     document.querySelector('#blocked').addEventListener('click', () => loadSample(blockedSample));
     document.querySelector('#privateReject').addEventListener('click', () => loadSample(privateRejectSample));
@@ -884,46 +1240,9 @@
       if (!control) return;
       if (control.dataset.openDemandAction === 'bundle') await buildOpenDemandPacket(control.dataset.opportunityId);
       if (control.dataset.openDemandAction === 'run') await runOpenDemandVerifier(control.dataset.taskId);
-      if (control.dataset.openDemandAction === 'feedback') {
-        await sendFeedback({
-          target_type: 'open_demand_opportunity',
-          target_id: control.dataset.targetId,
-          helpful: control.dataset.helpful === 'true',
-          route_useful: control.dataset.helpful === 'true',
-          would_have_built_manually: false,
-          saved_time_estimate_minutes: control.dataset.helpful === 'true' ? 10 : 0,
-          reason_code: control.dataset.helpful === 'true' ? 'routed_to_useful_path' : 'bad_routing'
-        }, openDemandStatus);
-        await loadOpenDemandLatest();
-      }
-    });
-    proofExamples.addEventListener('click', async (event) => {
-      const button = event.target.closest('[data-example-id]');
-      if (!button) return;
-      const example = examples.find((item) => item.id === button.dataset.exampleId);
-      if (!example) return;
-      if (example.request?.outcome) {
-        loadSample(example.request);
-        await routeRequest();
-        return;
-      }
-      if (example.request?.source_mode) {
-        openDemandSource.value = example.request.source_mode;
-        await scanOpenDemand();
-      }
     });
     document.querySelectorAll('[data-route-feedback]').forEach((button) => {
-      button.addEventListener('click', async () => {
-        await sendFeedback({
-          target_type: 'route',
-          target_id: lastPayload?.payload?.route_run_id || lastPayload?.payload?.http_request_id || 'route-demo',
-          helpful: button.dataset.routeFeedback === 'true',
-          route_useful: button.dataset.routeFeedback === 'true',
-          would_have_built_manually: false,
-          saved_time_estimate_minutes: button.dataset.routeFeedback === 'true' ? 8 : 0,
-          reason_code: button.dataset.routeFeedback === 'true' ? 'routed_to_useful_path' : 'bad_routing'
-        }, routeFeedbackStatus);
-      });
+      button.addEventListener('click', () => sendDecisionFeedback(button.dataset.routeFeedback === 'true'));
     });
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.addEventListener('click', () => {
@@ -934,8 +1253,8 @@
     });
 
     loadSample(safeSample);
+    renderGuideButtons();
     refreshHealth();
-    loadExamples();
     loadOpenDemandLatest();
     loadProductStatus();
   </script>

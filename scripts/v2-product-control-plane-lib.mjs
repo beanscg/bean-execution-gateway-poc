@@ -248,8 +248,12 @@ const FORBIDDEN_FREE_TEXT_KEYS = new Set([
 const allowedFeedbackReasons = new Set([
   'routed_to_useful_path',
   'bad_route',
+  'bad_routing',
+  'unclear_value',
+  'missing_option',
   'too_slow',
   'too_expensive',
+  'too_cautious',
   'blocked_correctly',
   'unsafe_or_private_blocked',
   'missing_supplier',

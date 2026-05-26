@@ -7,6 +7,7 @@
   "homepage": "https://bean-execution-gateway-poc.onrender.com",
   "repository": "https://github.com/beanscg/bean-execution-gateway-poc",
   "public_beta_status": "prepared_for_trusted_external_review",
+  "first_user_readiness_status": "complete_for_trusted_beta_review",
   "input_scope": ["public", "synthetic"],
   "blocked_input_scope": ["private", "secret", "regulated", "customer_data", "company_data", "local_file", "internal"],
   "endpoints": [
@@ -101,6 +102,12 @@
     "docs/public-beta-operations.md",
     "docs/public-beta-decision-packet.md",
     "docs/public-beta-learning-metrics.md"
+  ],
+  "first_user_docs": [
+    "docs/evaluator-quickstart.md",
+    "docs/how-to-review.md",
+    "docs/example-results.md",
+    "docs/first-user-readiness.md"
   ],
   "policy_blocks": [
     "requires_private_repo_access",

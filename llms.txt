@@ -6,16 +6,23 @@ Live demo: https://bean-execution-gateway-poc.onrender.com
 
 Primary positioning:
 
-- Gateway to the right agent path: owned agents, public paths, or build decision.
+- Gateway to the right execution path: owned agents, public paths, build decision, or block.
 - The requester gives an outcome; BEAN returns a safe executable path before spend.
+- The public demo now starts with three guided routes: Use public path, Use or build, and Block risky work.
+- The primary result is a decision memo with recommended path, scores, blocked actions, proof packet, and human approval gate.
 - V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
 - V1 contracts prove the product shape for 80 local-contract goals without turning on paid, private, customer, or external-supplier execution.
 - V2 contracts cover the full 120-goal delivered-product checklist without turning on paid, private, customer, legal, or external-supplier execution.
 - Public beta packet is prepared for trusted external review, with GitHub issue templates, onboarding, support rules, and Stephen approval gates before any invites or public posts.
+- First-user readiness is complete for trusted beta review, with evaluator quickstart, review guide, example results, and a 100-goal readiness map.
 
 Primary docs:
 
 - Product definition: /docs/product-definition.md
+- Evaluator quickstart: /docs/evaluator-quickstart.md
+- How to review: /docs/how-to-review.md
+- Example results: /docs/example-results.md
+- First-user readiness: /docs/first-user-readiness.md
 - POC truth pass: /docs/poc-truth.md
 - API examples: /docs/api-examples.md
 - Safety and trust: /docs/safety-and-trust.md

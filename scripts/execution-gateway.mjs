@@ -100,6 +100,15 @@ async function fetchJson(baseUrl, routePath, options = {}) {
   };
 }
 
+async function fetchText(baseUrl, routePath, options = {}) {
+  const response = await fetch(new URL(routePath, baseUrl), options);
+  return {
+    status: response.status,
+    text: await response.text(),
+    headers: Object.fromEntries(response.headers.entries()),
+  };
+}
+
 async function runHostedSmoke({ baseUrl }) {
   const safeRequest = {
     request_id: 'smoke-safe-public-route',
@@ -153,6 +162,15 @@ async function runHostedSmoke({ baseUrl }) {
     'x-ratelimit-remaining',
     'x-ratelimit-reset',
   ].every((header) => Boolean(health.headers?.[header])), health.headers);
+
+  const homepage = await fetchText(baseUrl, '/');
+  addCheck('homepage_first_user_demo_available', homepage.status === 200
+    && homepage.text.includes('Find the execution path before an agent runs.')
+    && homepage.text.includes('Use public path')
+    && homepage.text.includes('Use or build')
+    && homepage.text.includes('Block risky work')
+    && homepage.text.includes('Decision memo')
+    && !homepage.text.includes('Product Delivery Contract'), { status: homepage.status });
 
   const ready = await fetchJson(baseUrl, '/v0/ready');
   addCheck('readiness_public_demo_not_customer_ready', ready.status === 200

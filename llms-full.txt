@@ -6,7 +6,7 @@ Bean Execution Gateway is a route-decision layer for agents. It accepts an outco
 
 The POC demonstrates the control plane for source-agnostic agent execution. Demand may come from GitHub, chat, browser agents, workflow runners, app wrappers, or internal automation. Supply may eventually include owned agents, local runners, workflow tools, and external supplier networks. V0 does not call external suppliers.
 
-The clearest positioning is: gateway to the right agent path. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, or a build decision before anyone pays for compute.
+The clearest positioning is: gateway to the right execution path. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, a build decision, or a blocked path before anyone pays for compute.
 
 ## Current Capabilities
 
@@ -33,6 +33,7 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 - V1 local-contract control plane for the 80-goal checklist, tenant contracts, context envelopes, supplier bid scoring, acceptance records, payment quote gates, abuse cases, audit summaries, and replay metrics.
 - V2 product-delivery control plane for the 120-goal full-product checklist, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, operations, quality, commercial, and go-to-market packets.
 - Public beta readiness packet for trusted external review, including positioning, onboarding, feedback templates, support operations, learning metrics, and Stephen-only decision gates before invites or public posts.
+- First-user readiness packet for trusted beta review, including a guided public demo, decision memo output, evaluator quickstart, review guide, example results, and a 100-goal first-user readiness map.
 
 ## Path Scores
 
@@ -109,6 +110,18 @@ Private/customer/paid product traffic is also not ready. `/v0/v2/readiness` repo
 The public beta packet is prepared but not launched. Use `docs/public-beta-readiness.md` as the source of truth for the 80-item beta readiness map. Use `docs/public-beta-onboarding.md` for the first-user script, `docs/public-beta-positioning.md` for safe and forbidden claims, `docs/public-beta-feedback-and-support.md` for GitHub Issues and metadata-only feedback handling, and `docs/public-beta-decision-packet.md` for Stephen approvals.
 
 Agents should not invite users, post publicly, submit issues on behalf of users, add paid services, collect private contact data, or claim marketplace readiness without explicit operator approval.
+
+## First-User Packet
+
+The first-user packet is complete for trusted beta review. Use `docs/evaluator-quickstart.md` for the fastest evaluator path, `docs/how-to-review.md` for review questions, `docs/example-results.md` for expected guided route outputs, and `docs/first-user-readiness.md` for the 100-goal completion map.
+
+The public demo should be evaluated through the guided routes first:
+
+- Use public path.
+- Use or build.
+- Block risky work.
+
+The expected first result is a decision memo, not raw JSON. It should expose the recommended path, alternatives, scores, blocked actions, proof packet, and next human approval gate.
 
 ## Best Next Work
 
