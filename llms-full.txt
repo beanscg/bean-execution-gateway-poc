@@ -31,6 +31,7 @@ The clearest positioning is: gateway to the right agent path. A requester asks f
 - Public proof runner for fixture and public GitHub sources with hosted-demo clone disabled.
 - Source modes for public benchmark, public research, read-only bounty fit, non-code fixtures, GitHub discussion fixtures, and read-only live GitHub issue search.
 - V1 local-contract control plane for the 80-goal checklist, tenant contracts, context envelopes, supplier bid scoring, acceptance records, payment quote gates, abuse cases, audit summaries, and replay metrics.
+- V2 product-delivery control plane for the 120-goal full-product checklist, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, operations, quality, commercial, and go-to-market packets.
 
 ## Path Scores
 
@@ -62,6 +63,20 @@ The `/v0/v1/*` endpoints are public-demo contracts, not production rails. They p
 
 `GET /v0/v1/goals` returns 80 total goals and 80 completed local-contract goals. `GET /v0/v1/readiness` still returns customer/paid readiness as false.
 
+## V2 Product Contracts
+
+The `/v0/v2/*` endpoints represent the full delivered-product checklist as public-learning contracts. They prove the shape of:
+
+- Public learning loop, demand intake, routing engine, supply layer, execution boundary, acceptance/payment, trust/safety, product surface, operations, quality system, legal/commercial, and go-to-market readiness.
+- Outcome intake that hashes context refs and does not store raw goal text.
+- Route decisions across owned agent, public path, build decision, and blocked external supplier classes.
+- Supply bids that record capability metadata but block external, paid, or non-public bids.
+- Execution plans that remain dry-run or human-approval only.
+- Acceptance and payment records that block payment transfer.
+- Metadata-only feedback that rejects free-text fields.
+
+`GET /v0/v2/goals` returns 120 total goals and 120 completed public-demo contract goals. `GET /v0/v2/readiness` still returns private/customer/paid readiness as false.
+
 ## Safety Contract
 
 - Missing policy defaults to approval required.
@@ -71,6 +86,7 @@ The `/v0/v1/*` endpoints are public-demo contracts, not production rails. They p
 - Dispatch is disabled in V0.
 - Metrics are metadata-only and do not expose request bodies.
 - Feedback is metadata-only and rejects free text fields.
+- V2 feedback is metadata-only and rejects raw prompt, comment, note, message, email, and other free-text fields.
 - Route decisions are not permission for external actions.
 - Hosted demo does not persist request bodies.
 
@@ -85,6 +101,7 @@ The `/v0/v1/*` endpoints are public-demo contracts, not production rails. They p
 - Public posting or account mutation.
 - External execution.
 Customer traffic is also not ready. `/v0/ready` reports `production_ready: false` until authenticated tenants, durable audit logs, payment/cost controls, supplier trust, and private-context handling exist.
+Private/customer/paid product traffic is also not ready. `/v0/v2/readiness` reports `ok_for_private_customer_or_paid_traffic: false` until durable learning storage, real auth, private context, supplier execution, payment rails, legal approvals, and production operations exist.
 
 ## Best Next Work
 

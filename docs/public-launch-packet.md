@@ -16,6 +16,8 @@ Bean Execution Gateway is a gateway to the right agent path. A requester gives a
 - Open-demand scan over fixture or read-only public GitHub signals.
 - Local packet and static verifier loop.
 - Metadata-only feedback loop.
+- V2 120-goal product-delivery contract map.
+- Public-learning intake and route decisions that do not store raw prompt text.
 
 ## Hero Metrics
 
@@ -35,6 +37,8 @@ These are proof signals only. They are not revenue, production SLA, or marketpla
 6. Run the verifier.
 7. Show that external submission remains gated.
 8. Record metadata-only feedback.
+9. Open `/v0/v2/goals` to show the full product map.
+10. Open `/v0/v2/readiness` to show the remaining private, paid, supplier, legal, and ops gates.
 
 ## Not Ready To Claim
 
@@ -45,6 +49,8 @@ These are proof signals only. They are not revenue, production SLA, or marketpla
 - Payment settlement.
 - Production audit retention.
 - Autonomous public posting or external task execution.
+- Durable hosted learning storage beyond in-process public-demo memory.
+- Legal/commercial marketplace readiness.
 
 ## Launch Stop Conditions
 

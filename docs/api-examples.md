@@ -250,6 +250,72 @@ Expected shape:
 }
 ```
 
+## V2 Product Goal Map
+
+```bash
+curl -s https://bean-execution-gateway-poc.onrender.com/v0/v2/goals
+```
+
+Expected shape:
+
+```json
+{
+  "schema_version": "bean.v2.product_goal_progress.v1",
+  "total_goals": 120,
+  "completed_contract_goals": 120,
+  "blocked_production_gates": [
+    "no_durable_hosted_learning_store",
+    "no_payment_rail_connected"
+  ]
+}
+```
+
+## V2 Outcome Intake And Route
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/v2/intake \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v2-intake-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "schema_version": "bean.v2.demand_intake.v1",
+  "demand": {
+    "raw_goal_stored": false,
+    "request_body_stored": false
+  },
+  "decision": {
+    "dispatch_performed": false,
+    "spend_usd": 0,
+    "external_supplier_execution": false
+  }
+}
+```
+
+## V2 Metadata-Only Feedback
+
+```bash
+curl -s -X POST https://bean-execution-gateway-poc.onrender.com/v0/v2/feedback \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v2-feedback-request.json
+```
+
+Expected shape:
+
+```json
+{
+  "accepted": true,
+  "feedback": {
+    "free_text_stored": false,
+    "request_body_stored": false,
+    "reason_code": "routed_to_useful_path"
+  }
+}
+```
+
 ## Public Research Scan
 
 ```bash

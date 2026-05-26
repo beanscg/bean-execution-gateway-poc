@@ -25,6 +25,10 @@ import {
 import {
   createV1ControlPlane,
 } from './v1-control-plane-lib.mjs';
+import {
+  ProductControlPlaneError,
+  createProductControlPlane,
+} from './v2-product-control-plane-lib.mjs';
 
 const API_VERSION = 'v0';
 const DEMO_ASSET_PATH = path.join(rootDir, 'assets', 'execution-gateway-demo', 'index.html');
@@ -217,6 +221,22 @@ function createMetrics() {
       audit_reports: 0,
       replay_reports: 0,
     },
+    v2_product: {
+      goals: 0,
+      readiness: 0,
+      demand_intake: 0,
+      routes: 0,
+      supply_bids: 0,
+      execution_plans: 0,
+      acceptances: 0,
+      feedback: 0,
+      trust_reviews: 0,
+      learning_reports: 0,
+      ops_reports: 0,
+      quality_reports: 0,
+      commercial_reports: 0,
+      gtm_packets: 0,
+    },
     body_too_large: 0,
     errors: 0,
   };
@@ -330,6 +350,10 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
   const v1ControlPlane = createV1ControlPlane({
     memoryOnly: hostedDemo,
     auditLogPath: hostedDemo ? undefined : path.join(path.dirname(ledgerPath), 'v1-audit.jsonl'),
+  });
+  const v2Product = createProductControlPlane({
+    memoryOnly: hostedDemo,
+    eventLogPath: hostedDemo ? undefined : path.join(path.dirname(ledgerPath), 'v2-product-events.jsonl'),
   });
   const rateLimiter = createRateLimiter({
     limitPerMinute: parsePositiveInteger(process.env.BEAN_GATEWAY_RATE_LIMIT_PER_MINUTE, DEFAULT_RATE_LIMIT_PER_MINUTE),
@@ -478,6 +502,11 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/v2/health') {
+        reply(200, v2Product.health());
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/v1/goals') {
         metrics.v1_control_plane.goals += 1;
         reply(200, v1ControlPlane.goals());
@@ -499,6 +528,48 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
       if (req.method === 'GET' && pathname === '/v1/replay') {
         metrics.v1_control_plane.replay_reports += 1;
         reply(200, v1ControlPlane.replay());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/goals') {
+        metrics.v2_product.goals += 1;
+        reply(200, v2Product.goals());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/readiness') {
+        metrics.v2_product.readiness += 1;
+        reply(200, v2Product.readiness());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/learning') {
+        metrics.v2_product.learning_reports += 1;
+        reply(200, v2Product.learningSummary());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/ops') {
+        metrics.v2_product.ops_reports += 1;
+        reply(200, v2Product.opsSummary());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/quality') {
+        metrics.v2_product.quality_reports += 1;
+        reply(200, v2Product.qualitySummary());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/commercial') {
+        metrics.v2_product.commercial_reports += 1;
+        reply(200, v2Product.commercialSummary());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/v2/gtm') {
+        metrics.v2_product.gtm_packets += 1;
+        reply(200, v2Product.gtmPacket());
         return;
       }
 
@@ -643,6 +714,85 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
         }
         metrics.v1_control_plane.abuse_cases += 1;
         reply(201, v1ControlPlane.createAbuseCase(body));
+        return;
+      }
+
+      if (req.method === 'POST' && (pathname === '/v2/intake' || pathname === '/v2/route')) {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.demand_intake += 1;
+        metrics.v2_product.routes += 1;
+        reply(201, v2Product.submitOutcome(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v2/supply/bids') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.supply_bids += 1;
+        reply(201, v2Product.submitSupplyBid(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v2/execution/plans') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.execution_plans += 1;
+        reply(201, v2Product.createExecutionPlan(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v2/acceptance') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.acceptances += 1;
+        reply(201, v2Product.recordAcceptance(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v2/feedback') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.feedback += 1;
+        reply(201, v2Product.recordFeedback(body));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/v2/trust/review') {
+        const body = await readJsonBody(req);
+        const hostedRejectReason = hostedDemo ? rejectHostedDemoInput(body) : null;
+        if (hostedRejectReason) {
+          metrics.hosted_rejections += 1;
+          reply(400, { ok: false, hosted_demo: true, error: hostedRejectReason, warning: HOSTED_DEMO_WARNING });
+          return;
+        }
+        metrics.v2_product.trust_reviews += 1;
+        reply(201, v2Product.trustReview(body));
         return;
       }
 
@@ -802,6 +952,13 @@ function makeServer({ routeOutDir, ledgerPath, registryPath, hostedDemo = false 
     } catch (error) {
       metrics.errors += 1;
       if (error instanceof OpenDemandError) {
+        reply(error.statusCode || 400, {
+          ok: false,
+          error: error.message,
+        });
+        return;
+      }
+      if (error instanceof ProductControlPlaneError) {
         reply(error.statusCode || 400, {
           ok: false,
           error: error.message,

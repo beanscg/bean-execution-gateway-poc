@@ -630,6 +630,113 @@ export function buildOpenApiSpec() {
       responses: { 200: { description: 'Replay metrics' } },
     },
   };
+  const v2HealthPath = {
+    get: {
+      operationId: 'getV2ProductHealth',
+      summary: 'V2 product control-plane health',
+      description: 'Reports the full-product contract surface. No paid, private, customer, or external-supplier execution is enabled.',
+      responses: { 200: { description: 'V2 product health' } },
+    },
+  };
+  const v2GoalsPath = {
+    get: {
+      operationId: 'getV2ProductGoals',
+      summary: 'Get the full product-delivery goal map',
+      description: 'Returns 120 product goals implemented as public-demo contracts, plus the production gates that remain blocked.',
+      responses: { 200: { description: 'V2 product goal map' } },
+    },
+  };
+  const v2ReadinessPath = {
+    get: {
+      operationId: 'getV2ProductReadiness',
+      summary: 'Get full-product readiness',
+      description: 'Separates public learning traffic readiness from private/customer/paid production readiness.',
+      responses: { 200: { description: 'V2 readiness report' } },
+    },
+  };
+  const v2IntakePath = {
+    post: {
+      operationId: 'postV2OutcomeIntake',
+      summary: 'Submit an outcome and get a metadata-only route decision',
+      description: 'Hashes public refs, stores no raw prompt, and returns owned-agent, public-path, build-decision, or blocked external-supplier paths.',
+      responses: { 201: { description: 'Demand intake and route decision' } },
+    },
+  };
+  const v2SupplyBidPath = {
+    post: {
+      operationId: 'postV2SupplyBid',
+      summary: 'Record a supply bid without executing it',
+      description: 'Records supplier capability metadata and blocks external, paid, or non-public bids from selection.',
+      responses: { 201: { description: 'Supply bid contract' } },
+    },
+  };
+  const v2ExecutionPlanPath = {
+    post: {
+      operationId: 'postV2ExecutionPlan',
+      summary: 'Create a dry-run execution plan',
+      description: 'Creates a local proof or human-approval execution plan without dispatching work.',
+      responses: { 201: { description: 'Execution plan contract' } },
+    },
+  };
+  const v2AcceptancePath = {
+    post: {
+      operationId: 'postV2Acceptance',
+      summary: 'Record acceptance and payment state',
+      description: 'Records verifier/acceptance metadata and blocks all nonzero payment until a real payment rail is approved.',
+      responses: { 201: { description: 'Acceptance and payment contract' } },
+    },
+  };
+  const v2FeedbackPath = {
+    post: {
+      operationId: 'postV2LearningFeedback',
+      summary: 'Record metadata-only product feedback',
+      description: 'Accepts enumerated fields only; free text, raw prompts, emails, private context, and request bodies are not stored.',
+      responses: { 201: { description: 'Metadata-only learning feedback' } },
+    },
+  };
+  const v2TrustReviewPath = {
+    post: {
+      operationId: 'postV2TrustReview',
+      summary: 'Run a metadata-only trust review',
+      description: 'Classifies public/private risk and reports which trust gates remain contract-only or blocked.',
+      responses: { 201: { description: 'Trust review contract' } },
+    },
+  };
+  const v2LearningPath = {
+    get: {
+      operationId: 'getV2LearningSummary',
+      summary: 'Summarize V2 public-learning records',
+      responses: { 200: { description: 'Public-learning summary' } },
+    },
+  };
+  const v2OpsPath = {
+    get: {
+      operationId: 'getV2OpsSummary',
+      summary: 'Summarize operations readiness',
+      responses: { 200: { description: 'Operations readiness' } },
+    },
+  };
+  const v2QualityPath = {
+    get: {
+      operationId: 'getV2QualitySummary',
+      summary: 'Summarize quality-system readiness',
+      responses: { 200: { description: 'Quality-system readiness' } },
+    },
+  };
+  const v2CommercialPath = {
+    get: {
+      operationId: 'getV2CommercialSummary',
+      summary: 'Summarize legal and commercial readiness',
+      responses: { 200: { description: 'Legal/commercial readiness' } },
+    },
+  };
+  const v2GtmPath = {
+    get: {
+      operationId: 'getV2GtmPacket',
+      summary: 'Get go-to-market packet',
+      responses: { 200: { description: 'GTM packet' } },
+    },
+  };
   const feedbackPath = {
     post: {
       operationId: 'postFeedbackV0',
@@ -717,6 +824,21 @@ export function buildOpenApiSpec() {
       '/v0/v1/abuse/cases': v1AbuseCasePath,
       '/v0/v1/audit': v1AuditPath,
       '/v0/v1/replay': v1ReplayPath,
+      '/v0/v2/health': v2HealthPath,
+      '/v0/v2/goals': v2GoalsPath,
+      '/v0/v2/readiness': v2ReadinessPath,
+      '/v0/v2/intake': v2IntakePath,
+      '/v0/v2/route': v2IntakePath,
+      '/v0/v2/supply/bids': v2SupplyBidPath,
+      '/v0/v2/execution/plans': v2ExecutionPlanPath,
+      '/v0/v2/acceptance': v2AcceptancePath,
+      '/v0/v2/feedback': v2FeedbackPath,
+      '/v0/v2/trust/review': v2TrustReviewPath,
+      '/v0/v2/learning': v2LearningPath,
+      '/v0/v2/ops': v2OpsPath,
+      '/v0/v2/quality': v2QualityPath,
+      '/v0/v2/commercial': v2CommercialPath,
+      '/v0/v2/gtm': v2GtmPath,
       '/health': healthPath,
       '/ready': readyPath,
       '/metrics': metricsPath,
@@ -750,6 +872,21 @@ export function buildOpenApiSpec() {
       '/v1/abuse/cases': v1AbuseCasePath,
       '/v1/audit': v1AuditPath,
       '/v1/replay': v1ReplayPath,
+      '/v2/health': v2HealthPath,
+      '/v2/goals': v2GoalsPath,
+      '/v2/readiness': v2ReadinessPath,
+      '/v2/intake': v2IntakePath,
+      '/v2/route': v2IntakePath,
+      '/v2/supply/bids': v2SupplyBidPath,
+      '/v2/execution/plans': v2ExecutionPlanPath,
+      '/v2/acceptance': v2AcceptancePath,
+      '/v2/feedback': v2FeedbackPath,
+      '/v2/trust/review': v2TrustReviewPath,
+      '/v2/learning': v2LearningPath,
+      '/v2/ops': v2OpsPath,
+      '/v2/quality': v2QualityPath,
+      '/v2/commercial': v2CommercialPath,
+      '/v2/gtm': v2GtmPath,
     },
     components: {
       schemas: {
@@ -945,6 +1082,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'scripts/open-demand-lib.mjs',
     'scripts/open-demand-proof-runner.mjs',
     'scripts/v1-control-plane-lib.mjs',
+    'scripts/v2-product-control-plane-lib.mjs',
     'scripts/work-network-lib.mjs',
     'render.yaml',
     'schemas/execution-gateway/local-api.openapi.json',
@@ -988,6 +1126,7 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'docs/path-api-and-scoring.md',
     'docs/v1-product-goals.md',
     'docs/v1-local-contract-completion.md',
+    'docs/v2-product-delivery-goals.md',
     'adapters/execution-gateway/mcp-adapter.stub.md',
     'adapters/execution-gateway/github-app-adapter.stub.md',
     'adapters/execution-gateway/slack-app-adapter.stub.md',
@@ -1006,6 +1145,11 @@ export function buildLocalPackage({ outDir, generatedAt = new Date().toISOString
     'examples/execution-gateway/v1-supplier-bid-request.json',
     'examples/execution-gateway/v1-payment-quote-request.json',
     'examples/execution-gateway/v1-abuse-case-request.json',
+    'examples/execution-gateway/v2-intake-request.json',
+    'examples/execution-gateway/v2-supply-bid-request.json',
+    'examples/execution-gateway/v2-feedback-request.json',
+    'examples/execution-gateway/v2-acceptance-request.json',
+    'examples/execution-gateway/v2-trust-review-request.json',
     'examples/execution-gateway/agent-path-build-vs-use-request.json',
     'examples/execution-gateway/non-code-public-benchmark-request.json',
     'examples/execution-gateway/outcome-record.json',
@@ -1099,6 +1243,8 @@ Render POC constraints:
 - Stop if the platform asks for a paid plan, payment method, private data, private repo access, or broader account permissions.
 - /v0/ready reports public-demo readiness only; production/customer traffic stays blocked.
 - /v0/dispatch is intentionally disabled in V0.
+- /v0/v2/goals reports the 120-goal full-product public contract map.
+- /v0/v2/readiness reports public-learning readiness only; private/customer/paid traffic stays blocked.
 `);
   manifestFiles.push(readmePath);
   return buildArtifactManifest({ outDir, files: manifestFiles, generatedAt, relativePaths: true });

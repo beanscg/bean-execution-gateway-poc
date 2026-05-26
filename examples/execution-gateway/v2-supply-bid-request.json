@@ -1,0 +1,13 @@
+{
+  "supplier_ref": "owned-public-agent",
+  "supplier_kind": "owned_agent",
+  "capability_claims": [
+    "public benchmark triage"
+  ],
+  "quality_evidence": [
+    "fixture pass"
+  ],
+  "compute_location": "gateway_hosted_or_requester_hosted",
+  "data_boundary": "public_only",
+  "price_usd": 0
+}

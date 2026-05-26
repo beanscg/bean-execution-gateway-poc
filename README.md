@@ -12,6 +12,7 @@ Current proof metrics:
 - Time to ranked paths: wall-clock time from demand scan to ranked agent paths.
 - Unsafe actions prevented: spend, private-data, account, public-write, and external-submission gates stopped before execution.
 - V1 local-contract completion: 80/80 product gates have public-demo contracts, with production blockers still explicit.
+- V2 product-delivery completion: 120/120 full-product goals have public-demo contracts, with production blockers still explicit.
 
 ## What It Does Now
 
@@ -26,6 +27,7 @@ Current proof metrics:
 - Accepts metadata-only route feedback through `/v0/feedback` and `/v0/open-demand/feedback`.
 - Exposes readiness, metadata-only metrics, security headers, and rate-limit headers.
 - Exposes V1 local-contract control-plane endpoints for tenant scope, context envelopes, supplier bids, outcome acceptance, payment quotes, abuse cases, audit summaries, replay metrics, and the 80-goal checklist.
+- Exposes V2 product-delivery endpoints for the 120-goal product map, outcome intake, route decisions, supply bids, execution plans, acceptance/payment state, metadata-only feedback, trust reviews, learning summaries, ops, quality, commercial, and GTM readiness.
 - Hard-blocks executable dispatch through `/v0/dispatch`.
 - Ships with proof fixtures, adversarial fixtures, SDK stubs, adapter stubs, and a Render Free demo config.
 
@@ -37,6 +39,7 @@ Current proof metrics:
 - It does not make supplier bids selectable when they require external execution, non-public data, or nonzero payment.
 - It does not monetize routes or charge requesters.
 - It does not claim marketplace liquidity. The supplier network is represented only as a blocked future class.
+- It does not make the 120 V2 product contracts equivalent to a paid/private/customer production launch.
 
 ## Quickstart
 
@@ -68,9 +71,19 @@ curl -s http://127.0.0.1:8787/v0/v1/goals
 curl -s http://127.0.0.1:8787/v0/v1/readiness
 curl -s http://127.0.0.1:8787/v0/v1/audit
 curl -s http://127.0.0.1:8787/v0/v1/replay
+curl -s http://127.0.0.1:8787/v0/v2/goals
+curl -s http://127.0.0.1:8787/v0/v2/readiness
+curl -s http://127.0.0.1:8787/v0/v2/learning
+curl -s http://127.0.0.1:8787/v0/v2/gtm
 curl -s -X POST http://127.0.0.1:8787/v0/path \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/open-demand-path-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/v2/intake \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v2-intake-request.json
+curl -s -X POST http://127.0.0.1:8787/v0/v2/feedback \
+  -H 'content-type: application/json' \
+  --data @examples/execution-gateway/v2-feedback-request.json
 curl -s -X POST http://127.0.0.1:8787/v0/open-demand/scan \
   -H 'content-type: application/json' \
   --data @examples/execution-gateway/open-demand-scan-request.json
@@ -105,7 +118,7 @@ BEAN_GATEWAY_BASE_URL=http://127.0.0.1:8787 npm run gateway:smoke:hosted
 
 The verification suite checks proof tasks, adversarial policy fixtures, schema self-tests, registry lint, open-demand guardrails, zero spend, zero external writes, and zero external executions.
 
-The hosted smoke suite also checks security headers, rate-limit headers, `/v0/ready`, `/v0/metrics`, disabled dispatch, hosted private-input rejection, and memory-only hosted outcomes.
+The hosted smoke suite also checks security headers, rate-limit headers, `/v0/ready`, `/v0/metrics`, disabled dispatch, hosted private-input rejection, memory-only hosted outcomes, V1 contracts, and the V2 product-delivery contracts.
 
 ## Public Demo Boundary
 
@@ -125,6 +138,7 @@ Hosted demo input scope:
 - Runtime rate limiting is on by default.
 - Security headers are emitted on API and demo responses.
 - `/v0/ready` intentionally reports `production_ready: false`.
+- `/v0/v2/readiness` intentionally reports `ok_for_private_customer_or_paid_traffic: false`.
 
 ## Docs
 
@@ -143,4 +157,5 @@ Hosted demo input scope:
 - [Path API and scoring](docs/path-api-and-scoring.md)
 - [V1 product goals](docs/v1-product-goals.md)
 - [V1 local-contract completion](docs/v1-local-contract-completion.md)
+- [V2 product delivery goals](docs/v2-product-delivery-goals.md)
 - [Public demo terms](TERMS.md)

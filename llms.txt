@@ -10,6 +10,7 @@ Primary positioning:
 - The requester gives an outcome; BEAN returns a safe executable path before spend.
 - V0 proves route decisions, public-demand scanning, local proof packets, and stop conditions.
 - V1 contracts prove the product shape for 80 local-contract goals without turning on paid, private, customer, or external-supplier execution.
+- V2 contracts cover the full 120-goal delivered-product checklist without turning on paid, private, customer, legal, or external-supplier execution.
 
 Primary docs:
 
@@ -18,6 +19,7 @@ Primary docs:
 - API examples: /docs/api-examples.md
 - Safety and trust: /docs/safety-and-trust.md
 - V1 readiness: /docs/v1-readiness.md
+- V2 product delivery goals: /docs/v2-product-delivery-goals.md
 - Capability manifest: /capability-manifest.json
 - Agent instructions: /AGENTS.md
 
@@ -47,6 +49,20 @@ API:
 - POST /v0/v1/abuse/cases
 - GET /v0/v1/audit
 - GET /v0/v1/replay
+- GET /v0/v2/goals
+- GET /v0/v2/readiness
+- POST /v0/v2/intake
+- POST /v0/v2/route
+- POST /v0/v2/supply/bids
+- POST /v0/v2/execution/plans
+- POST /v0/v2/acceptance
+- POST /v0/v2/feedback
+- POST /v0/v2/trust/review
+- GET /v0/v2/learning
+- GET /v0/v2/ops
+- GET /v0/v2/quality
+- GET /v0/v2/commercial
+- GET /v0/v2/gtm
 - POST /v0/open-demand/path
 - POST /v0/open-demand/scan
 - POST /v0/open-demand/opportunities/{opportunity_id}/bundle
@@ -66,3 +82,4 @@ Boundaries:
 - No request-body persistence in hosted demo.
 - No secrets, private context, customer data, local files, or regulated data.
 - V1 supplier bids are contract evaluations only; external or paid suppliers are not selectable.
+- V2 product contracts are public-learning contracts only; private/customer/paid production remains blocked.

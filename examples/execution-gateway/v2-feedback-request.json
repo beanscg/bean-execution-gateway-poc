@@ -1,0 +1,9 @@
+{
+  "target_type": "route_decision",
+  "target_id": "route_public_demo",
+  "helpful": true,
+  "route_useful": true,
+  "reason_code": "routed_to_useful_path",
+  "chosen_route": "owned_agent_local_proof",
+  "latency_bucket": "under_30s"
+}

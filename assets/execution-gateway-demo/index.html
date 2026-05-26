@@ -427,6 +427,20 @@
     <section class="open-demand">
       <div class="open-demand-head">
         <div>
+          <h2>Product Delivery Contract</h2>
+          <p>Inspect the full product map, public-learning readiness, and the gates still blocking private, paid, customer, and supplier traffic.</p>
+        </div>
+        <div class="open-demand-controls">
+          <button id="productRefresh">Refresh</button>
+        </div>
+      </div>
+      <div class="open-demand-metrics" id="productMetrics"></div>
+      <div class="open-demand-status" id="productStatus">Loading product contract</div>
+    </section>
+
+    <section class="open-demand">
+      <div class="open-demand-head">
+        <div>
           <h2>Open Demand Prototype</h2>
           <p>Scan public work signals, rank agent-solvable tasks, and build local evidence packets.</p>
         </div>
@@ -542,6 +556,9 @@
     const heroMetrics = document.querySelector('#heroMetrics');
     const proofExamples = document.querySelector('#proofExamples');
     const routeFeedbackStatus = document.querySelector('#routeFeedbackStatus');
+    const productRefresh = document.querySelector('#productRefresh');
+    const productMetrics = document.querySelector('#productMetrics');
+    const productStatus = document.querySelector('#productStatus');
     let openDemand = null;
     let examples = [];
     let selectedOpportunityId = '';
@@ -673,6 +690,31 @@
         ['Time to ranked paths', time],
         ['Unsafe actions prevented', metrics.unsafe_actions_prevented ?? '-'],
       ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
+    }
+
+    async function loadProductStatus() {
+      productRefresh.disabled = true;
+      productStatus.textContent = 'Loading product contract...';
+      try {
+        const [goals, readiness, learning, gtm] = await Promise.all([
+          fetch(`${apiRoot}/v0/v2/goals`).then((response) => response.json()),
+          fetch(`${apiRoot}/v0/v2/readiness`).then((response) => response.json()),
+          fetch(`${apiRoot}/v0/v2/learning`).then((response) => response.json()),
+          fetch(`${apiRoot}/v0/v2/gtm`).then((response) => response.json())
+        ]);
+        productMetrics.innerHTML = [
+          ['Contract goals', `${goals.completed_contract_goals ?? 0}/${goals.total_goals ?? 0}`],
+          ['Public learning', readiness.ok_for_public_learning_traffic ? 'ready' : 'blocked'],
+          ['Private/paid traffic', readiness.ok_for_private_customer_or_paid_traffic ? 'ready' : 'blocked'],
+          ['Learning records', learning.records?.events ?? 0],
+          ['Launch copy', gtm.launch_copy_status || 'draft required'],
+        ].map(([label, value]) => `<div><strong>${escapeHtml(label)}</strong><span>${escapeHtml(value)}</span></div>`).join('');
+        productStatus.textContent = `Production blockers: ${(readiness.product_blockers || []).join(', ')}`;
+      } catch (error) {
+        productStatus.textContent = error.message;
+      } finally {
+        productRefresh.disabled = false;
+      }
     }
 
     function renderExamples() {
@@ -829,6 +871,7 @@
     document.querySelector('#blocked').addEventListener('click', () => loadSample(blockedSample));
     document.querySelector('#privateReject').addEventListener('click', () => loadSample(privateRejectSample));
     routeButton.addEventListener('click', routeRequest);
+    productRefresh.addEventListener('click', loadProductStatus);
     openDemandScan.addEventListener('click', scanOpenDemand);
     openDemandOpportunities.addEventListener('click', (event) => {
       const card = event.target.closest('[data-opportunity-id]');
@@ -894,6 +937,7 @@
     refreshHealth();
     loadExamples();
     loadOpenDemandLatest();
+    loadProductStatus();
   </script>
 </body>
 </html>

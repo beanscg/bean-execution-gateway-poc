@@ -1,0 +1,9 @@
+{
+  "outcome": {
+    "goal": "Find the safest zero-spend execution path for this public benchmark task.",
+    "task_type": "agent_task_triage"
+  },
+  "context_refs": [
+    "https://github.com/example/project/issues/222"
+  ]
+}

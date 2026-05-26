@@ -169,7 +169,10 @@ async function runHostedSmoke({ baseUrl }) {
     && Boolean(openapi.payload?.paths?.['/v0/ready'])
     && Boolean(openapi.payload?.paths?.['/v0/dispatch'])
     && Boolean(openapi.payload?.paths?.['/v0/v1/goals'])
-    && Boolean(openapi.payload?.paths?.['/v0/v1/supplier-bids']), { status: openapi.status });
+    && Boolean(openapi.payload?.paths?.['/v0/v1/supplier-bids'])
+    && Boolean(openapi.payload?.paths?.['/v0/v2/goals'])
+    && Boolean(openapi.payload?.paths?.['/v0/v2/intake'])
+    && Boolean(openapi.payload?.paths?.['/v0/v2/feedback']), { status: openapi.status });
 
   const pathDecision = await fetchJson(baseUrl, '/v0/path', {
     method: 'POST',
@@ -280,6 +283,130 @@ async function runHostedSmoke({ baseUrl }) {
   addCheck('v1_replay_metadata_only', v1Replay.status === 200
     && v1Replay.payload?.external_actions_performed === false
     && v1Replay.payload?.spend_usd === 0, v1Replay.payload);
+
+  const v2Goals = await fetchJson(baseUrl, '/v0/v2/goals');
+  addCheck('v2_full_product_goal_contract_complete', v2Goals.status === 200
+    && v2Goals.payload?.total_goals === 120
+    && v2Goals.payload?.completed_contract_goals === 120
+    && Array.isArray(v2Goals.payload?.blocked_production_gates), v2Goals.payload);
+
+  const v2Readiness = await fetchJson(baseUrl, '/v0/v2/readiness');
+  addCheck('v2_public_learning_ready_not_private_paid_ready', v2Readiness.status === 200
+    && v2Readiness.payload?.ok_for_public_learning_traffic === true
+    && v2Readiness.payload?.ok_for_private_customer_or_paid_traffic === false
+    && v2Readiness.payload?.guarantees?.request_body_stored === false, v2Readiness.payload);
+
+  const v2Route = await fetchJson(baseUrl, '/v0/v2/intake', {
+    method: 'POST',
+    body: JSON.stringify({
+      outcome: {
+        goal: 'Find the best zero-spend execution path for a public benchmark task.',
+        task_type: 'agent_task_triage',
+      },
+      context_refs: ['https://github.com/example/project/issues/222'],
+    }),
+  });
+  addCheck('v2_outcome_intake_routes_without_raw_prompt_storage', v2Route.status === 201
+    && v2Route.payload?.demand?.raw_goal_stored === false
+    && v2Route.payload?.decision?.dispatch_performed === false
+    && v2Route.payload?.decision?.spend_usd === 0
+    && v2Route.payload?.decision?.selected_path?.supplier_class, v2Route.payload);
+
+  const v2Supply = await fetchJson(baseUrl, '/v0/v2/supply/bids', {
+    method: 'POST',
+    body: JSON.stringify({
+      supplier_ref: 'owned-public-agent',
+      supplier_kind: 'owned_agent',
+      capability_claims: ['public benchmark triage'],
+      quality_evidence: ['fixture pass'],
+      compute_location: 'gateway_hosted_or_requester_hosted',
+      data_boundary: 'public_only',
+      price_usd: 0,
+    }),
+  });
+  addCheck('v2_supply_bid_records_claims_without_external_execution', v2Supply.status === 201
+    && v2Supply.payload?.selectable_now === true
+    && v2Supply.payload?.capability_hashes?.length === 1, v2Supply.payload);
+
+  const v2Execution = await fetchJson(baseUrl, '/v0/v2/execution/plans', {
+    method: 'POST',
+    body: JSON.stringify({
+      route_id: v2Route.payload?.decision?.route_id,
+      idempotency_key: 'hosted-smoke-v2',
+      timeout_seconds: 30,
+    }),
+  });
+  addCheck('v2_execution_plan_is_dry_run_only', v2Execution.status === 201
+    && v2Execution.payload?.dispatch_performed === false
+    && v2Execution.payload?.external_supplier_execution === false
+    && v2Execution.payload?.verifier_required_before_acceptance === true, v2Execution.payload);
+
+  const v2Acceptance = await fetchJson(baseUrl, '/v0/v2/acceptance', {
+    method: 'POST',
+    body: JSON.stringify({
+      outcome_ref: 'hosted-smoke-outcome',
+      verifier_result: 'passed',
+      acceptance_state: 'accepted',
+      requested_payable_usd: 7,
+    }),
+  });
+  addCheck('v2_acceptance_blocks_payment_transfer', v2Acceptance.status === 201
+    && v2Acceptance.payload?.requested_payable_usd === 7
+    && v2Acceptance.payload?.payable_usd === 0
+    && v2Acceptance.payload?.settlement_status === 'blocked_no_payment_rail', v2Acceptance.payload);
+
+  const v2Feedback = await fetchJson(baseUrl, '/v0/v2/feedback', {
+    method: 'POST',
+    body: JSON.stringify({
+      target_type: 'route_decision',
+      target_id: v2Route.payload?.decision?.route_id,
+      helpful: true,
+      route_useful: true,
+      reason_code: 'routed_to_useful_path',
+      chosen_route: v2Route.payload?.decision?.selected_path?.path_id,
+      latency_bucket: 'under_30s',
+    }),
+  });
+  addCheck('v2_feedback_metadata_only', v2Feedback.status === 201
+    && v2Feedback.payload?.accepted === true
+    && v2Feedback.payload?.feedback?.free_text_stored === false
+    && v2Feedback.payload?.feedback_summary?.total >= 1, v2Feedback.payload);
+
+  const v2Trust = await fetchJson(baseUrl, '/v0/v2/trust/review', {
+    method: 'POST',
+    body: JSON.stringify({
+      source: 'hosted-smoke',
+      data_boundary: 'public_only',
+    }),
+  });
+  addCheck('v2_trust_review_public_learning_only', v2Trust.status === 201
+    && v2Trust.payload?.allowed_for_public_learning === true
+    && v2Trust.payload?.allowed_for_private_customer_traffic === false, v2Trust.payload);
+
+  const v2Learning = await fetchJson(baseUrl, '/v0/v2/learning');
+  addCheck('v2_learning_summary_metadata_only', v2Learning.status === 200
+    && v2Learning.payload?.request_body_stored === false
+    && v2Learning.payload?.exportable_training_corpus === true
+    && v2Learning.payload?.records?.feedback >= 1, v2Learning.payload);
+
+  const v2Ops = await fetchJson(baseUrl, '/v0/v2/ops');
+  addCheck('v2_ops_exposes_remaining_durable_store_gap', v2Ops.status === 200
+    && v2Ops.payload?.spend_usd === 0
+    && ['blocked_in_hosted_demo', 'local_jsonl_only'].includes(v2Ops.payload?.durable_db_status), v2Ops.payload);
+
+  const v2Quality = await fetchJson(baseUrl, '/v0/v2/quality');
+  addCheck('v2_quality_system_contract_available', v2Quality.status === 200
+    && v2Quality.payload?.route_choice_regression_tests_status === 'node_test_contract', v2Quality.payload);
+
+  const v2Commercial = await fetchJson(baseUrl, '/v0/v2/commercial');
+  addCheck('v2_commercial_keeps_legal_payment_gates_blocked', v2Commercial.status === 200
+    && v2Commercial.payload?.payment_terms_status === 'not_ready_no_payment_rail'
+    && v2Commercial.payload?.supplier_terms_status === 'not_ready_requires_legal_review', v2Commercial.payload);
+
+  const v2Gtm = await fetchJson(baseUrl, '/v0/v2/gtm');
+  addCheck('v2_gtm_packet_available_without_public_post', v2Gtm.status === 200
+    && v2Gtm.payload?.launch_copy_status === 'draft_required_before_public_post'
+    && v2Gtm.payload?.feedback_collection_status === 'metadata_only_api_available', v2Gtm.payload);
 
   const safe = await fetchJson(baseUrl, '/v0/route', {
     method: 'POST',

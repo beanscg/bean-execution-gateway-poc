@@ -647,6 +647,181 @@
         }
       }
     },
+    "/v0/v2/health": {
+      "get": {
+        "operationId": "getV2ProductHealth",
+        "summary": "V2 product control-plane health",
+        "description": "Reports the full-product contract surface. No paid, private, customer, or external-supplier execution is enabled.",
+        "responses": {
+          "200": {
+            "description": "V2 product health"
+          }
+        }
+      }
+    },
+    "/v0/v2/goals": {
+      "get": {
+        "operationId": "getV2ProductGoals",
+        "summary": "Get the full product-delivery goal map",
+        "description": "Returns 120 product goals implemented as public-demo contracts, plus the production gates that remain blocked.",
+        "responses": {
+          "200": {
+            "description": "V2 product goal map"
+          }
+        }
+      }
+    },
+    "/v0/v2/readiness": {
+      "get": {
+        "operationId": "getV2ProductReadiness",
+        "summary": "Get full-product readiness",
+        "description": "Separates public learning traffic readiness from private/customer/paid production readiness.",
+        "responses": {
+          "200": {
+            "description": "V2 readiness report"
+          }
+        }
+      }
+    },
+    "/v0/v2/intake": {
+      "post": {
+        "operationId": "postV2OutcomeIntake",
+        "summary": "Submit an outcome and get a metadata-only route decision",
+        "description": "Hashes public refs, stores no raw prompt, and returns owned-agent, public-path, build-decision, or blocked external-supplier paths.",
+        "responses": {
+          "201": {
+            "description": "Demand intake and route decision"
+          }
+        }
+      }
+    },
+    "/v0/v2/route": {
+      "post": {
+        "operationId": "postV2OutcomeIntake",
+        "summary": "Submit an outcome and get a metadata-only route decision",
+        "description": "Hashes public refs, stores no raw prompt, and returns owned-agent, public-path, build-decision, or blocked external-supplier paths.",
+        "responses": {
+          "201": {
+            "description": "Demand intake and route decision"
+          }
+        }
+      }
+    },
+    "/v0/v2/supply/bids": {
+      "post": {
+        "operationId": "postV2SupplyBid",
+        "summary": "Record a supply bid without executing it",
+        "description": "Records supplier capability metadata and blocks external, paid, or non-public bids from selection.",
+        "responses": {
+          "201": {
+            "description": "Supply bid contract"
+          }
+        }
+      }
+    },
+    "/v0/v2/execution/plans": {
+      "post": {
+        "operationId": "postV2ExecutionPlan",
+        "summary": "Create a dry-run execution plan",
+        "description": "Creates a local proof or human-approval execution plan without dispatching work.",
+        "responses": {
+          "201": {
+            "description": "Execution plan contract"
+          }
+        }
+      }
+    },
+    "/v0/v2/acceptance": {
+      "post": {
+        "operationId": "postV2Acceptance",
+        "summary": "Record acceptance and payment state",
+        "description": "Records verifier/acceptance metadata and blocks all nonzero payment until a real payment rail is approved.",
+        "responses": {
+          "201": {
+            "description": "Acceptance and payment contract"
+          }
+        }
+      }
+    },
+    "/v0/v2/feedback": {
+      "post": {
+        "operationId": "postV2LearningFeedback",
+        "summary": "Record metadata-only product feedback",
+        "description": "Accepts enumerated fields only; free text, raw prompts, emails, private context, and request bodies are not stored.",
+        "responses": {
+          "201": {
+            "description": "Metadata-only learning feedback"
+          }
+        }
+      }
+    },
+    "/v0/v2/trust/review": {
+      "post": {
+        "operationId": "postV2TrustReview",
+        "summary": "Run a metadata-only trust review",
+        "description": "Classifies public/private risk and reports which trust gates remain contract-only or blocked.",
+        "responses": {
+          "201": {
+            "description": "Trust review contract"
+          }
+        }
+      }
+    },
+    "/v0/v2/learning": {
+      "get": {
+        "operationId": "getV2LearningSummary",
+        "summary": "Summarize V2 public-learning records",
+        "responses": {
+          "200": {
+            "description": "Public-learning summary"
+          }
+        }
+      }
+    },
+    "/v0/v2/ops": {
+      "get": {
+        "operationId": "getV2OpsSummary",
+        "summary": "Summarize operations readiness",
+        "responses": {
+          "200": {
+            "description": "Operations readiness"
+          }
+        }
+      }
+    },
+    "/v0/v2/quality": {
+      "get": {
+        "operationId": "getV2QualitySummary",
+        "summary": "Summarize quality-system readiness",
+        "responses": {
+          "200": {
+            "description": "Quality-system readiness"
+          }
+        }
+      }
+    },
+    "/v0/v2/commercial": {
+      "get": {
+        "operationId": "getV2CommercialSummary",
+        "summary": "Summarize legal and commercial readiness",
+        "responses": {
+          "200": {
+            "description": "Legal/commercial readiness"
+          }
+        }
+      }
+    },
+    "/v0/v2/gtm": {
+      "get": {
+        "operationId": "getV2GtmPacket",
+        "summary": "Get go-to-market packet",
+        "responses": {
+          "200": {
+            "description": "GTM packet"
+          }
+        }
+      }
+    },
     "/health": {
       "get": {
         "operationId": "getHealthV0",
@@ -1261,6 +1436,181 @@
         "responses": {
           "200": {
             "description": "Replay metrics"
+          }
+        }
+      }
+    },
+    "/v2/health": {
+      "get": {
+        "operationId": "getV2ProductHealth",
+        "summary": "V2 product control-plane health",
+        "description": "Reports the full-product contract surface. No paid, private, customer, or external-supplier execution is enabled.",
+        "responses": {
+          "200": {
+            "description": "V2 product health"
+          }
+        }
+      }
+    },
+    "/v2/goals": {
+      "get": {
+        "operationId": "getV2ProductGoals",
+        "summary": "Get the full product-delivery goal map",
+        "description": "Returns 120 product goals implemented as public-demo contracts, plus the production gates that remain blocked.",
+        "responses": {
+          "200": {
+            "description": "V2 product goal map"
+          }
+        }
+      }
+    },
+    "/v2/readiness": {
+      "get": {
+        "operationId": "getV2ProductReadiness",
+        "summary": "Get full-product readiness",
+        "description": "Separates public learning traffic readiness from private/customer/paid production readiness.",
+        "responses": {
+          "200": {
+            "description": "V2 readiness report"
+          }
+        }
+      }
+    },
+    "/v2/intake": {
+      "post": {
+        "operationId": "postV2OutcomeIntake",
+        "summary": "Submit an outcome and get a metadata-only route decision",
+        "description": "Hashes public refs, stores no raw prompt, and returns owned-agent, public-path, build-decision, or blocked external-supplier paths.",
+        "responses": {
+          "201": {
+            "description": "Demand intake and route decision"
+          }
+        }
+      }
+    },
+    "/v2/route": {
+      "post": {
+        "operationId": "postV2OutcomeIntake",
+        "summary": "Submit an outcome and get a metadata-only route decision",
+        "description": "Hashes public refs, stores no raw prompt, and returns owned-agent, public-path, build-decision, or blocked external-supplier paths.",
+        "responses": {
+          "201": {
+            "description": "Demand intake and route decision"
+          }
+        }
+      }
+    },
+    "/v2/supply/bids": {
+      "post": {
+        "operationId": "postV2SupplyBid",
+        "summary": "Record a supply bid without executing it",
+        "description": "Records supplier capability metadata and blocks external, paid, or non-public bids from selection.",
+        "responses": {
+          "201": {
+            "description": "Supply bid contract"
+          }
+        }
+      }
+    },
+    "/v2/execution/plans": {
+      "post": {
+        "operationId": "postV2ExecutionPlan",
+        "summary": "Create a dry-run execution plan",
+        "description": "Creates a local proof or human-approval execution plan without dispatching work.",
+        "responses": {
+          "201": {
+            "description": "Execution plan contract"
+          }
+        }
+      }
+    },
+    "/v2/acceptance": {
+      "post": {
+        "operationId": "postV2Acceptance",
+        "summary": "Record acceptance and payment state",
+        "description": "Records verifier/acceptance metadata and blocks all nonzero payment until a real payment rail is approved.",
+        "responses": {
+          "201": {
+            "description": "Acceptance and payment contract"
+          }
+        }
+      }
+    },
+    "/v2/feedback": {
+      "post": {
+        "operationId": "postV2LearningFeedback",
+        "summary": "Record metadata-only product feedback",
+        "description": "Accepts enumerated fields only; free text, raw prompts, emails, private context, and request bodies are not stored.",
+        "responses": {
+          "201": {
+            "description": "Metadata-only learning feedback"
+          }
+        }
+      }
+    },
+    "/v2/trust/review": {
+      "post": {
+        "operationId": "postV2TrustReview",
+        "summary": "Run a metadata-only trust review",
+        "description": "Classifies public/private risk and reports which trust gates remain contract-only or blocked.",
+        "responses": {
+          "201": {
+            "description": "Trust review contract"
+          }
+        }
+      }
+    },
+    "/v2/learning": {
+      "get": {
+        "operationId": "getV2LearningSummary",
+        "summary": "Summarize V2 public-learning records",
+        "responses": {
+          "200": {
+            "description": "Public-learning summary"
+          }
+        }
+      }
+    },
+    "/v2/ops": {
+      "get": {
+        "operationId": "getV2OpsSummary",
+        "summary": "Summarize operations readiness",
+        "responses": {
+          "200": {
+            "description": "Operations readiness"
+          }
+        }
+      }
+    },
+    "/v2/quality": {
+      "get": {
+        "operationId": "getV2QualitySummary",
+        "summary": "Summarize quality-system readiness",
+        "responses": {
+          "200": {
+            "description": "Quality-system readiness"
+          }
+        }
+      }
+    },
+    "/v2/commercial": {
+      "get": {
+        "operationId": "getV2CommercialSummary",
+        "summary": "Summarize legal and commercial readiness",
+        "responses": {
+          "200": {
+            "description": "Legal/commercial readiness"
+          }
+        }
+      }
+    },
+    "/v2/gtm": {
+      "get": {
+        "operationId": "getV2GtmPacket",
+        "summary": "Get go-to-market packet",
+        "responses": {
+          "200": {
+            "description": "GTM packet"
           }
         }
       }
