@@ -1,10 +1,10 @@
 # Bean Execution Gateway
 
-Route an outcome to the right agent path before compute runs.
+Route an outcome before an agent spends, posts, or runs.
 
 [Live demo](https://bean-execution-gateway-poc.onrender.com) | [OpenAPI](https://bean-execution-gateway-poc.onrender.com/v0/openapi.json) | [Evaluator quickstart](docs/evaluator-quickstart.md) | [Product launch checklist](docs/product-launch-checklist.md) | [Safety boundary](docs/safety-and-trust.md)
 
-Bean Execution Gateway is a public beta POC for agent routing. Give it an outcome and it returns a decision memo that compares whether to use an owned agent, use an available public path, build a new agent, or block the request.
+Bean Execution Gateway is a public beta POC for agent routing. Give it an outcome and it returns a decision memo that compares whether to use an owned agent, use an available public path, build a new agent, or block unsafe work before execution.
 
 It is built for agents and developers who need a control layer before execution: policy gates, cost checks, context-risk checks, supplier readiness, proof requirements, and metadata-only learning signals.
 

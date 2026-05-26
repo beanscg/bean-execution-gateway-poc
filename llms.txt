@@ -1,6 +1,6 @@
 # Bean Execution Gateway
 
-Bean Execution Gateway is a public beta POC for routing outcomes to the right agent path before compute runs.
+Bean Execution Gateway is a public beta POC for routing an outcome before an agent spends, posts, or runs.
 
 Live demo: https://bean-execution-gateway-poc.onrender.com
 

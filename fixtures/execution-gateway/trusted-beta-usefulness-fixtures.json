@@ -1,0 +1,112 @@
+{
+  "schema_version": "bean.trusted_beta_usefulness_fixtures.v1",
+  "description": "Synthetic trusted-beta usefulness fixtures for measuring whether route decisions are useful, not only policy-correct. These are public/synthetic only and do not represent real beta feedback.",
+  "fixtures": [
+    {
+      "id": "beta_public_issue_existing_path",
+      "persona": "developer_tool_builder",
+      "expected_policy_state": "allowed",
+      "expected_path": "public_open_source_path",
+      "expected_route_useful": true,
+      "expected_reason_code": "routed_to_useful_path",
+      "input": {
+        "outcome": {
+          "goal": "Find and evaluate an existing public open-source agent path for a public GitHub issue before building anything new.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "agent_path_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/issues/501"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "beta_public_dataset_owned_proof",
+      "persona": "automation_operator",
+      "expected_policy_state": "allowed",
+      "expected_path": "owned_agent_local_proof",
+      "expected_route_useful": true,
+      "expected_reason_code": "routed_to_useful_path",
+      "input": {
+        "outcome": {
+          "goal": "Use our owned local agent to classify a public dataset and produce a proof packet.",
+          "task_type": "non_code_task",
+          "desired_artifact": "proof_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-datasets/support-intents"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "beta_build_when_no_public_path",
+      "persona": "agent_platform_founder",
+      "expected_policy_state": "allowed",
+      "expected_path": "build_new_agent_decision",
+      "expected_route_useful": true,
+      "expected_reason_code": "would_build_manually",
+      "input": {
+        "outcome": {
+          "goal": "Build a dedicated parser when no existing public path fits this public RFQ document set.",
+          "task_type": "non_code_task",
+          "desired_artifact": "build_decision_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-rfq-examples"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "beta_block_private_context",
+      "persona": "security_reviewer",
+      "expected_policy_state": "blocked",
+      "expected_path": null,
+      "expected_route_useful": true,
+      "expected_reason_code": "unsafe_or_private_blocked",
+      "input": {
+        "outcome": {
+          "goal": "Use a private repo issue and local file to pick the best agent path.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "blocked_packet"
+        },
+        "context_refs": [
+          "private://github/example/internal/issues/22",
+          "file:///tmp/private-notes.md"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "beta_gate_public_post",
+      "persona": "community_manager",
+      "expected_policy_state": "approval_required",
+      "expected_path": "public_open_source_path",
+      "expected_route_useful": true,
+      "expected_reason_code": "blocked_correctly",
+      "input": {
+        "outcome": {
+          "goal": "Find the existing public agent path, then leave a public reply with the recommendation.",
+          "task_type": "public_research",
+          "desired_artifact": "approval_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/discussions/52"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    }
+  ]
+}

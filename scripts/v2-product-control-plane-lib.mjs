@@ -320,6 +320,21 @@ function privateSignal(input = {}) {
   return secretLikePattern.test(JSON.stringify(input || {}));
 }
 
+function inferRoutingIntent(text) {
+  if (/\b(?:owned|local|internal|in-house|our agent|my agent|requester-hosted|gateway-hosted)\b/i.test(text)) {
+    return 'owned_agent';
+  }
+  if (/\b(?:build|create|write|design|implement|generate)\b.*\b(?:new|custom|bespoke|from scratch|dedicated)\b.*\b(?:agent|workflow|tool|system|parser|pipeline|adapter)\b/i.test(text)
+    || /\b(?:no existing|nothing available|must build|build-vs-buy|build vs buy|no available public path|no existing public path)\b/i.test(text)) {
+    return 'build_decision';
+  }
+  if (/\b(?:use|reuse|find|inspect|evaluate|route to)\b.*\b(?:public|open[-\s]?source|existing|available|github|library|benchmark|dataset|issue)\b/i.test(text)
+    || /\b(?:public|open[-\s]?source|existing|available)\b.*\b(?:agent|path|tool|workflow|implementation|pattern)\b/i.test(text)) {
+    return 'public_path';
+  }
+  return 'owned_agent';
+}
+
 function metadataEvent(kind, payload = {}) {
   return {
     schema_version: 'bean.v2.product_event.v1',
@@ -337,20 +352,23 @@ function classifyOutcome(input = {}) {
   const outcome = input.outcome && typeof input.outcome === 'object' ? input.outcome : {};
   const requestedTaskType = safeEnum(outcome.task_type, allowedTaskTypes, 'agent_task_triage');
   const text = JSON.stringify({ outcome, context_refs: input.context_refs || [] });
+  const routingIntent = inferRoutingIntent(text);
   if (privateSignal({ outcome, context_refs: input.context_refs || [] })) {
     return {
       task_type: requestedTaskType,
       sensitivity: 'blocked_private_or_secret_like',
       policy_state: 'blocked',
       blocked_reasons: ['private_or_secret_like_input'],
+      routing_intent: routingIntent,
     };
   }
-  if (/\b(?:pay|paid|purchase|subscribe|post|submit|comment|claim|apply)\b/i.test(text)) {
+  if (/\b(?:pay|paid|purchase|subscribe|post|submit|comment|claim|apply|login|log in|sign in|authenticate|reserve|public reply|leave\s+(?:a|an)?\s*(?:public\s+)?(?:comment|reply|message|note)|reply\s+(?:on|to)\s+(?:a|the)?\s*(?:public\s+)?(?:discussion|thread|issue))\b/i.test(text)) {
     return {
       task_type: requestedTaskType,
       sensitivity: 'public_or_synthetic',
       policy_state: 'approval_required',
       blocked_reasons: ['potential_external_write_or_spend_requires_operator'],
+      routing_intent: routingIntent,
     };
   }
   return {
@@ -358,10 +376,24 @@ function classifyOutcome(input = {}) {
     sensitivity: 'public_or_synthetic',
     policy_state: 'allowed',
     blocked_reasons: [],
+    routing_intent: routingIntent,
   };
 }
 
 function routeCandidates(classification) {
+  const intent = classification.routing_intent || 'owned_agent';
+  const boost = (pathId, scores) => {
+    if (intent === 'public_path' && pathId === 'public_open_source_path') {
+      return { quality_score: 84, speed_score: 86, risk_score: classification.policy_state === 'allowed' ? 92 : 58 };
+    }
+    if (intent === 'build_decision' && pathId === 'build_new_agent_decision') {
+      return { quality_score: 90, speed_score: 78, risk_score: classification.policy_state === 'allowed' ? 90 : 58 };
+    }
+    if (intent === 'owned_agent' && pathId === 'owned_agent_local_proof') {
+      return { quality_score: 78, speed_score: 86, risk_score: classification.policy_state === 'allowed' ? 94 : 60 };
+    }
+    return scores;
+  };
   const base = [
     {
       path_id: 'owned_agent_local_proof',
@@ -412,12 +444,27 @@ function routeCandidates(classification) {
       reason: 'External supplier execution remains blocked until identity, payment, dispute, and legal gates exist.',
     },
   ];
-  return base.map((candidate) => ({
-    ...candidate,
-    total_score: candidate.quality_score == null
-      ? null
-      : Math.round((candidate.quality_score * 0.35) + (candidate.speed_score * 0.2) + (candidate.cost_score * 0.25) + (candidate.risk_score * 0.2)),
-  }));
+  return base.map((candidate) => {
+    const adjusted = {
+      ...candidate,
+      routing_intent_match: (
+        (intent === 'owned_agent' && candidate.path_id === 'owned_agent_local_proof')
+        || (intent === 'public_path' && candidate.path_id === 'public_open_source_path')
+        || (intent === 'build_decision' && candidate.path_id === 'build_new_agent_decision')
+      ),
+      ...boost(candidate.path_id, {
+        quality_score: candidate.quality_score,
+        speed_score: candidate.speed_score,
+        risk_score: candidate.risk_score,
+      }),
+    };
+    return {
+      ...adjusted,
+      total_score: adjusted.quality_score == null
+        ? null
+        : Math.round((adjusted.quality_score * 0.35) + (adjusted.speed_score * 0.2) + (adjusted.cost_score * 0.25) + (adjusted.risk_score * 0.2)),
+    };
+  });
 }
 
 function chooseCandidate(candidates) {
@@ -500,6 +547,7 @@ function createProductControlPlane({ memoryOnly = true, eventLogPath } = {}) {
       sensitivity: classification.sensitivity,
       policy_state: classification.policy_state,
       blocked_reasons: classification.blocked_reasons,
+      routing_intent: classification.routing_intent,
       context_ref_count: Array.isArray(input.context_refs) ? input.context_refs.length : 0,
       context_ref_hashes: Array.isArray(input.context_refs)
         ? input.context_refs.map((ref) => stableHash(String(ref)).slice(0, 16)).slice(0, 12)
@@ -518,6 +566,7 @@ function createProductControlPlane({ memoryOnly = true, eventLogPath } = {}) {
       route_id: stableId('route', { demand_id: demand.demand_id, selected: selected?.path_id || 'none', at: Date.now() }),
       demand_id: demand.demand_id,
       policy_state: classification.policy_state,
+      routing_intent: classification.routing_intent,
       selected_path: selected,
       candidates,
       no_route_found: selected == null,

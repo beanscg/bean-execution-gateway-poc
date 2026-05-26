@@ -6,7 +6,7 @@ Bean Execution Gateway is a route-decision layer for agents. It accepts an outco
 
 The POC demonstrates the control plane for source-agnostic agent execution. Demand may come from GitHub, chat, browser agents, workflow runners, app wrappers, or internal automation. Supply may eventually include owned agents, local runners, workflow tools, and external supplier networks. V0 does not call external suppliers.
 
-The clearest positioning is: route an outcome to the right agent path before compute runs. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, a build decision, or a blocked path before anyone pays for compute or dispatches a supplier.
+The clearest positioning is: route an outcome before an agent spends, posts, or runs. A requester asks for an outcome. BEAN decides whether to route to an owned agent, a public/open path, a build decision, or a blocked path before anyone pays for compute, posts publicly, or dispatches a supplier.
 
 Search phrases: agent execution gateway, agent routing gateway, outcome to agent path, build vs use agent decision, source-agnostic agent marketplace control plane, public demand agent proof runner, metadata-only agent feedback, zero-spend agent execution guardrails.
 

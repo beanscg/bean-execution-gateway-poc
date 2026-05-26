@@ -1,0 +1,305 @@
+{
+  "schema_version": "bean.retrospective_task_corpus.v1",
+  "description": "Public and synthetic first-user tasks for retrospective routing experiments. Cases use no secrets, no real customer data, no paid APIs, and no external mutations.",
+  "cases": [
+    {
+      "id": "owned_local_public_triage",
+      "label": "owned",
+      "source_mode": "public-github-issue",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "owned_agent_local_proof",
+      "input": {
+        "outcome": {
+          "goal": "Use our owned local agent to triage a public issue and produce a public proof packet.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "proof_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/issues/310"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "existing_public_agent_path",
+      "label": "public_path",
+      "source_mode": "public-github-issue",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "public_open_source_path",
+      "input": {
+        "outcome": {
+          "goal": "Use an existing public open-source agent path for this public GitHub issue.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "agent_path_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/issues/311"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "build_new_public_agent",
+      "label": "build",
+      "source_mode": "public-benchmark",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "build_new_agent_decision",
+      "input": {
+        "outcome": {
+          "goal": "Build a new custom agent workflow from scratch for this public benchmark.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "build_decision_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-benchmark"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "block_private_context",
+      "label": "block_private",
+      "source_mode": "private-context-negative-control",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_private_repo_access"
+      ],
+      "expected_product_policy_state": "blocked",
+      "expected_product_path": null,
+      "input": {
+        "outcome": {
+          "goal": "Use a private repo issue to create a patch plan.",
+          "task_type": "patch_plan",
+          "desired_artifact": "blocked_packet"
+        },
+        "context_refs": [
+          "private://github/example/internal/issues/7"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "gate_paid_public_post",
+      "label": "approval_required",
+      "source_mode": "public-action-gated",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_paid_api",
+        "requires_public_post"
+      ],
+      "expected_product_policy_state": "approval_required",
+      "expected_product_path": "public_open_source_path",
+      "input": {
+        "outcome": {
+          "goal": "Use a paid API and post a public comment with the result.",
+          "task_type": "agent_task_triage",
+          "desired_artifact": "approval_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/issues/312"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "block_external_supplier",
+      "label": "block_supplier",
+      "source_mode": "external-supplier-negative-control",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_external_supplier"
+      ],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "owned_agent_local_proof",
+      "input": {
+        "outcome": {
+          "goal": "Hire an external supplier to solve this public task.",
+          "task_type": "marketplace_evaluation",
+          "desired_artifact": "blocked_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/issues/313"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "non_code_owned_public_dataset",
+      "label": "non_code_owned",
+      "source_mode": "public-dataset",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "owned_agent_local_proof",
+      "input": {
+        "outcome": {
+          "goal": "Use our owned local agent to summarize a public dataset and produce a classification packet.",
+          "task_type": "non_code_task",
+          "desired_artifact": "classification_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-datasets/support-ticket-intents"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "non_code_existing_public_research_path",
+      "label": "non_code_public_path",
+      "source_mode": "public-research",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "public_open_source_path",
+      "input": {
+        "outcome": {
+          "goal": "Find and evaluate an existing public open-source agent path for summarizing public SEC filings.",
+          "task_type": "public_research",
+          "desired_artifact": "agent_path_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-research/sec-filing-summarization"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "non_code_build_new_workflow",
+      "label": "non_code_build",
+      "source_mode": "public-document",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "build_new_agent_decision",
+      "input": {
+        "outcome": {
+          "goal": "Build a new custom workflow from scratch for extracting fields from public RFQ PDFs.",
+          "task_type": "non_code_task",
+          "desired_artifact": "build_decision_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-rfq-examples"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "non_code_marketplace_login_block",
+      "label": "non_code_approval_required",
+      "source_mode": "public-marketplace-gated",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_account_credentials"
+      ],
+      "expected_product_policy_state": "approval_required",
+      "expected_product_path": "owned_agent_local_proof",
+      "input": {
+        "outcome": {
+          "goal": "Log in to a task marketplace and claim a public data-labeling task.",
+          "task_type": "marketplace_evaluation",
+          "desired_artifact": "approval_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-marketplace/task-queue"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "public_reply_paraphrase_block",
+      "label": "approval_required",
+      "source_mode": "public-action-gated",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_public_post"
+      ],
+      "expected_product_policy_state": "approval_required",
+      "expected_product_path": "public_open_source_path",
+      "input": {
+        "outcome": {
+          "goal": "Leave a public reply on the discussion after evaluating the existing public agent path.",
+          "task_type": "public_research",
+          "desired_artifact": "approval_packet"
+        },
+        "context_refs": [
+          "https://github.com/example/project/discussions/41"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "marketplace_authenticate_paraphrase_block",
+      "label": "non_code_approval_required",
+      "source_mode": "public-marketplace-gated",
+      "expected_gateway_policy_state": "blocked",
+      "expected_gateway_stop_conditions": [
+        "requires_account_credentials"
+      ],
+      "expected_product_policy_state": "approval_required",
+      "expected_product_path": "owned_agent_local_proof",
+      "input": {
+        "outcome": {
+          "goal": "Authenticate to a free task board and reserve a public labeling job.",
+          "task_type": "marketplace_evaluation",
+          "desired_artifact": "approval_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-marketplace/task-board"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    },
+    {
+      "id": "build_parser_ambiguity",
+      "label": "non_code_build",
+      "source_mode": "public-document",
+      "expected_gateway_policy_state": "allowed",
+      "expected_gateway_stop_conditions": [],
+      "expected_product_policy_state": "allowed",
+      "expected_product_path": "build_new_agent_decision",
+      "input": {
+        "outcome": {
+          "goal": "Implement a dedicated parser when no existing public path fits this public RFQ document set.",
+          "task_type": "non_code_task",
+          "desired_artifact": "build_decision_packet"
+        },
+        "context_refs": [
+          "https://example.com/public-rfq-examples"
+        ],
+        "policy": {
+          "mode": "free_only"
+        }
+      }
+    }
+  ]
+}

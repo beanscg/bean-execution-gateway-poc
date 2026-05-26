@@ -29,6 +29,7 @@
     "gateway:server:hosted-demo": "BEAN_GATEWAY_HOSTED_DEMO=1 node scripts/execution-gateway-server.mjs --host 0.0.0.0 --port ${PORT:-8787}",
     "gateway:smoke:hosted": "node scripts/execution-gateway.mjs hosted-smoke --base-url ${BEAN_GATEWAY_BASE_URL:-http://127.0.0.1:8787}",
     "gateway:verify": "node scripts/execution-gateway.mjs verify --out dist/execution-gateway/verification",
-    "launch:readiness": "node scripts/product-launch-readiness.mjs --out dist/execution-gateway/product-launch-readiness.json"
+    "launch:readiness": "node scripts/product-launch-readiness.mjs --out dist/execution-gateway/product-launch-readiness.json",
+    "retrospective:experiments": "node scripts/retrospective-experiments.mjs --out dist/execution-gateway/retrospective-experiments"
   }
 }

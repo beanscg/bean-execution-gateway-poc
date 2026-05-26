@@ -70,8 +70,8 @@ const PROMPT_INJECTION_PATTERN = /\b(?:ignore (?:all )?(?:previous|prior) instru
 const REGULATED_PATTERN = /\b(?:hipaa|pci|gdpr|ssn|social security|bank account|medical record|patient data|cardholder)\b/i;
 const UNSAFE_PATTERN = /\b(?:credential theft|phishing kit|malware|ransomware|steal passwords|bypass authentication|spam campaign|exploit a live target)\b/i;
 const PAID_PATTERN = /\b(?:paid api|subscription|buy credits|purchase|paywall|requires payment|non-free|costs?\s+\$|spend\s+\$)\b/i;
-const PUBLIC_POST_PATTERN = /\b(?:post a comment|submit a pr|open a pull request|publish|tweet|reddit post|send a message|email the maintainer|outreach)\b/i;
-const ACCOUNT_PATTERN = /\b(?:login|sign in|account credentials|oauth|kyc|wallet private key|api key required|connect account)\b/i;
+const PUBLIC_POST_PATTERN = /\b(?:post\s+(?:a|an)?\s*(?:public\s+)?(?:comment|reply|message|post)|leave\s+(?:a|an)?\s*(?:public\s+)?(?:comment|reply|message|note)|reply\s+(?:on|to)\s+(?:a|the)?\s*(?:public\s+)?(?:discussion|thread|issue)|submit a pr|open a pull request|publish|tweet|reddit post|send a message|email the maintainer|outreach)\b/i;
+const ACCOUNT_PATTERN = /\b(?:login|log in|sign in|sign into|authenticate|account credentials|oauth|kyc|wallet private key|api key required|connect account)\b/i;
 const EXTERNAL_SUPPLIER_PATTERN = /\b(?:external supplier|hire a freelancer|delegate to marketplace|remote agent|external agent|paid worker)\b/i;
 
 function asArray(value) {

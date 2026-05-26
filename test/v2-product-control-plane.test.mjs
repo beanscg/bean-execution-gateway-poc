@@ -68,6 +68,32 @@ test('v2 outcome intake routes public work without storing raw prompt data', () 
   assert.equal(result.learning_signal.raw_prompt_required_for_replay, false);
 });
 
+test('v2 route selection follows public path and build intent', () => {
+  const service = createProductControlPlane({ memoryOnly: true });
+
+  const publicPath = service.submitOutcome({
+    outcome: {
+      goal: 'Use an existing public open-source agent path for this public GitHub issue.',
+      task_type: 'agent_task_triage',
+    },
+    context_refs: ['https://github.com/example/project/issues/444'],
+  });
+  assert.equal(publicPath.demand.routing_intent, 'public_path');
+  assert.equal(publicPath.decision.selected_path.path_id, 'public_open_source_path');
+  assert.equal(publicPath.decision.selected_path.routing_intent_match, true);
+
+  const buildPath = service.submitOutcome({
+    outcome: {
+      goal: 'Build a new custom agent workflow from scratch for a public benchmark.',
+      task_type: 'agent_task_triage',
+    },
+    context_refs: ['https://example.com/public-benchmark'],
+  });
+  assert.equal(buildPath.demand.routing_intent, 'build_decision');
+  assert.equal(buildPath.decision.selected_path.path_id, 'build_new_agent_decision');
+  assert.equal(buildPath.decision.selected_path.routing_intent_match, true);
+});
+
 test('v2 controls block private-like input and paid execution while preserving metadata learning', () => {
   const service = createProductControlPlane({ memoryOnly: true });
 

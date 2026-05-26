@@ -164,13 +164,19 @@ async function runHostedSmoke({ baseUrl }) {
   ].every((header) => Boolean(health.headers?.[header])), health.headers);
 
   const homepage = await fetchText(baseUrl, '/');
+  const homepageHasCurrentHeadline = homepage.text.includes('Route an outcome before an agent spends, posts, or runs.');
+  const homepageHasPreviousHeadline = homepage.text.includes('Find the execution path before an agent runs.');
   addCheck('homepage_first_user_demo_available', homepage.status === 200
-    && homepage.text.includes('Find the execution path before an agent runs.')
+    && (homepageHasCurrentHeadline || homepageHasPreviousHeadline)
     && homepage.text.includes('Use public path')
     && homepage.text.includes('Use or build')
     && homepage.text.includes('Block risky work')
     && homepage.text.includes('Decision memo')
-    && !homepage.text.includes('Product Delivery Contract'), { status: homepage.status });
+    && !homepage.text.includes('Product Delivery Contract'), {
+    status: homepage.status,
+    current_headline_live: homepageHasCurrentHeadline,
+    previous_headline_live: homepageHasPreviousHeadline,
+  });
 
   const ready = await fetchJson(baseUrl, '/v0/ready');
   addCheck('readiness_public_demo_not_customer_ready', ready.status === 200

@@ -89,7 +89,7 @@ assertContains(blockerText, /private|tenant|customer/i, 'blocked gates must ment
 assertContains(blockerText, /legal|terms|liability|KYC|tax/i, 'blocked gates must mention legal/commercial readiness', failures);
 
 const readme = readText('README.md');
-assertContains(readme, /Route an outcome to the right agent path before compute runs\./, 'README must open with launch positioning', failures);
+assertContains(readme, /Route an outcome before an agent spends, posts, or runs\./, 'README must open with launch positioning', failures);
 assertContains(readme, /Beta Boundary/, 'README must expose beta boundary', failures);
 assertContains(readme, /Agent And Developer Quickstart/, 'README must include agent/developer quickstart', failures);
 

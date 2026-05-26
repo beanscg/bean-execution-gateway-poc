@@ -51,7 +51,7 @@ function requestJson(baseUrl, pathname, { method = 'GET', body } = {}) {
 test('public demo first viewport is first-user oriented', () => {
   const html = fs.readFileSync(new URL('../assets/execution-gateway-demo/index.html', import.meta.url), 'utf8');
 
-  assert.match(html, /Find the execution path before an agent runs\./);
+  assert.match(html, /Route an outcome before an agent spends, posts, or runs\./);
   assert.match(html, /Use public path/);
   assert.match(html, /Use or build/);
   assert.match(html, /Block risky work/);
